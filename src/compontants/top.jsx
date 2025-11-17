@@ -1,19 +1,21 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import '../App.css';
 import ArticleBox from "./articleBox.jsx";
-import google from "../image/search.png";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import user from "../icons/user_10374408.png";
 import {auth} from "./firebase.js";
 import { emit,on, off  } from './eventBus';
+import { Link, useNavigate } from "react-router-dom";
 
 
 const Top = () => {
+    const navigate = useNavigate();
+  
   const [searchTerm, setSearchTerm] = useState('');
+  const [User, setUser] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Search term:', searchTerm);
     emit('sendValue', searchTerm); // هذا ما سيُرسل إلى ArticleBox
   };
   const handleDelete = (e) => {
@@ -22,21 +24,34 @@ const Top = () => {
   };
 
   const handleLogin = () => {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        console.log("User logged in:", user);
-      })
-      .catch((error) => {
-        console.error("Login error:", error);
-      });
+    navigate(`/p/${User.id}`)
   };
+
+useEffect(() => {
+  const storedUser = localStorage.getItem("me");
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser);
+      setUser(parsed);
+    } catch (error) {
+      console.error("❌ Failed to parse user data:", error);
+    }
+  } else {
+    console.warn("⚠️ No user data found in localStorage");
+  }
+}, []); 
+
 
   return (
     <header className="top">
-        <button onClick={()=>{handleLogin()}} className="login-button"> Login <img src={google} /></button>
-
+        <button onClick={()=>{handleLogin()}} className="login-button"> <img style={{ width: "40px",
+    height: "40px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "1px solid #1da1f2",
+    cursor: "pointer" }}
+ src={User.imgProfile || user} /></button>
+{/* 
       <div className="search-container">
         <form className="wrap" onSubmit={handleSubmit}>
           <div className="search">
@@ -71,12 +86,12 @@ const Top = () => {
             </button>
           </div>
         </form>
-      </div>
+      </div> */}
      
 
       <div className="logo-center">
         <div className="img"></div>
-        <div className="company_name"><a href="#"> bypen </a></div>
+        <div className="company_name"><a href="/"> bayan </a></div>
       </div>
     </header>
   );

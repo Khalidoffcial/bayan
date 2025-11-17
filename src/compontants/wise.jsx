@@ -41,7 +41,7 @@ export default function QuoteSlider() {
 
       setIndex(newIndex);
       setimage(images[Math.floor(Math.random() * images.length)]);
-    }, 0.5 * 60 * 1000); // كل 5 دقائق
+    }, 2 * 60 * 1000); // كل 5 دقائق
 
     return () => clearInterval(interval);
   }, [index]);

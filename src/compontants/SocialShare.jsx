@@ -4,7 +4,7 @@ import whatsapp from "../image/apple.png";
 import telegram from "../image/telegram.png";
 import linkedin from "../image/linkedin.png";
 import x from "../image/twitter.png";
-import { li } from 'framer-motion/client';
+import { li } from 'framer-motion';
 
 const SocialShare = ({ title, text, url, platforms = ['facebook', 'twitter', 'whatsapp'] }) => {
   const encodedUrl = encodeURIComponent(url);

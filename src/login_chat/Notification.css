@@ -1,0 +1,37 @@
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #333;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideIn 0.3s forwards, fadeOut 0.3s forwards 2.7s;
+  font-family: Arial, sans-serif;
+  z-index: 1000;
+}
+
+.notification_info {
+  background-color: #2196f3;
+}
+
+.notification_error {
+  background-color: #f44336;
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}

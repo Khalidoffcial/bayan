@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation,useParams, useNavigate } from "react-router-dom";
 import { database } from './firebase';
 import { ref, onValue } from "firebase/database";
 import Top from './top';
@@ -17,28 +17,39 @@ const Articlereading = () => {
   const [imageUrl, setImageUrl] = useState('');
   const navigate = useNavigate();
   const articleRef = useRef(null);
+   const location = useLocation();
 
-  useEffect(() => {
-    if (!articleId) return;
 
-    const artcleref = ref(database, `articles/article${articleId}`);
-    onValue(artcleref, (snapshot) => {
-      const data = snapshot.val();
-      if (data) SetdataArticle(data);
-    });
+  // useEffect(() => {
+  //   if (!articleId) return;
 
-    const fetchImageUrl = async (artid) => {
-      try {
-        const imgRef = storageRef(storage, `images/image${artid}`);
-        const url = await getDownloadURL(imgRef);
-        setImageUrl(url);
-      } catch (error) {
-        console.error('Error fetching image URL:', error);
-      }
-    };
+  //   const artcleref = ref(database, `articles/article${articleId}`);
+  //   onValue(artcleref, (snapshot) => {
+  //     const data = snapshot.val();
+  //     if (data) SetdataArticle(data);
+  //   });
 
-    fetchImageUrl(articleId);
-  }, [articleId]);
+  //   const fetchImageUrl = async (artid) => {
+  //     try {
+  //       const imgRef = storageRef(storage, `images/image${artid}`);
+  //       const url = await getDownloadURL(imgRef);
+  //       setImageUrl(url);
+  //     } catch (error) {
+  //       console.error('Error fetching image URL:', error);
+  //     }
+  //   };
+
+  //   fetchImageUrl(articleId);
+  // }, [articleId]);
+
+
+useEffect(()=>{
+    SetdataArticle(location.state?.DataArticle);
+
+},[])
+
+
+
 
   const handleback = () => navigate(-1);
 

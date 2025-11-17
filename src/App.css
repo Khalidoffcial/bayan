@@ -15,7 +15,10 @@
     background: #d9d9d9;
     font-family: "Zain", sans-serif;
     overflow-x: hidden;
+    font-weight:900;
+    direction: ltr;
   }
+  
   header.top {
     position: fixed;
     top: 0;
@@ -170,20 +173,18 @@
   .login-button {
     position: relative;
     display: flex;
-    background-color: #000000;
+    background-color: #d6d6d6;
     color: white;
     border: none;
     border-radius: 20px;
-    padding: 8px 16px;
+    padding: 1px 1px;
     cursor: pointer;
-    font-size: 15px;
     transition: background-color 0.3s ease;
     align-items: center;
+    width:min-content;
+    hight:min-content;
   }
-  button img{
-    height: 20px;
-    margin: 1px;
-  }
+
   .login-button:hover {
     background-color: #2e2e2e;
   }
@@ -252,7 +253,7 @@ i {
     display: block;
     width: max-content;
 }
-
+/* 
 .service_home {
     padding-top: 40px;
     width: 100%;
@@ -291,7 +292,7 @@ i {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    /* gap: 10px 40px; */
+    /* gap: 10px 40px; 
     border-radius: 4px;
     align-self: center;
     justify-content: center;
@@ -313,7 +314,7 @@ i {
     max-width: 92%;
     max-height: 350px;
     flex-direction: row-reverse;
-    /* max-height: 20%; */
+    /* max-height: 20%; 
     background-color: #0e0e0e;
     display: flex;
     border-radius: 5px;
@@ -465,7 +466,7 @@ i {
     background-color: #ff6600;
     font-size: 50px;
     margin: 2%;
-}
+} */
 
 .img-slider {
     margin-top: 50px;
@@ -724,6 +725,8 @@ i {
     background-color: #e0e0e0;
   }
   
+
+
 
 @media (min-width:900px)and(max-width:1150px) {
     nav ul li a {

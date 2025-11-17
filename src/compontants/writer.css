@@ -1,0 +1,674 @@
+/* //writer file */
+
+
+/* الزر الأساسي */
+
+.WriterBox {
+    width: 40%;
+    min-width: 280px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+    transition: 0.3s;
+    font-family: "Inter", sans-serif;
+    height: 50px;
+    border-radius: 8px;
+    background-color: #585858;
+    color: rgb(199, 199, 199);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    cursor: text;
+}
+
+
+/* نافذة الكتابة */
+
+.WriterModal {
+    position: fixed;
+    top: 5%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    background: #1b1b1b;
+    color: #fff;
+    width: 80%;
+    height: 90%;
+    max-width: 90%;
+    border-radius: 12px;
+    padding: 25px;
+    z-index: 1001;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    font-family: "Inter", sans-serif;
+    opacity: 0;
+    transition: all 0.3s ease;
+    overflow-y: scroll;
+}
+
+
+/* الهيدر */
+
+.WriterHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.WriterHeader h3 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #aaa;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.closeBtn:hover {
+    color: #fff;
+}
+
+
+/* اختيار نوع المحتوى */
+
+.TypeSelector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.TypeSelector button {
+    background: #535353;
+    border: none;
+    color: #ccc;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.TypeSelector button.active {
+    background: #007aff;
+    color: #fff;
+}
+
+
+/* الإدخال */
+
+.WriterInput {
+    width: 100%;
+    min-height: 120px;
+    /* أقل ارتفاع مريح للكتابة */
+    max-height: 350px;
+    /* أقصى ارتفاع قبل ظهور الـ scroll */
+    background: #222;
+    color: #fff;
+    padding: 12px 14px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    resize: vertical;
+    /* يسمح فقط بتغيير الارتفاع يدويًا */
+    outline: none;
+    font-size: 15px;
+    font-family: "Inter", sans-serif;
+    line-height: 1.6;
+    transition: all 0.2s ease;
+    overflow-y: auto;
+    /* لو النص زاد، يظهر scroll ناعم */
+}
+
+
+/* الأزرار السفلية */
+
+.WriterActions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.cancelBtn {
+    background: #444;
+    color: #ccc;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.submitBtn {
+    background: #007aff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+/* الخلفية */
+
+.Backdrop {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 1000;
+}
+
+
+/* Upload Section */
+
+.upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+
+/* زر رفع الصور */
+
+.upload-card {
+    width: 180px;
+    height: 180px;
+    border: 2px dashed #555;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    cursor: pointer;
+    transition: 0.3s;
+    background: #1b1b1b;
+}
+
+.upload-card:hover {
+    border-color: #0af;
+    color: #0af;
+    background: #222;
+    transform: scale(1.05);
+}
+
+
+/* الكروت اللي فيها الصور */
+
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+
+/* كل كارت صورة */
+
+.image-card {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #111;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.image-card:hover {
+    transform: scale(1.03);
+}
+
+.image-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* زر الحذف */
+
+.remove-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: #fff;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.remove-btn:hover {
+    background: rgba(255, 0, 0, 0.7);
+}
+
+
+/* عرض الصورة بالحجم الكامل */
+
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.fullscreen-image {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+    object-fit: contain;
+}
+
+
+/* //writer file */
+
+
+/* الزر الأساسي */
+
+.WriterBox {
+    width: 40%;
+    min-width: 280px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+    transition: 0.3s;
+    font-family: "Inter", sans-serif;
+    height: 50px;
+    border-radius: 8px;
+    background-color: #585858;
+    color: rgb(199, 199, 199);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 900;
+    cursor: text;
+}
+
+
+/* نافذة الكتابة */
+
+.WriterModal {
+    position: fixed;
+    top: 5%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    background: #1b1b1b;
+    color: #fff;
+    width: 80%;
+    height: 90%;
+    max-width: 90%;
+    border-radius: 12px;
+    padding: 25px;
+    z-index: 1001;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    font-family: "Inter", sans-serif;
+    opacity: 0;
+    transition: all 0.3s ease;
+    overflow-y: scroll;
+}
+
+
+/* الهيدر */
+
+.WriterHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.WriterHeader h3 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #aaa;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.closeBtn:hover {
+    color: #fff;
+}
+
+
+/* اختيار نوع المحتوى */
+
+.TypeSelector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.TypeSelector button {
+    background: #333;
+    border: none;
+    color: #ccc;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.TypeSelector button.active {
+    background: #007aff;
+    color: #fff;
+}
+
+
+/* الإدخال */
+
+.WriterInput {
+    width: 100%;
+    min-height: 120px;
+    /* أقل ارتفاع مريح للكتابة */
+    max-height: 350px;
+    /* أقصى ارتفاع قبل ظهور الـ scroll */
+    background: #222;
+    color: #fff;
+    padding: 12px 14px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    resize: vertical;
+    /* يسمح فقط بتغيير الارتفاع يدويًا */
+    outline: none;
+    font-size: 15px;
+    font-family: "Inter", sans-serif;
+    line-height: 1.6;
+    transition: all 0.2s ease;
+    overflow-y: auto;
+    /* لو النص زاد، يظهر scroll ناعم */
+}
+
+.sm_WriterInput {
+    width: 100%;
+    height: 50px;
+    /* أقل ارتفاع مريح للكتابة */
+    /* أقصى ارتفاع قبل ظهور الـ scroll */
+    background: #222;
+    color: #fff;
+    padding: 12px 14px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    resize: vertical;
+    /* يسمح فقط بتغيير الارتفاع يدويًا */
+    outline: none;
+    font-size: 15px;
+    font-family: "Inter", sans-serif;
+    line-height: 1.6;
+    transition: all 0.2s ease;
+    overflow-y: auto;
+    /* لو النص زاد، يظهر scroll ناعم */
+    margin-bottom: 10px;
+}
+
+.container_dateSeries {
+    display: flex;
+    direction: ltr;
+}
+
+.container_dateSeries input {
+    width: 30%;
+}
+
+.container_dateSeries .series-section {
+    width: 70%;
+}
+
+.series-section select {
+    width: 40%;
+}
+
+.series-section input {
+    width: 50%;
+}
+
+.series-section button {
+    width: 10%;
+    background: #535353;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    background: #007aff;
+    color: #fff;
+}
+
+
+/* الأزرار السفلية */
+
+.WriterActions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.cancelBtn {
+    background: #444;
+    color: #ccc;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.submitBtn {
+    background: #007aff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+/* الخلفية */
+
+.Backdrop {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 1000;
+}
+
+
+/* Upload Section */
+
+.upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+
+/* زر رفع الصور */
+
+.upload-card {
+    width: 180px;
+    height: 180px;
+    border: 2px dashed #555;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    cursor: pointer;
+    transition: 0.3s;
+    background: #1b1b1b;
+}
+
+.upload-card:hover {
+    border-color: #0af;
+    color: #0af;
+    background: #222;
+    transform: scale(1.05);
+}
+
+
+/* الكروت اللي فيها الصور */
+
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+
+/* كل كارت صورة */
+
+.image-card {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #111;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.image-card:hover {
+    transform: scale(1.03);
+}
+
+.image-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* زر الحذف */
+
+.remove-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: #fff;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.remove-btn:hover {
+    background: rgba(255, 0, 0, 0.7);
+}
+
+
+/* عرض الصورة بالحجم الكامل */
+
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.fullscreen-image {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+    object-fit: contain;
+}
+
+.ck.ck-editor__main {
+    border-radius: 12px;
+    border: 1px solid #ccc !important;
+    overflow: hidden;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.ck.ck-editor__editable {
+    min-height: 250px !important;
+    padding: 16px;
+    font-size: 16px;
+    line-height: 1.6;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    color: #c5c5c5 !important;
+}
+
+.ck.ck-editor__editable:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+.ck.ck-toolbar {
+    border-radius: 12px 12px 0 0 !important;
+    background: #f5f5f5 !important;
+    border-bottom: 1px solid #ddd !important;
+}
+
+.ck.ck-toolbar button.ck-button {
+    border-radius: 6px !important;
+    transition: all 0.2s ease;
+    color: white !important;
+}
+
+.ck.ck-toolbar button.ck-button:hover {
+    background: #007bff !important;
+    color: white !important;
+}
+
+
+/* ✨ Dark Mode */
+
+@media (prefers-color-scheme: dark) {
+    .ck.ck-editor__main {
+        background: #1e1e1e;
+        border: 1px solid #464646 !important;
+    }
+    .ck.ck-toolbar {
+        background: #2b2b2b !important;
+        color: #f5f5f5;
+        border: none;
+        /* border-color: #000000 !important; */
+    }
+    .ck.ck-editor__editable {
+        background: #1e1e1e !important;
+        color: #f0f0f0 !important;
+    }
+}

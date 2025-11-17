@@ -9,6 +9,7 @@ import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject,listAll } 
   import updata from "./refresh-page-option.png";
   import remove from './remove.png';
 // import ArticleBox from './articleBox.jsx';
+import { sendToClaude } from './cloudeApi.jsx';
 
 const AdminArticle = () => {
   const refIMG = useRef(null);
@@ -237,7 +238,12 @@ const AdminArticle = () => {
       fetchImages();
     }, []);
   
-  
+  // useEffect(()=>{
+  //   setImmediate(async () => {
+  //     const result = await sendToClaude("اكتبلي مقال عن الذكاء العاطفي في الحياة اليومية");
+  //     console.log(result);
+  //   },1000);
+  // },[])
   
   return (
     <>

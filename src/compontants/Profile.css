@@ -1,0 +1,237 @@
+.profile-container {
+    direction: ltr;
+    /* غيرها ل rtl عند دعم العربي */
+    max-width: 80%;
+    padding: 20px;
+    padding-top: 100px;
+    color: #222;
+background: #f7f7f7;
+    border-radius: 20px;}
+
+
+/* صورة البروفايل */
+
+.profile-pic-wrapper {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: auto;
+}
+
+.profile-pic {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #1da1f2;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.profile-pic:hover {
+    transform: scale(1.05);
+}
+
+
+/* Dropdown */
+
+.dropdown-menu {
+    position: absolute;
+    top: 120px;
+    left: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    z-index: 100;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    width: 100%;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: #f1f1f1;
+}
+
+.logout {
+    color: red;
+}
+
+
+/* Crop modal */
+
+.crop-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+}
+
+.save-btn {
+    display: flex;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #1da1f2;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    align-self: self-end;
+    justify-self: end;
+    z-index: 1;
+}
+
+.follow-btn {
+    display: flex;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #1da1f2;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    justify-self: center;
+    z-index: 1;
+}
+
+.follow-btn svg {
+    margin-right: 5px;
+}
+
+.unfollow-btn {
+    display: flex;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #ffffff;
+    border: none;
+    color: #1da1f2;
+    border-radius: 8px;
+    cursor: pointer;
+    justify-self: center;
+    z-index: 1;
+    font-weight: 600;
+}
+
+.unfollow-btn svg {
+    margin-right: 5px;
+}
+
+
+/* معلومات */
+
+.info {
+    margin: 20px auto;
+    text-align: center;
+}
+
+.editable {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.editable input {
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    padding: 0 2px;
+    font-size: 30px;
+    font-family: "Zain", sans-serif;
+}
+
+.editable textarea {
+    height: 40px;
+    min-width: max-content;
+    border: none;
+    border-radius: 10px;
+    padding: 0 2px;
+    font-size: 30px;
+    font-family: "Zain", sans-serif;
+}
+
+.editable .icon {
+    cursor: pointer;
+    color: #1da1f2;
+}
+
+
+/* إحصائيات */
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    font-weight: bold;
+    width: 80%;
+    justify-self: center;
+}
+
+
+/* Tabs */
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    border-bottom: 2px solid #ddd;
+}
+
+.tabs button {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.tabs button.active {
+    border-bottom: 3px solid #1da1f2;
+    color: #1da1f2;
+    font-weight: bold;
+}
+
+
+/* محتوى التاب */
+
+.tab-content {
+    padding: 20px;
+    font-size: 15px;
+}
+
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    /* backdrop-filter: blur(6px); */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    cursor: zoom-out;
+}
+
+.image-preview {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    cursor: auto;
+}
