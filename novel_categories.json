@@ -1,0 +1,28 @@
+{
+    "Genres": {
+        "Romance": ["love", "relationship", "heart", "romantic", "passion", "marriage", "affection", "crush", "desire", "couple", "dating", "flirt", "honeymoon", "love story", "partner"],
+        "Fantasy": ["magic", "dragon", "wizard", "sword", "kingdom", "myth", "hero", "adventure", "quest", "enchanted", "castle", "elven", "mythical", "fantasy world", "spell"],
+        "Mystery": ["murder", "detective", "crime", "investigation", "clue", "suspect", "mystery", "secret", "case", "evidence", "police", "forensic", "whodunit", "disappearance", "alibi"],
+        "Thriller": ["suspense", "danger", "chase", "spy", "terror", "fear", "action", "hacker", "crime", "mystery", "escape", "conspiracy", "detective", "kidnap", "assassin"],
+        "Adventure": ["journey", "explore", "travel", "survival", "quest", "expedition", "danger", "trek", "discover", "island", "mountain", "sea", "wilderness", "explorer", "voyage"],
+        "Science Fiction": ["space", "alien", "future", "robot", "technology", "time travel", "galaxy", "sci-fi", "cyber", "AI", "extraterrestrial", "universe", "spaceship", "planet", "innovation"]
+    },
+    "Themes": {
+        "Friendship": ["friend", "bond", "loyalty", "companionship", "support", "trust", "relationship", "team", "allies", "friends"],
+        "Revenge": ["revenge", "vengeance", "retaliation", "anger", "justice", "fight", "enemy", "betrayal", "payback", "grudge"],
+        "Coming of Age": ["growth", "maturity", "learning", "self-discovery", "teenager", "adolescent", "experience", "life lesson", "change", "development"],
+        "Courage": ["bravery", "heroic", "fearless", "risk", "battle", "strength", "challenge", "fight", "resolve", "perseverance"],
+        "Survival": ["survive", "danger", "life", "escape", "rescue", "adventure", "risk", "struggle", "endure", "threat"]
+    },
+    "Tone": {
+        "Suspenseful": ["suspense", "tense", "thrill", "mystery", "danger", "anticipation", "uncertainty", "fear", "cliffhanger", "unexpected"],
+        "Dark": ["dark", "gloomy", "horror", "tragic", "death", "sadness", "pain", "evil", "despair", "nightmare"],
+        "Humorous": ["funny", "comedy", "joke", "laugh", "humor", "sarcastic", "witty", "entertainment", "hilarious", "amusing"],
+        "Emotional": ["emotional", "tear", "heartfelt", "sad", "love", "passion", "sentimental", "touching", "compassion", "affection"]
+    },
+    "Purpose": {
+        "Entertainment": ["fun", "enjoy", "amuse", "exciting", "engaging", "thrill", "adventure", "entertainment", "story", "plot"],
+        "Social Commentary": ["society", "critique", "inequality", "justice", "culture", "politics", "change", "awareness", "lesson", "reflection"],
+        "Moral Teaching": ["lesson", "moral", "virtue", "ethics", "behavior", "principle", "guide", "teach", "wisdom", "value"]
+    }
+}
