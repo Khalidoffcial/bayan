@@ -1,4 +1,8 @@
 // services/contentService.js
+const dao = require("../datastore/Dao.js");
+const sign = require("../datastore/signin_signupDao_firebase.js");
+const categories = require("../categories.json");
+const novel_categories = require("../novel_categories.json");
 
 const { translate } = require('@vitalets/google-translate-api');
 
@@ -150,7 +154,6 @@ async function saveContent_Article_Novels({
 }) {
         try {
             if (!autherID || !id || !title || !content)
-                return res.status(400).json({ message: "Missing required fields" });
     
             if (type === "article") {
                 const translate = await translateToEnglish(`${title} ${descrip} ${content}`);
@@ -179,11 +182,11 @@ async function saveContent_Article_Novels({
                 };
                 console.log(newArticle_novels);
                 await dao.addContentCategory("articles", newArticle_novels);
-                res.status(200).json({ message: "Article saved successfully" });
-    
+                await sign.addContentId_User("articles", autherID,id);
+                
+                
             } else if (type === "novels") {
                 const translate = await translateToEnglish(`${title} ${descrip} ${content}`);
-                console.log(translate);
                 const classification = classifyNovel(translate);
     
                 const newArticle_novels = {
@@ -203,15 +206,15 @@ async function saveContent_Article_Novels({
     
                 console.log(newArticle_novels);
                 await dao.addContentCategory("novels", newArticle_novels);
-                res.status(200).json({ message: "Article saved successfully" });
+                await sign.addContentId_User("novels", autherID,id);
     
             }
     
         } catch (err) {
             console.error("Save error:", err);
-            res.status(500).json({ message: "Error saving article" });
         }
 }
+
 async function saveContent_Posts({
     autherID,
     id,
@@ -220,9 +223,8 @@ async function saveContent_Posts({
     type
 }) {
 try {
-        const { autherID, id, img, content, type } = req.body;
         if (!autherID || !id || !content)
-            return res.status(400).json({ message: "Missing required fields" });
+            return "Missing required fields";
 
         const translate = await translateToEnglish(content);
         console.log(translate);
@@ -247,11 +249,10 @@ try {
         };
 
         await dao.addContentCategory("posts", newPost);
-        res.status(200).json({ message: "Post saved successfully" });
-
+        await sign.addContentId_User("posts", autherID,id);
+        
     } catch (err) {
         console.error("Save error:", err);
-        res.status(500).json({ message: "Error saving post" });
     }
 }
 

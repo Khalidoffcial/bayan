@@ -1,6 +1,6 @@
 const { initializeApp, getApps, getApp } = require("firebase/app");
 const { getStorage } = require("firebase/storage");
-const { getDatabase, ref, set, get, update, child, push, query, equalTo, orderByChild, limitToLast, limitToFirst } = require('firebase/database');
+const { getDatabase, ref, set, get, update, child, push, query, equalTo, orderByChild, limitToLast, limitToFirst,runTransaction } = require('firebase/database');
 
 // import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
@@ -19,4 +19,4 @@ const db = getDatabase(authApp)
 const storage = getStorage(authApp);
 // const auth = getAuth(app);
 
-module.exports = { db, storage, ref, set, get, update, child, push, query, equalTo, orderByChild, limitToLast, limitToFirst };
+module.exports = { db, storage, ref, set, get, update, child, push, query, equalTo, orderByChild, limitToLast, limitToFirst,runTransaction };

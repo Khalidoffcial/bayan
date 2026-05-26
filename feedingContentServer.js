@@ -3,6 +3,7 @@ const { Server } = require("socket.io");
 
 const dao = require("./datastore/Dao.js");
 const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
+const { sign } = require("crypto");
 
 const httpServer = createServer();
 
@@ -151,8 +152,7 @@ async function getUser(userId) {
 // ======================================================
 // ENGAGEMENT SYSTEM
 // ======================================================
-
-async function trackEngagement(contentId, type) {
+async function trackEngagement(contentId, userId,type) {
     try {
         const key = `eng:${contentId}`;
 
@@ -166,21 +166,56 @@ async function trackEngagement(contentId, type) {
             };
         }
 
-        if (type === "view") data.views += 1;
-        if (type === "like") data.likes += 1;
-        if (type === "comment") data.comments += 1;
+        // 👀 views
+        if (type === "view") {
+            data.views += 1;
+        }
+
+        // ❤️ like
+        if (type === "like") {
+            const liked = await dao.hasUserLiked(contentId, userId);
+
+            if (liked) return data; // يمنع التكرار
+
+            data.likes += 1;
+            await increaseLike(contentId, userId);
+        }
+
+        // 💔 unlike
+        if (type === "unlike") {
+            const liked = await dao.hasUserLiked(contentId, userId);
+
+            if (!liked) return data;
+
+            data.likes = Math.max(0, data.likes - 1);
+            await decreaseLike(contentId, userId);
+        }
+
+        // 💬 comment
+        if (type === "comment") {
+            data.comments += 1;
+        }
 
         await cacheSet(key, data, 86400);
 
         return data;
     } catch (err) {
-        console.log(
-            "trackEngagement error:",
-            err.message
-        );
+        console.log("trackEngagement error:", err.message);
     }
 }
+async function increaseLike(postId, userId) {
+    const path = `posts/post${postId}`;
 
+    await dao.incrementFieldTransaction(path, "likes", 1);
+    await dao.likeContent("posts", postId, userId);
+}
+
+async function decreaseLike(postId, userId) {
+    const path = `posts/post${postId}`;
+
+    await dao.incrementFieldTransaction(path, "likes", -1);
+    await dao.unlikeContent("posts", postId, userId);
+}
 // ======================================================
 // RANKING ENGINE
 // ======================================================
@@ -452,14 +487,27 @@ io.on("connection", (socket) => {
 
     socket.on(
         "ENGAGEMENT",
-        async ({ contentId, type }) => {
+        async ({ contentId,userId, type }) => {
             await trackEngagement(
                 contentId,
+                userId,
                 type
             );
         }
     );
-
+    
+        // ==================================================
+        // ACCOUNT CONTENT
+        // ==================================================
+    
+        socket.on(
+            "MYCONTENT",
+            async ({ idUser, type }) => {
+                const content = await sign.find_Content_byID(type,idUser);
+                socket.emit("CONTENT_RESULT",content)
+            }
+        );
+    
     // ==================================================
     // GET FEED
     // ==================================================

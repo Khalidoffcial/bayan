@@ -13,6 +13,7 @@ const fetch = require("node-fetch");
 const { translate } = require('@vitalets/google-translate-api');
 const fs = require("fs");
 const { saveContent_Article_Novels,saveContent_Posts } = require("./service/saveContent.js");
+const { log } = require("console");
 
 const categories = JSON.parse(fs.readFileSync("./categories.json", "utf8"));
 const novel_categories = JSON.parse(fs.readFileSync('novel_categories.json', 'utf8'));
@@ -508,7 +509,8 @@ app.post("/saveArticle_novels", async(req, res) => {
 
 // 📱 حفظ بوست
 app.post("/saveposts", async(req, res) => {
-    await saveContent_Posts(...req.body);
+    await saveContent_Posts(req.body);
+    console.log(req.body)
 });
 
 

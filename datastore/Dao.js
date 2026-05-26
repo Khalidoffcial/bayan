@@ -1,4 +1,4 @@
-const { db, ref, set, get, update, query, equalTo, orderByChild, limitToLast, limitToFirst } = require('./firebaseArticle.js');
+const { db, ref, set, get, update, query, equalTo, orderByChild, limitToLast, limitToFirst,runTransaction } = require('./firebaseArticle.js');
 
 // حفظ بوست جديد
 // async function savePost(post) {
@@ -365,6 +365,94 @@ async function deleteContent(type, id) {
 }
 
 
+//increase like comment
+
+async function incrementFieldTransaction(path, field, amount = 1) {
+    try {
+        const targetRef = ref(db, path);
+
+        await runTransaction(targetRef, (currentData) => {
+            if (currentData === null) {
+                currentData = {};
+            }
+
+            const currentValue = currentData[field] || 0;
+
+            return {
+                ...currentData,
+                [field]: currentValue + amount
+            };
+        });
+
+        console.log(`${field} updated successfully`);
+    } catch (error) {
+        console.error("Transaction error:", error);
+    }
+}
+
+
+async function likeContent(type,postId, userId) {
+    const postRef = ref(db, `${type}s/${type}${postId}`);
+
+    try {
+        await runTransaction(postRef, (content) => {
+            if (!content) return content;
+
+            if (!content.likesBy) {
+                content.likesBy = {};
+            }
+
+            // لو المستخدم عمل لايك قبل كده → نوقف
+            if (content.likesBy[userId]) {
+                return content;
+            }
+
+            content.likesBy[userId] = true;
+            content.likesCount = (content.likesCount || 0) + 1;
+
+            return content;
+        });
+
+        console.log("Liked successfully");
+    } catch (err) {
+        console.error("Like error:", err);
+    }
+}
+
+
+async function unlikeContent(type,postId, userId) {
+    const postRef = ref(db, `${type}s/${type}${postId}`);
+
+    try {
+        await runTransaction(postRef, (content) => {
+            if (!content || !content.likesBy) return content;
+
+            if (!content.likesBy[userId]) {
+                return content;
+            }
+
+            delete content.likesBy[userId];
+            content.likesCount = Math.max((content.likesCount || 0) - 1, 0);
+
+            return content;
+        });
+
+        console.log("Unliked successfully");
+    } catch (err) {
+        console.error("Unlike error:", err);
+    }
+}
+
+
+async function hasUserLiked(postId, userId) {
+    const snap = await get(ref(db, `posts/post${postId}/likesBy/${userId}`));
+    return snap.exists();
+}
+
+
+
+
+
 module.exports = {
     updateArticle,
     getPostID,
@@ -383,4 +471,8 @@ module.exports = {
     deleteArticle,
 
     deleteArticle,
+    incrementFieldTransaction,
+    likeContent,
+    unlikeContent,
+    hasUserLiked,
 }

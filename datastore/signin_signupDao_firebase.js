@@ -241,6 +241,22 @@ async function findbyID(idN) {
     }
 }
 
+
+async function find_Content_byID(type,idUser) {
+    try {
+        const userRef = ref(db, `user_data/Profile/${idUser}/${type}`); // المسار بناءً على Id_user
+        const snapshot = await get(userRef);
+
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            return userData;
+        } else {
+            console.log('User not found');
+        }
+    } catch (error) {
+        throw error;
+    }
+}
 async function findbyEmail(email) {
     try {
         const userQuery = query(ref(db, "user_data/Profile"), orderByChild('email'), equalTo(email));
@@ -384,6 +400,71 @@ async function DecreaseFollower(idUser, idFollowedUser) {
 
 
 
+
+
+async function addContentId_User(type,idUser, content_id) {
+    try {
+        findbyID(idUser).then((updatedUser) => {
+
+            if(type == "posts"){
+
+                let posts = updatedUser.posts || [];
+                posts.push(content_id); // للإضافة
+                update(ref(db, `user_data/Profile/${idUser}`), { posts });
+            } else if(type =="articles"){
+                let articles = updatedUser.posts || [];
+                articles.push(content_id); // للإضافة    
+                update(ref(db, `user_data/Profile/${idUser}`), { articles });
+            }
+            else if(type =="novels"){
+                let novels = updatedUser.posts || [];
+                novels.push(content_id); // للإضافة
+
+                update(ref(db, `user_data/Profile/${idUser}`), { novels });
+            }
+
+
+
+            return "suc";
+        }).catch((err) => {
+            return err;
+        });
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function deletePostsFrom_User(idUser, content_id) {
+    try {
+        // 1️⃣ جلب بيانات المستخدم الأساسي
+        const snapshot = await get(ref(db, `user_data/Profile/${idUser}`));
+
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+
+            posts = userData.posts.filter(id => id !== content_id); // للحذف
+
+            // 4️⃣ تحديث البيانات في Firebase
+            await update(ref(db, `user_data/Profile/${idUser}`), { posts });
+
+            // 5️⃣ جلب القيم الجديدة بعد التحديث
+            const updatedSnapshot = await get(ref(db, `user_data/Profile/${idUser}`));
+            const updatedData = updatedSnapshot.val();
+
+            console.log("Updated user data:", updatedData);
+            return updatedData;
+        } else {
+            throw new Error("User not found");
+        }
+    } catch (error) {
+        console.error("Error decreasing following:", error);
+        throw error;
+    }
+}
+
+
+
 module.exports = {
     login_user,
     logup_user_Insert,
@@ -397,6 +478,9 @@ module.exports = {
     DecreaseFollowing,
     DecreaseFollower,
     findbyID,
+    find_Content_byID,
     findbyEmail,
-    findUserByEmailAndUid
+    findUserByEmailAndUid,
+    addContentId_User,
+    deletePostsFrom_User
 };
