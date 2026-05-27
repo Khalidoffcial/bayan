@@ -56,7 +56,8 @@ async function updateArticle(id, updates) {
 
 // جلب بوست بناءً على ID
 async function getPostID(id) {
-    const articleRef = ref(db, `posts/post${id}`);
+    console.log(id)
+    const articleRef = ref(db, `posts/posts${id}`);
     try {
         const snapshot = await get(articleRef);
         if (snapshot.exists()) {
@@ -67,6 +68,11 @@ async function getPostID(id) {
     } catch (error) {
         console.error('Error fetching post:', error);
     }
+
+
+
+
+
 }
 // جلب قصه بناءً على ID
 async function getnovelsID(id) {

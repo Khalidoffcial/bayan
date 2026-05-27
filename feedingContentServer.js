@@ -3,7 +3,7 @@ const { Server } = require("socket.io");
 
 const dao = require("./datastore/Dao.js");
 const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
-const { sign } = require("crypto");
+const { log } = require("console");
 
 const httpServer = createServer();
 
@@ -499,15 +499,71 @@ io.on("connection", (socket) => {
         // ==================================================
         // ACCOUNT CONTENT
         // ==================================================
-    
-        socket.on(
-            "MYCONTENT",
-            async ({ idUser, type }) => {
-                const content = await sign.find_Content_byID(type,idUser);
-                socket.emit("CONTENT_RESULT",content)
+socket.on(
+    "MYCONTENT",
+    async ({ idUser, type }) => {
+        try {
+
+            const contentIds =
+                await DaoForDbUser.find_ContentUser_byID(type, idUser);
+
+            let content = [];
+
+            if (type === "posts") {
+
+                    const userData =
+        await DaoForDbUser.findbyID(idUser);
+
+    const posts = await Promise.all(
+        contentIds.map((id) => dao.getPostID(id))
+    );
+
+    content = posts.map((post) => ({
+        userData,
+        ...post
+    }));
+
             }
-        );
-    
+
+            if (type === "articles") {
+                    const userData =
+        await DaoForDbUser.findbyID(idUser);
+
+    const articles = await Promise.all(
+        contentIds.map((id) => dao.getArticle(id))
+    );
+
+    content = articles.map((article) => ({
+        userData,
+        ...article
+    }));
+            }
+
+            if (type === "novels") {
+                    const userData =
+        await DaoForDbUser.findbyID(idUser);
+
+    const novels = await Promise.all(
+        contentIds.map((id) => dao.getnovelsID(id))
+    );
+
+    content = novels.map((novel) => ({
+        userData,
+        ...novel
+    }));
+            }
+
+            console.log(content);
+
+            socket.emit("CONTENT_RESULT", content);
+
+        } catch (err) {
+            console.log("MYCONTENT ERROR:", err.message);
+
+            socket.emit("CONTENT_RESULT", []);
+        }
+    }
+);
     // ==================================================
     // GET FEED
     // ==================================================

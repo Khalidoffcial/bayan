@@ -242,7 +242,7 @@ async function findbyID(idN) {
 }
 
 
-async function find_Content_byID(type,idUser) {
+async function find_ContentUser_byID(type,idUser) {
     try {
         const userRef = ref(db, `user_data/Profile/${idUser}/${type}`); // المسار بناءً على Id_user
         const snapshot = await get(userRef);
@@ -257,6 +257,7 @@ async function find_Content_byID(type,idUser) {
         throw error;
     }
 }
+
 async function findbyEmail(email) {
     try {
         const userQuery = query(ref(db, "user_data/Profile"), orderByChild('email'), equalTo(email));
@@ -478,7 +479,7 @@ module.exports = {
     DecreaseFollowing,
     DecreaseFollower,
     findbyID,
-    find_Content_byID,
+    find_ContentUser_byID,
     findbyEmail,
     findUserByEmailAndUid,
     addContentId_User,
