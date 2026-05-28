@@ -19,7 +19,7 @@ const categories = JSON.parse(fs.readFileSync("./categories.json", "utf8"));
 const novel_categories = JSON.parse(fs.readFileSync('novel_categories.json', 'utf8'));
 
 
-const PORT = process.env.PORT1 || 4000;
+const PORT = process.env.PORT || 4000;
 app.use(cors({ origin: "*" }));
 
 // ✅ استخدم cors بدلاً من الهيدر اليدوي (أبسط وآمن)

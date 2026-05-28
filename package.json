@@ -1,8 +1,9 @@
 {
     "name": "server",
     "version": "1.0.0",
-    "main": "Addition_server.js",
+    "main": "signup_signin_server.js",
     "scripts": {
+        "start": "node signup_signin_server.js",
         "s": "nodemon signup_signin_server.js",
         "k": "nodemon Socket-io.js",
         "w": "nodemon websocketServer.js"
