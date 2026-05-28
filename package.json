@@ -14,7 +14,7 @@
     "@tinymce/tinymce-react": "^5.1.1",
     "axios": "^1.9.0",
     "ckbox": "^2.6.0",
-    "firebase": "^9.23.0",
+    "firebase": "^12.12.1",
     "framer-motion": "^10.18.0",
     "gsap": "^3.13.0",
     "js-cookie": "^3.0.5",

@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaImage, FaTimes } from "react-icons/fa";
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 const Writer = () => {
   const [active, setActive] = useState(false);
   const [type, setType] = useState("post");
@@ -123,7 +124,7 @@ const saveImages = async () =>{
   const uploadedImages = await saveImages(); // 🟢 كده تمام
  axios
         .post(
-          "http://localhost:4000/saveposts",
+          "http://bayan.railway.internal:4000/saveposts",
           { 
             autherID:DataUser.id,
             id: PostId,
@@ -170,7 +171,7 @@ const saveImages = async () =>{
     };
     axios
         .post(
-          "http://localhost:4000/saveArticle_novels",newArticle,
+          "http://bayan.railway.internal:4000/saveArticle_novels",newArticle,
           {
             headers: {
               Authorization: "Bearer " + cookie("get"),
@@ -185,9 +186,7 @@ const saveImages = async () =>{
 
 
 
-    /*const imageUrl = await saveImages(images,articleId);*/
 
-    // await dao.saveArticle(newArticle);
   };
 
 
@@ -426,7 +425,7 @@ const saveImages = async () =>{
               </>
             ):(
 
-                            <textarea
+              <textarea
               className="WriterInput"
               placeholder={`Write your ${type} here...`}
               value={content}

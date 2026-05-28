@@ -77,12 +77,11 @@ body {
 .account {
     height: 50px;
     width: 100%;
+    direction: ltr;
     display: flex;
-    justify-content: right;
+    justify-content: flex-start;
     align-items: center;
-    /* background-color: #7a7a7ab0; */
 }
-
 
 /* صورة البروفايل */
 
@@ -116,10 +115,10 @@ body {
 }
 
 .nameacc {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 400;
     color: #000000;
-    line-height:22px;
+    line-height:20px;
     margin: 0;
     padding: 0;
 }

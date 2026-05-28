@@ -1,19 +1,60 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useCallback, useEffect ,useRef} from "react";
+import {
+  useParams,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+
+
 
 import Cropper from "react-easy-crop";
-import { FaPen, FaCheck, FaUserFriends, FaUserPlus, FaUserCircle,FaTimes, FaBeer } from "react-icons/fa";
+import { 
+  FaPen, 
+  FaCheck, 
+  FaUserFriends, 
+  FaUserPlus, 
+  FaUserCircle, 
+  FaBeer,  
+  FaImage,
+  FaTimes,
+  FaHeart,
+  FaComment,
+  FaShareAlt, } from "react-icons/fa";
 import { SlUserFollow } from "react-icons/sl";
 
 import { ref as storageRef, getDownloadURL, uploadBytes } from 'firebase/storage';
 import { storage } from './firebase';
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { io } from "socket.io-client";
 import "./Profile.css";
 import Sidebar from './sidebar.jsx';
 import Top from './top.jsx';
 import default_img from "../icons/user_10374408.png";
 import cookie from "../databases/cookies_DAO.js";
+
+
+// ======================================================
+// SOCKET
+// ======================================================
+
+const SOCKET_URL =
+  "http://bayan.railway.internal:9000";
+
+
+
+  
+const getDirection = (
+  text = ""
+) => {
+  const rtlRegex =
+    /[\u0591-\u07FF]/;
+
+  return rtlRegex.test(text)
+    ? "rtl"
+    : "ltr";
+};
+
 
 
 export default function Profile() {
@@ -38,6 +79,51 @@ const [showImage, setShowImage] = useState(false);
 const [FollowersNumbers, setFollowersNumbers] = useState();
 const [FollowingNumbers, setFollowingNumbers] = useState();
 const [FollowMode, setFollowMode] = useState();
+const [followers, setFollowers] = useState(0); // 👈 كان ناقص
+const [followingMap, setFollowingMap] = useState({}); // لو حابب مستقبلًا
+const [likesMap, setLikesMap] = useState({}); // لكل بوست
+const [feed, set_feed] = useState([]);
+
+  const [loading, setLoading] =
+    useState(false);
+
+ // COMMENT MODAL
+
+  const [commented, setCommented] =
+    useState(false);
+
+  // LIKES
+
+  const [likedPosts, setLikedPosts] =
+    useState({});
+
+      const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  
+    const [content, setContent] = useState("");
+
+    const [images_Preview, setImages_Preview] = useState([]);
+  const [images, setImages] = useState([]);
+  const [imageToFullscreen, setImageToFullscreen] = useState(null);
+  const [
+    imagesPreview,
+    setImagesPreview,
+  ] = useState([]);
+
+
+  const socketRef =
+    useRef(null);
+
+  const articleRef =
+    useRef(null);
+
+  const location =
+    useLocation();
+
+      const navigate =
+    useNavigate();
+
+
 
 
 //data from token
@@ -77,10 +163,19 @@ useEffect(() => {
 // eslint-disable-next-line
 
 
-useEffect(() => {
+  // ======================================================
+  // SOCKET INIT
+  // ======================================================
 
+  useEffect(() => {
+    socketRef.current = io(
+      SOCKET_URL
+    );
 
-},[idOtherUser])
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, []);
 
 
 
@@ -94,7 +189,7 @@ useEffect(() => {
 
     axios
       .post(
-        "http://localhost:4000/getuser",
+        "http://bayan.railway.internal:4000/getuser",
         { idOtherUser },
         {
           headers: {
@@ -135,14 +230,78 @@ useEffect(() => {
 }, [UserDataMain, idOtherUser]);
 
 
+useEffect(() => {
+  socketRef.current?.on("newFollower", () => {
+    setFollowersNumbers(prev => (prev || 0) + 1);
+  });
 
+  socketRef.current?.on("lostFollower", () => {
+    setFollowersNumbers(prev => Math.max(0, (prev || 0) - 1));
+  });
+
+  return () => {
+    socketRef.current?.off("newFollower");
+    socketRef.current?.off("lostFollower");
+  };
+}, []);
+
+
+
+
+
+
+
+
+
+
+
+useEffect(() => {
+  if (!idOtherUser) return;
+
+  socketRef.current?.emit("MYCONTENT", {
+    idUser: idOtherUser,
+    type: activeTab,
+  });
+
+const handleContent = (feed) => {
+  set_feed(Array.isArray(feed) ? [...feed].reverse() : []);
+};
+
+  socketRef.current?.on("CONTENT_RESULT", handleContent);
+
+  return () => {
+    socketRef.current?.off("CONTENT_RESULT", handleContent);
+  };
+}, [activeTab, idOtherUser]);
+
+
+
+function followUser() {
+  const storedUser = localStorage.getItem("me");
+  const parsed = JSON.parse(storedUser);
+
+  socketRef.current?.emit("followUser", {
+    idUser: parsed.id,
+    idFollowedUser: idOtherUser
+  });
+}
+
+function unfollowUser() {
+  const storedUser = localStorage.getItem("me");
+  const parsed = JSON.parse(storedUser);
+
+  socketRef.current?.emit("unfollowUser", {
+    idUser: parsed.id,
+    idFollowedUser: idOtherUser
+  });
+}
 
   const followingUser = async () => {
     const storedUser = localStorage.getItem("me");
       const parsed = JSON.parse(storedUser);
   axios
   .post(
-      "http://localhost:4000/followingUser",
+      "http://bayan.railway.internal:4000/followingUser",
       {  IdUser: parsed.id,
     idFollowedUser:idOtherUser },
     {
@@ -169,7 +328,7 @@ useEffect(() => {
       const parsed = JSON.parse(storedUser);
   axios
   .post(
-      "http://localhost:4000/unfollowingUser",
+      "http://bayan.railway.internal:4000/unfollowingUser",
       {  IdUser: parsed.id,
     idFollowedUser:idOtherUser },
     {
@@ -215,7 +374,7 @@ const saveIMG = async (imgid, base64Image) => {
 function updataWithServer(Updatable, status) {
   axios
     .post(
-      "http://localhost:4000/editProfile",
+      "http://bayan.railway.internal:4000/editProfile",
       { Updatable, status },
       {
         headers: {
@@ -283,6 +442,397 @@ const handleCancelCropped = async () => {
   const onCropComplete = useCallback((_, croppedAreaPixels) => {
     setCroppedArea(croppedAreaPixels);
   }, []);
+
+
+  // ======================================================
+  // IMAGE CHANGE
+  // ======================================================
+
+  const handleImageChange = (e) => {
+
+    const files =
+      Array.from(e.target.files);
+
+    setImages((prev) => [
+      ...prev,
+      ...files,
+    ]);
+
+    const previews =
+      files.map((file) =>
+        URL.createObjectURL(file)
+      );
+
+    setImagesPreview((prev) => [
+      ...prev,
+      ...previews,
+    ]);
+  };
+
+  // ======================================================
+  // CLOSE MODAL
+  // ======================================================
+
+  const handleClose = () => {
+
+    setCommented(false);
+
+    setContent("");
+
+    setImages([]);
+
+    setImagesPreview([]);
+  };
+
+  // ======================================================
+  // SAVE IMAGES
+  // ======================================================
+
+  const saveImages = async () => {
+
+    if (!images.length)
+      return [];
+
+    try {
+
+      const uploadPromises =
+        images.map(async (
+          img,
+          index
+        ) => {
+
+          const uniqueId = `${Date.now()}_${index}_${img.name}`;
+
+          const imgRef =
+            storageRef(
+              storage,
+              `images/${uniqueId}`
+            );
+
+          await uploadBytes(
+            imgRef,
+            img
+          );
+
+          return await getDownloadURL(
+            imgRef
+          );
+        });
+
+      return await Promise.all(
+        uploadPromises
+      );
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error uploading images:",
+        error
+      );
+
+      return [];
+    }
+  };
+
+  // ======================================================
+  // GENERATE POST ID
+  // ======================================================
+
+  const generateID = () =>
+    Math.floor(
+      1000 + Math.random() * 9000
+    );
+
+  // ======================================================
+  // SAVE COMMENT
+  // ======================================================
+
+  const savePost = async () => {
+
+    if (!content.trim()) {
+
+      alert(
+        "❗ الرجاء كتابة تعليق"
+      );
+
+      return;
+    }
+
+    try {
+
+      const uploadedImages =
+        await saveImages();
+
+      await axios.post(
+        "http://bayan.railway.internal:4000/saveposts",
+        {
+          autherID:
+              JSON.parse(localStorage.getItem("me")).id,
+
+          id: generateID(),
+
+          comment_on:
+            location.state.id,
+
+          img: uploadedImages,
+
+          content,
+
+          type: "posts",
+        },
+        {
+          headers: {
+            Authorization:
+              "Bearer " +
+              cookie("get"),
+          },
+        }
+      );
+
+      handleClose();
+
+    } catch (err) {
+
+      console.log(
+        "Save comment error:",
+        err.message
+      );
+    }
+  };
+
+
+  // ======================================================
+  // ACTIONS
+  // ======================================================
+
+const handleLike = (item) => {
+  const postId = item?.id;
+
+  setLikesMap((prev) => {
+    const isLiked = prev[postId];
+
+    const updated = {
+      ...prev,
+      [postId]: !isLiked,
+    };
+
+    socketRef.current?.emit("ENGAGEMENT", {
+      contentId: postId,
+      userId: JSON.parse(localStorage.getItem("me")).id,
+      type: isLiked ? "unlike" : "like",
+    });
+
+    return updated;
+  });
+};
+
+  const handleComment = () => {
+    setCommented(true);
+  };
+
+  const handleShare = async (item) => {
+
+    try {
+
+      if (navigator.share) {
+
+        await navigator.share({
+          title:
+            item?.content ||
+            "Post",
+
+          text:
+            item?.content?.slice(
+              0,
+              100
+            ),
+
+          url:
+            window.location.href,
+        });
+
+      } else {
+
+        alert(
+          "Sharing not supported"
+        );
+      }
+
+    } catch (err) {
+
+      console.log(err);
+    }
+  };
+
+  // ======================================================
+  // LOADING
+  // ======================================================
+
+  if (loading) {
+
+    return (
+      <div className="loading">
+        <h1>
+          جاري التحميل...
+        </h1>
+      </div>
+    );
+  }
+
+
+
+
+function renderContent(item) {
+  return(
+
+          <motion.div
+        key={item?.id}
+        className="BottomBox"
+        initial={{
+          opacity: 0,
+          y: 20,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+      >
+        {/* POSTS */}
+
+
+
+          <div className="container_post">
+            {/* USER */}
+
+            <div
+              className="account"
+              onClick={() =>
+                navigate(
+                  `/p/${item.userData?.Id_user}`
+                )
+              }
+            >
+              <img
+                src={
+                  item.userData?.imgProfile || default_img}
+                className="profile-pic-posts"
+                alt=""
+              />
+
+              <div className="names">
+                <h2 className="nameacc">
+                  {
+                    item.userData?.F_user
+                  }
+                </h2>
+
+                <p className="usernameacc">
+                  {
+                    item.userData?.S_user
+                  }
+                </p>
+              </div>
+            </div>
+
+            {/* IMAGE */}
+
+            {item?.img
+              ?.length >
+              0 && (
+              <div className="img_article">
+                <img
+                  src={
+                    item.img[0]
+                  }
+                  alt={
+                    item.content
+                  }
+                />
+              </div>
+            )}
+
+            {/* CONTENT */}
+
+            <div
+              ref={articleRef}
+              className="content_Post"
+              dir={getDirection(
+                item?.content
+              )}
+              onClick={() =>
+                navigate(
+                  `/rp/${item?.id}`,
+                  {
+                    state:
+                      item,
+                  }
+                ) 
+              }
+              dangerouslySetInnerHTML={{
+                __html:
+                  item?.content ||
+                  "",
+              }}
+            />
+
+            {/* DATE */}
+
+            <div className="his_Post">
+              {item?.date}
+            </div>
+<hr/>
+            {/* ACTIONS */}
+
+            <div className="actions">
+              <button
+                className="like_action"
+                onClick={() =>
+                  handleLike(
+                    item
+                  )
+                }
+                style={{
+                  color:
+                    likedPosts[
+                      item?.id
+                    ]
+                      ? "#d30000"
+                      : "#333",
+                }}
+              >
+                <FaHeart />
+
+                <span>
+                  {likesMap[item?.id] ? 1 : 0}
+                </span>
+              </button>
+
+              <button
+                className="comment_action"
+                onClick={
+                  handleComment
+                }
+              >
+                <FaComment />
+              </button>
+
+              <button
+                className="share_action"
+                onClick={() =>
+                  handleShare(
+                    item
+                  )
+                }
+              >
+                <FaShareAlt />
+              </button>
+            </div>
+          </div>
+      </motion.div>
+    ////////
+  )
+  
+}
 
   return (<>
       <Sidebar />
@@ -427,8 +977,8 @@ const handleCancelCropped = async () => {
 
       {/* Tabs */}
       
-      {/* <div className="tabs">
-        {["posts","repost" ,"about", "followers", "following"].map((tab) => (
+      <div className="tabs">
+        {["posts","articles","novels"].map((tab) => (
           <motion.button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -439,22 +989,24 @@ const handleCancelCropped = async () => {
           </motion.button>
         ))}
       </div>
-
-      */}
+     
       {/* Tab Content */}
-      {/* <motion.div
+      <motion.div
         key={activeTab}
         className="tab-content"
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {activeTab === "posts" && <p>Here are your posts...</p>}
-        {activeTab === "repost" && <p>repost section...</p>}
-        {activeTab === "about" && <p>About section...</p>}
-        {activeTab === "followers" && <p>👥 قائمة المتابعين</p>}
-        {activeTab === "following" && <p>➡️ قائمة الحسابات التي تتابعها</p>}
-      </motion.div> */}
+        {
+            feed.length > 0 && (
+            feed.map(
+              (item) =>
+                item?.content && (renderContent(item))
+            )
+          )
+        }
+      </motion.div>
 
       
       <AnimatePresence>

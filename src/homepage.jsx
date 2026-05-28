@@ -16,7 +16,7 @@ const HomePage = () => {
   useEffect(() => {
     axios
       .post(
-        "http://localhost:4000/auth",
+        "http://192.168.1.9:4000/auth",
         {},
         {
           headers: {

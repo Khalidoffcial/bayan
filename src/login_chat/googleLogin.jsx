@@ -21,7 +21,7 @@ export default function GoogleLoginButton({ endpoint }) {
         uid: user.uid,
       };
 
-      const res = await axios.post(`http://localhost:4000/${endpoint}`, googleUser, {
+      const res = await axios.post(`http://192.168.1.9:4000/${endpoint}`, googleUser, {
         headers: { "Content-Type": "application/json" },
       });
 

@@ -22,7 +22,7 @@ function Login() {
   useEffect(() => {
     axios
       .post(
-        "http://localhost:4000/auth",
+        "http://192.168.1.9:4000/auth",
         {},
         {
           headers: {
@@ -41,7 +41,7 @@ function Login() {
 
   // Handlers
   const handleLogin = () => {
-    const url = "http://localhost:4000/signin";
+    const url = "http://192.168.1.9:4000/signin";
     const data = { identifierUser: username, password };
 
     axios
@@ -75,7 +75,7 @@ function Login() {
       };
 
 
-      const url = "http://localhost:4000/auth/google";
+      const url = "http://192.168.1.9:4000/auth/google";
 
       axios
       .post(url, data, { headers: { "Content-Type": "application/json" } })
@@ -120,7 +120,8 @@ function Login() {
 
       {/* LOGIN BOX */}
       <div className="signup-box">
-        <h2>Login</h2>
+        <h2>Bayan</h2>
+        <h6>Login</h6>
 
         {/* Username */}
         <div className="user-box">

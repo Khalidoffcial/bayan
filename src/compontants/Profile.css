@@ -235,3 +235,11 @@ background: #f7f7f7;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
     cursor: auto;
 }
+
+@media (max-width:900px) {
+    .profile-container {
+
+    max-width: 100%;
+}
+
+}

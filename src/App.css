@@ -223,7 +223,6 @@ i {
 }
 
 .homepage{
-    display: flex;
     width: 80%;
 }
 
@@ -597,6 +596,14 @@ i {
     color: #222222;
 }
 
+.his_Post {
+    display: flex;
+    align-self: end;
+    color: #222222;
+    font-size: .6em;
+    font-weight:500;
+justify-content: flex-end;
+}
 .content_Article {
     font-size: 1.5em;
     display: block;
@@ -606,6 +613,71 @@ i {
     line-height: 45px;
     color: #222222;
     width: 100%;
+}
+
+.content_Post {
+    font-size: 1.2m;
+    display: block;
+    margin: 10px;
+    padding:20px;
+    font-weight: 450;
+    line-height: 30px;
+    color: #222222;
+    width: 100%;
+}
+.container_post{
+    display: block;
+    padding: 15px;
+    border: #9e9e9e .01rem solid;
+    border-radius: 8px;
+}
+
+.actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 0px;
+    justify-content: flex-start;
+    direction: rtl;
+    flexWrap: wrap;
+    background-color: #fdffef00;
+    border-radius: 8px;
+}
+
+
+.like_action{
+    display: flex;
+    width:10%;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+        background-color: #fdffef00;
+
+}
+
+.comment_action{
+    display: flex;
+    alignItems: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: #fdffef00;
+}
+
+.share_action{
+    
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: #fdffef00;
 }
 
 .editor {
@@ -625,7 +697,6 @@ i {
     border: none;
     padding: 8px;
     font-size: 1.3em;
-    font-family: "Zain", sans-serif;
     border-radius: 10px;
     outline: none;
 }
@@ -637,7 +708,6 @@ i {
     border: none;
     padding: 8px;
     font-size: 1.3em;
-    font-family: "Zain", sans-serif;
     border-radius: 10px;
     outline: none;
     align-self: start;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import "./interstetsModels.css";
 
-const socket = io("http://localhost:9000");
+const socket = io("http://192.168.1.9:9000");
 
 export default function InterestsPopup() {
   const [showModal, setShowModal] = useState(true);
@@ -54,7 +54,10 @@ export default function InterestsPopup() {
   const handleSubmit = () => {
     socket.emit("setInterests",JSON.parse(idUser).id,selected);
     socket.on("result", (v) => {
-        if (v === "ok") { 
+      console.log("okkkkk");
+      
+      if (v.status === "ok") { 
+          console.log("okkk22");
               localStorage.setItem("userInterests", JSON.stringify(selected));
               setShowModal(false);
           }
