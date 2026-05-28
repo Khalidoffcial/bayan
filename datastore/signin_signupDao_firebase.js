@@ -297,108 +297,102 @@ async function findUserByEmailAndUid(email, uid) {
     }
 }
 
-
 async function IncreasingFollowing(idUser, idFollowedUser) {
     try {
-        // جلب بيانات المستخدم
-        const updatedUser = await findbyID(idUser);
+        const userSnap = await get(ref(db, `user_data/Profile/${idUser}`));
 
+        if (!userSnap.exists()) throw new Error("User not found");
 
-        let following = updatedUser.following || [];
-        following.push(idFollowedUser); // للإضافة
+        const userData = userSnap.val();
 
-        // تحديث بيانات المستخدم
+        let following = userData.following || [];
+
+        // 🔥 منع التكرار
+        if (!following.includes(idFollowedUser)) {
+            following.push(idFollowedUser);
+        }
+
         await update(ref(db, `user_data/Profile/${idUser}`), { following });
 
-        // جلب البيانات المحدثة
-        const updatedSnapshot = await get(ref(db, `user_data/Profile/${idUser}`));
-        const updatedData = updatedSnapshot.val();
-
-        console.log("Updated value:", updatedData);
-        return updatedData;
+        return userData;
 
     } catch (error) {
         console.error("Error updating following:", error);
         throw error;
     }
 }
-
 async function IncreasingFollowers(idUser, idFollowedUser) {
     try {
-        //Increase follower in the other user
-        findbyID(idFollowedUser).then((updatedUser) => {
+        const snap = await get(ref(db, `user_data/Profile/${idFollowedUser}`));
 
-            let followers = updatedUser.following || [];
-            followers.push(idUser); // للإضافة
+        if (!snap.exists()) throw new Error("User not found");
 
-            update(ref(db, `user_data/Profile/${idFollowedUser}`), { followers });
-            return "suc";
-        }).catch((err) => {
-            return err;
+        const userData = snap.val();
+
+        let followers = userData.followers || [];
+
+        // 🔥 منع التكرار
+        if (!followers.includes(idUser)) {
+            followers.push(idUser);
+        }
+
+        await update(ref(db, `user_data/Profile/${idFollowedUser}`), {
+            followers
         });
 
+        return true;
+
     } catch (error) {
+        console.error("Error updating followers:", error);
         throw error;
     }
 }
 
 async function DecreaseFollowing(idUser, idFollowedUser) {
     try {
-        // 1️⃣ جلب بيانات المستخدم الأساسي
-        const snapshot = await get(ref(db, `user_data/Profile/${idUser}`));
+        const snap = await get(ref(db, `user_data/Profile/${idUser}`));
 
-        if (snapshot.exists()) {
-            const userData = snapshot.val();
+        if (!snap.exists()) throw new Error("User not found");
 
-            following = userData.following.filter(id => id !== idFollowedUser); // للحذف
+        const userData = snap.val();
 
-            // 4️⃣ تحديث البيانات في Firebase
-            await update(ref(db, `user_data/Profile/${idUser}`), { following });
+        let following = userData.following || [];
 
-            // 5️⃣ جلب القيم الجديدة بعد التحديث
-            const updatedSnapshot = await get(ref(db, `user_data/Profile/${idUser}`));
-            const updatedData = updatedSnapshot.val();
+        following = following.filter(id => id !== idFollowedUser);
 
-            console.log("Updated user data:", updatedData);
-            return updatedData;
-        } else {
-            throw new Error("User not found");
-        }
+        await update(ref(db, `user_data/Profile/${idUser}`), { following });
+
+        return userData;
+
     } catch (error) {
-        console.error("Error decreasing following:", error);
+        console.error(error);
         throw error;
     }
 }
-
 
 async function DecreaseFollower(idUser, idFollowedUser) {
     try {
-        // 1️⃣ جلب بيانات المستخدم الأساسي
-        const snapshot = await get(ref(db, `user_data/Profile/${idFollowedUser}`));
+        const snap = await get(ref(db, `user_data/Profile/${idFollowedUser}`));
 
-        if (snapshot.exists()) {
-            const userData = snapshot.val();
+        if (!snap.exists()) throw new Error("User not found");
 
-            followers = userData.followers.filter(id => id !== idUser); // للحذف
+        const userData = snap.val();
 
-            // 4️⃣ تحديث البيانات في Firebase
-            await update(ref(db, `user_data/Profile/${idFollowedUser}`), { followers });
+        let followers = userData.followers || [];
 
-            // 5️⃣ جلب القيم الجديدة بعد التحديث
-            const updatedSnapshot = await get(ref(db, `user_data/Profile/${idFollowedUser}`));
-            const updatedData = updatedSnapshot.val();
+        followers = followers.filter(id => id !== idUser);
 
-            // console.log("Updated user data:", updatedData);
-            return updatedData;
-        } else {
-            throw new Error("User not found");
-        }
+        await update(ref(db, `user_data/Profile/${idFollowedUser}`), {
+            followers
+        });
+
+        return true;
+
     } catch (error) {
-        console.error("Error decreasing following:", error);
+        console.error(error);
         throw error;
     }
 }
-
 
 
 
@@ -413,12 +407,12 @@ async function addContentId_User(type,idUser, content_id) {
                 posts.push(content_id); // للإضافة
                 update(ref(db, `user_data/Profile/${idUser}`), { posts });
             } else if(type =="articles"){
-                let articles = updatedUser.posts || [];
+                let articles = updatedUser.articles || [];
                 articles.push(content_id); // للإضافة    
                 update(ref(db, `user_data/Profile/${idUser}`), { articles });
             }
             else if(type =="novels"){
-                let novels = updatedUser.posts || [];
+                let novels = updatedUser.novels || [];
                 novels.push(content_id); // للإضافة
 
                 update(ref(db, `user_data/Profile/${idUser}`), { novels });

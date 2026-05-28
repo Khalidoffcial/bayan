@@ -90,7 +90,7 @@ async function getnovelsID(id) {
 }
 // جلب مقال بناءً على ID
 async function getArticleID(id) {
-    const articleRef = ref(db, `articles/article${id}`);
+    const articleRef = ref(db, `articles/articles${id}`);
     try {
         const snapshot = await get(articleRef);
         if (snapshot.exists()) {

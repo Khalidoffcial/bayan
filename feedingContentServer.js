@@ -25,6 +25,7 @@ let redisClient = null;
 let useRedis = false;
 
 const memoryCache = new Map();
+const onlineUsers = new Map();
 
 (async () => {
     try {
@@ -339,6 +340,8 @@ async function enrichContent(contentArray) {
 
 io.on("connection", (socket) => {
     console.log("🟢 Client Connected:", socket.id);
+        onlineUsers.set(userId, socket.id);
+        socket.userId = userId;
 
     // ==================================================
     // SET INTERESTS
@@ -504,8 +507,12 @@ socket.on(
     async ({ idUser, type }) => {
         try {
 
+
+            console.log({ idUser, type })
+
             const contentIds =
                 await DaoForDbUser.find_ContentUser_byID(type, idUser);
+                console.log(contentIds)
 
             let content = [];
 
@@ -514,24 +521,27 @@ socket.on(
                     const userData =
         await DaoForDbUser.findbyID(idUser);
 
+        console.log(contentIds); // [ 4621, 8795 ]
     const posts = await Promise.all(
         contentIds.map((id) => dao.getPostID(id))
     );
-
+    
+    
     content = posts.map((post) => ({
         userData,
         ...post
     }));
+    
+}
 
-            }
-
-            if (type === "articles") {
-                    const userData =
-        await DaoForDbUser.findbyID(idUser);
-
+if (type === "articles") {
+    const userData =
+    await DaoForDbUser.findbyID(idUser);
+    
     const articles = await Promise.all(
-        contentIds.map((id) => dao.getArticle(id))
+        contentIds.map((id) => dao.getArticleID(id))
     );
+    console.log(contentIds);
 
     content = articles.map((article) => ({
         userData,
@@ -650,6 +660,57 @@ socket.on(
         }
     );
 
+
+    socket.on("followUser", async ({ idUser, idFollowedUser }) => {
+    try {
+
+        // 1. DB update
+        await sign.IncreasingFollowing(idUser, idFollowedUser);
+        await sign.IncreasingFollowers(idUser, idFollowedUser);
+
+        // 2. إرسال تحديث للمستخدم المتابع
+        const targetSocket = onlineUsers.get(idFollowedUser);
+
+        if (targetSocket) {
+            io.to(targetSocket).emit("newFollower", {
+                from: idUser
+            });
+        }
+
+        // 3. رد للـ sender
+        socket.emit("followSuccess", {
+            userId: idFollowedUser
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+
+socket.on("unfollowUser", async ({ idUser, idFollowedUser }) => {
+    try {
+
+        await sign.DecreaseFollowing(idUser, idFollowedUser);
+        await sign.DecreaseFollower(idUser, idFollowedUser);
+
+        const targetSocket = onlineUsers.get(idFollowedUser);
+
+        if (targetSocket) {
+            io.to(targetSocket).emit("lostFollower", {
+                from: idUser
+            });
+        }
+
+        socket.emit("unfollowSuccess", {
+            userId: idFollowedUser
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
+});
+
     // ==================================================
     // DISCONNECT
     // ==================================================
@@ -659,6 +720,8 @@ socket.on(
             "🔴 Client disconnected:",
             socket.id
         );
+        onlineUsers.delete(socket.userId);
+
     });
 });
 

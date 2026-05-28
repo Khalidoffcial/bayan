@@ -152,8 +152,11 @@ async function saveContent_Article_Novels({
     content,
     type
 }) {
-        try {
-            if (!autherID || !id || !title || !content)
+    console.log("سبف مقاله");
+    
+    try {
+        if (!autherID || !id || !title || !content)
+            console.log("في حاجه غلط");
     
             if (type === "article") {
                 const translate = await translateToEnglish(`${title} ${descrip} ${content}`);

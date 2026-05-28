@@ -504,7 +504,7 @@ function getCurrentTime() {
 
 // 📝 حفظ مقال أو قصة
 app.post("/saveArticle_novels", async(req, res) => {
-    await saveContent_Article_Novels(...req.body)
+    await saveContent_Article_Novels(req.body)
 });
 
 // 📱 حفظ بوست
@@ -541,6 +541,7 @@ app.post("/getuser", async(req, res) => {
         res.status(500).json({ message: "Error searching user" });
     }
 });
+
 // متابعه مستخدم
 app.post("/followingUser", async(req, res) => {
     const { IdUser, idFollowedUser } = req.body;
