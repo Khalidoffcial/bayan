@@ -339,10 +339,11 @@ async function enrichContent(contentArray) {
 // ======================================================
 
 io.on("connection", (socket) => {
-    console.log("🟢 Client Connected:", socket.id);
+    const userId = socket.handshake.query.userId; // ✅
+    if (userId) {
         onlineUsers.set(userId, socket.id);
         socket.userId = userId;
-
+    }
     // ==================================================
     // SET INTERESTS
     // ==================================================
@@ -729,7 +730,9 @@ socket.on("unfollowUser", async ({ idUser, idFollowedUser }) => {
 // START SERVER
 // ======================================================
 
-httpServer.listen(9000,"0.0.0.0", () => {
+const PORT = process.env.PORT2 || 9000; // ✅
+
+httpServer.listen(PORT,"0.0.0.0", () => {
     console.log(
         "🚀 Advanced AI Feed Server Running on Port 9000"
     );
