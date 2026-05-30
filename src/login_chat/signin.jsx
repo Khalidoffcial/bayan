@@ -4,7 +4,7 @@ import cookie from "../databases/cookies_DAO.js";
 import nextIcon from "../icons/next.png";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import earth from "../image/3d-rendering-dark-earth-space.jpg";
+import earth from "../image/image0.svg";
 import { auth, googleProvider } from "./firebase.js";
 import { signInWithPopup } from "firebase/auth";
 import Notification from "./Notification";
@@ -129,6 +129,7 @@ function Login() {
             type="text"
             placeholder="Username"
             autoComplete="off"
+            autofill="false"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />

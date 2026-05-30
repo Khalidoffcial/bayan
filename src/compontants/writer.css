@@ -13,8 +13,8 @@
     font-family: "Inter", sans-serif;
     height: 50px;
     border-radius: 8px;
-    background-color: #585858;
-    color: rgb(199, 199, 199);
+    background-color: #f0f0f0;
+    color: rgb(14, 14, 14);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -294,8 +294,8 @@
     font-family: "Inter", sans-serif;
     height: 50px;
     border-radius: 8px;
-    background-color: #585858;
-    color: rgb(199, 199, 199);
+    background-color: #a3a3a3a4;
+    color: rgb(0, 0, 0);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -315,7 +315,7 @@
     top: 5%;
     left: 10%;
     transform: translate(-50%, -50%);
-    background: #1b1b1b;
+    background: #e6e6e6;
     color: #fff;
     width: 80%;
     height: 90%;

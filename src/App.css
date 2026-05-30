@@ -12,7 +12,7 @@
   }
   
   body {
-    background: #d9d9d9;
+    background: #ffffff;
     font-family: "Zain", sans-serif;
     overflow-x: hidden;
     font-weight:900;
@@ -756,7 +756,7 @@ justify-content: flex-end;
 .sidebar {
     width: 20%;
     height: 100%;
-    background-color: #f7f7f7;
+    background-color: #ffffff;
     padding: 20px;
     border-right: 1px solid #ddd;
     position:fixed;

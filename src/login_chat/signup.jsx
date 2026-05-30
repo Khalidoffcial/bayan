@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./signup.css";
 import axios from "axios";
 import nextIcon from "../icons/next.png";
-import earth from "../image/3d-rendering-dark-earth-space.jpg";
+import earth from "../image/image0.svg";
 import { Link, useNavigate } from "react-router-dom";
 import cookie from "../databases/cookies_DAO.js";
 
@@ -166,6 +166,7 @@ function Signup() {
             type="text"
             placeholder="Full Name"
             onChange={handleFullName}
+            autofill="false"
           />
 
           <input

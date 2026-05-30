@@ -1,0 +1,242 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style="background-color: #050505; overflow: hidden;">
+    <defs>
+        <radialGradient id="bgGrad" cx="50%" cy="50%" r="75%">
+            <stop offset="0%" stop-color="#091322" />
+            <stop offset="60%" stop-color="#060b13" />
+            <stop offset="100%" stop-color="#050505" />
+        </radialGradient>
+
+        <linearGradient id="fadeRightData" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#F5F5F5" stop-opacity="0.35" />
+            <stop offset="50%" stop-color="#F5F5F5" stop-opacity="0.1" />
+            <stop offset="100%" stop-color="#F5F5F5" stop-opacity="0" />
+        </linearGradient>
+
+        <linearGradient id="fadeLeftData" x1="1920" y1="0" x2="1120" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#F5F5F5" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#F5F5F5" stop-opacity="0" />
+        </linearGradient>
+        
+        <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#F5F5F5" stop-opacity="0.8" />
+            <stop offset="100%" stop-color="#F5F5F5" stop-opacity="0" />
+        </radialGradient>
+
+        <style>
+            .float-slow { animation: float-anim 18s ease-in-out infinite; }
+            .float-slower { animation: float-anim-alt 24s ease-in-out infinite alternate; }
+            .spin { animation: spin-anim 80s linear infinite; }
+            .spin-reverse { animation: spin-anim 120s linear infinite reverse; }
+            .pulse { animation: pulse-anim 7s ease-in-out infinite alternate; }
+            .pulse-slow { animation: pulse-anim 12s ease-in-out infinite alternate-reverse; }
+            .dash-flow { animation: dash-flow-anim 40s linear infinite; }
+            .dash-flow-fast { animation: dash-flow-anim 25s linear infinite reverse; }
+            
+            @keyframes float-anim {
+                0%, 100% { transform: translate(0, 0); }
+                50% { transform: translate(12px, -18px); }
+            }
+            @keyframes float-anim-alt {
+                0%, 100% { transform: translate(0, 0); }
+                50% { transform: translate(-10px, 15px); }
+            }
+            @keyframes spin-anim {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            @keyframes pulse-anim {
+                0% { opacity: 0.15; transform: scale(0.95); }
+                100% { opacity: 0.7; transform: scale(1.15); }
+            }
+            @keyframes dash-flow-anim {
+                from { stroke-dashoffset: 1000; }
+                to { stroke-dashoffset: 0; }
+            }
+        </style>
+    </defs>
+
+    <rect width="100%" height="100%" fill="url(#bgGrad)" />
+
+    <!-- ========================================== -->
+    <!-- TOP-LEFT: Neural Network / Scientific Nodes-->
+    <!-- ========================================== -->
+    <g id="top-left-neural-net" class="float-slow">
+        <!-- Connections -->
+        <g stroke="#F5F5F5" stroke-width="1" opacity="0.12">
+            <line x1="150" y1="150" x2="250" y2="80" />
+            <line x1="150" y1="150" x2="300" y2="250" />
+            <line x1="150" y1="150" x2="180" y2="320" />
+            
+            <line x1="250" y1="80" x2="400" y2="120" />
+            <line x1="250" y1="80" x2="300" y2="250" />
+            
+            <line x1="400" y1="120" x2="450" y2="280" />
+            <line x1="400" y1="120" x2="600" y2="180" />
+            
+            <line x1="300" y1="250" x2="180" y2="320" />
+            <line x1="300" y1="250" x2="450" y2="280" />
+            <line x1="300" y1="250" x2="350" y2="420" />
+            
+            <line x1="180" y1="320" x2="100" y2="450" />
+            <line x1="180" y1="320" x2="350" y2="420" />
+            
+            <line x1="450" y1="280" x2="350" y2="420" />
+            <line x1="450" y1="280" x2="600" y2="180" />
+            <line x1="450" y1="280" x2="650" y2="380" />
+            
+            <line x1="350" y1="420" x2="100" y2="450" />
+            <line x1="350" y1="420" x2="480" y2="520" />
+        </g>
+        
+        <!-- Nodes -->
+        <circle cx="150" cy="150" r="3" fill="#F5F5F5" opacity="0.6" class="pulse" />
+        <circle cx="250" cy="80" r="2" fill="#F5F5F5" opacity="0.4" />
+        <circle cx="400" cy="120" r="4" fill="#F5F5F5" opacity="0.7" class="pulse-slow" />
+        <circle cx="300" cy="250" r="3.5" fill="#F5F5F5" opacity="0.8" class="pulse" />
+        <circle cx="180" cy="320" r="2.5" fill="#F5F5F5" opacity="0.5" />
+        <circle cx="450" cy="280" r="2" fill="#F5F5F5" opacity="0.6" />
+        <circle cx="350" cy="420" r="3" fill="#F5F5F5" opacity="0.4" class="pulse-slow" />
+        <circle cx="100" cy="450" r="2" fill="#F5F5F5" opacity="0.3" />
+        <circle cx="600" cy="180" r="1.5" fill="#F5F5F5" opacity="0.5" />
+        <circle cx="650" cy="380" r="2.5" fill="#F5F5F5" opacity="0.2" />
+        <circle cx="480" cy="520" r="2" fill="#F5F5F5" opacity="0.3" />
+        
+        <!-- Halos around major nodes -->
+        <circle cx="300" cy="250" r="15" fill="url(#nodeGlow)" opacity="0.2" class="pulse" />
+        <circle cx="400" cy="120" r="12" fill="url(#nodeGlow)" opacity="0.15" />
+        <circle cx="150" cy="150" r="10" fill="url(#nodeGlow)" opacity="0.2" class="pulse-slow" />
+    </g>
+
+    <!-- ========================================== -->
+    <!-- BOTTOM-LEFT: Literature / Articles / Data  -->
+    <!-- ========================================== -->
+    <g id="bottom-left-literature">
+        <g stroke="url(#fadeRightData)" fill="none" class="float-slower">
+            <line x1="0" y1="800" x2="450" y2="800" stroke-width="1.5" stroke-dasharray="25 15 5 10 50 20 10 10" class="dash-flow" />
+            <line x1="0" y1="835" x2="600" y2="835" stroke-width="1" stroke-dasharray="10 5 40 15 5 5 80 20" class="dash-flow-fast" />
+            <line x1="0" y1="870" x2="350" y2="870" stroke-width="2" stroke-dasharray="60 20 10 10 5 15" class="dash-flow" />
+            <line x1="0" y1="905" x2="700" y2="905" stroke-width="1" stroke-dasharray="5 10 15 5 120 30 10 10 20 15" class="dash-flow-fast" />
+            <line x1="0" y1="940" x2="550" y2="940" stroke-width="1.5" stroke-dasharray="30 15 5 5 10 10 40 20" class="dash-flow" />
+            <line x1="0" y1="975" x2="800" y2="975" stroke-width="0.5" stroke-dasharray="5 5 100 20 10 5" class="dash-flow-fast" />
+            <line x1="0" y1="1010" x2="400" y2="1010" stroke-width="2" stroke-dasharray="40 10 20 10" class="dash-flow" />
+            <line x1="0" y1="1045" x2="650" y2="1045" stroke-width="1" stroke-dasharray="15 15 80 20 5 10" class="dash-flow-fast" />
+        </g>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- TOP-RIGHT: Scientific Culture / Astrolabe  -->
+    <!-- ========================================== -->
+    <g id="top-right-science">
+        <g style="transform-origin: 1700px 150px;" class="spin">
+            <!-- Inner geometric orbit -->
+            <circle cx="1700" cy="150" r="120" fill="none" stroke="#F5F5F5" opacity="0.15" stroke-dasharray="1 8" stroke-width="2" />
+            <circle cx="1700" cy="150" r="120" fill="none" stroke="#F5F5F5" opacity="0.25" stroke-dasharray="40 300" stroke-width="2" />
+            
+            <!-- Middle structural orbit -->
+            <circle cx="1700" cy="150" r="220" fill="none" stroke="#0A1A35" opacity="0.9" stroke-dasharray="150 200 50 100" stroke-width="3" />
+            <circle cx="1700" cy="150" r="220" fill="none" stroke="#F5F5F5" opacity="0.1" stroke-dasharray="300 400" stroke-width="1" />
+            
+            <!-- Nodes on orbits -->
+            <circle cx="1820" cy="150" r="3" fill="#F5F5F5" opacity="0.6" />
+            <circle cx="1559" cy="271" r="2" fill="#F5F5F5" opacity="0.4" />
+        </g>
+        
+        <g style="transform-origin: 1700px 150px;" class="spin-reverse">
+            <!-- Outer delicate orbit -->
+            <circle cx="1700" cy="150" r="340" fill="none" stroke="#F5F5F5" opacity="0.08" stroke-dasharray="200 150 50 300" stroke-width="1" />
+            <circle cx="1700" cy="150" r="340" fill="none" stroke="#0A1A35" opacity="0.6" stroke-dasharray="10 40" stroke-width="2" />
+            
+            <circle cx="1700" cy="150" r="480" fill="none" stroke="#F5F5F5" opacity="0.04" stroke-dasharray="5 15" stroke-width="1" />
+            
+            <!-- Nodes on orbits -->
+            <circle cx="1360" cy="150" r="2.5" fill="#F5F5F5" opacity="0.5" />
+            <circle cx="1940" cy="390" r="1.5" fill="#F5F5F5" opacity="0.3" />
+        </g>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- BOTTOM-RIGHT: Flowing Knowledge Streams    -->
+    <!-- ========================================== -->
+    <g id="bottom-right-flow">
+        <!-- Deep background ambient wave -->
+        <path fill="none" stroke="#0A1A35" stroke-width="60" opacity="0.2">
+            <animate attributeName="d" 
+                values="M 1200 1150 C 1400 850, 1600 650, 2000 400; 
+                        M 1150 1150 C 1450 800, 1650 700, 2000 350; 
+                        M 1200 1150 C 1400 850, 1600 650, 2000 400" 
+                dur="22s" repeatCount="indefinite" />
+        </path>
+        
+        <!-- Smooth elegant primary streams -->
+        <path fill="none" stroke="#F5F5F5" stroke-width="1.5" opacity="0.15">
+            <animate attributeName="d" 
+                values="M 1050 1100 C 1350 800, 1600 550, 1950 300; 
+                        M 1100 1100 C 1400 750, 1650 600, 1950 250; 
+                        M 1050 1100 C 1350 800, 1600 550, 1950 300" 
+                dur="26s" repeatCount="indefinite" />
+        </path>
+        
+        <path fill="none" stroke="#F5F5F5" stroke-width="1" opacity="0.25">
+            <animate attributeName="d" 
+                values="M 1150 1100 C 1450 850, 1750 700, 1950 450; 
+                        M 1200 1100 C 1500 800, 1700 750, 1950 400; 
+                        M 1150 1100 C 1450 850, 1750 700, 1950 450" 
+                dur="19s" repeatCount="indefinite" />
+        </path>
+        
+        <!-- Dashed tech/data streams following the flow -->
+        <path fill="none" stroke="#F5F5F5" stroke-width="1.5" opacity="0.2" stroke-dasharray="10 15" class="dash-flow">
+            <animate attributeName="d" 
+                values="M 1300 1100 C 1550 900, 1800 750, 1950 550; 
+                        M 1250 1100 C 1600 850, 1850 800, 1950 500; 
+                        M 1300 1100 C 1550 900, 1800 750, 1950 550" 
+                dur="23s" repeatCount="indefinite" />
+        </path>
+
+        <path fill="none" stroke="#F5F5F5" stroke-width="0.5" opacity="0.3" stroke-dasharray="3 6" class="dash-flow-fast">
+            <animate attributeName="d" 
+                values="M 1400 1100 C 1650 950, 1850 850, 1950 650; 
+                        M 1350 1100 C 1700 900, 1900 900, 1950 600; 
+                        M 1400 1100 C 1650 950, 1850 850, 1950 650" 
+                dur="20s" repeatCount="indefinite" />
+        </path>
+
+        <!-- A lower sweeping wave crossing the bottom horizontally for depth -->
+        <path fill="none" stroke="#F5F5F5" stroke-width="1" opacity="0.08">
+            <animate attributeName="d" 
+                values="M 500 1100 C 900 950, 1500 950, 1950 800; 
+                        M 450 1100 C 850 900, 1550 900, 1950 850; 
+                        M 500 1100 C 900 950, 1500 950, 1950 800" 
+                dur="30s" repeatCount="indefinite" />
+        </path>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- GLOBAL: Floating Particles & Constellations-->
+    <!-- ========================================== -->
+    <g id="floating-particles">
+        <!-- Top Left Area -->
+        <circle cx="80" cy="80" r="1.5" fill="#F5F5F5" opacity="0.5" class="float-slow pulse" />
+        <circle cx="550" cy="50" r="1" fill="#F5F5F5" opacity="0.3" class="float-slower" />
+        <circle cx="700" cy="250" r="2" fill="#0A1A35" class="float-slow pulse-slow" />
+        
+        <!-- Bottom Left Area -->
+        <circle cx="150" cy="720" r="2" fill="#F5F5F5" opacity="0.4" class="float-slower pulse" />
+        <circle cx="450" cy="1000" r="1.5" fill="#F5F5F5" opacity="0.2" class="float-slow" />
+        <circle cx="750" cy="850" r="1" fill="#F5F5F5" opacity="0.5" class="float-slower pulse-slow" />
+        
+        <!-- Top Right Area -->
+        <circle cx="1300" cy="120" r="1.5" fill="#F5F5F5" opacity="0.6" class="float-slow pulse" />
+        <circle cx="1850" cy="80" r="2.5" fill="#0A1A35" opacity="0.8" class="float-slower" />
+        <circle cx="1500" cy="350" r="1" fill="#F5F5F5" opacity="0.3" class="float-slow" />
+        
+        <!-- Bottom Right Area -->
+        <circle cx="1800" cy="850" r="2" fill="#F5F5F5" opacity="0.5" class="float-slower pulse-slow" />
+        <circle cx="1400" cy="950" r="2.5" fill="#0A1A35" opacity="0.9" class="float-slow pulse" />
+        <circle cx="1650" cy="1020" r="1.5" fill="#F5F5F5" opacity="0.4" class="float-slower" />
+        
+        <!-- Very sparse center particles (almost invisible for clean login space) -->
+        <circle cx="950" cy="200" r="1" fill="#F5F5F5" opacity="0.15" class="float-slow" />
+        <circle cx="1200" cy="850" r="1.5" fill="#F5F5F5" opacity="0.1" class="float-slower pulse" />
+    </g>
+</svg>
