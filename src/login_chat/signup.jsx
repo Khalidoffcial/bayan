@@ -33,7 +33,7 @@ function Signup() {
 
     axios
       .post(
-        "http://bayan.railway.internal:4000/auth",
+        "https://bayan.railway.internal:4000/auth",
         {},
         {
           headers: {
@@ -118,7 +118,7 @@ function Signup() {
     };
 
     axios
-      .post("http://bayan.railway.internal:4000/signup", data, {
+      .post("https://bayan.railway.internal:4000/signup", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {

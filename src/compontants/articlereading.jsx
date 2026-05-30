@@ -236,7 +236,7 @@ const saveImages = async () =>{
   const uploadedImages = await saveImages(); // 🟢 كده تمام
  axios
         .post(
-          "http://192.168.1.9:4000/saveposts",
+          "http://bayan.railway.internal:4000/saveposts",
           { 
             autherID:getUserId(),
             id: PostId_generated,

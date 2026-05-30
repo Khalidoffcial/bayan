@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import "./interstetsModels.css";
 
-const socket = io("http://192.168.1.9:9000");
+const socket = io("http://bayan.railway.internal:9000");
 
 export default function InterestsPopup() {
   const [showModal, setShowModal] = useState(true);

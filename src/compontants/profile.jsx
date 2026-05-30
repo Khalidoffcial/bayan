@@ -39,7 +39,7 @@ import cookie from "../databases/cookies_DAO.js";
 // ======================================================
 
 const SOCKET_URL =
-  "http://bayan.railway.internal:9000";
+  "https://bayan.railway.internal:9000";
 
 
 
