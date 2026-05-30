@@ -39,7 +39,7 @@ import cookie from "../databases/cookies_DAO.js";
 // ======================================================
 
 const SOCKET_URL =
-  "https://bayan.railway.internal:9000";
+  "bayan-production-9dd3.up.railway.app:9000";
 
 
 
@@ -189,7 +189,7 @@ useEffect(() => {
 
     axios
       .post(
-        "http://bayan.railway.internal:4000/getuser",
+        "bayan-production-9dd3.up.railway.app:4000/getuser",
         { idOtherUser },
         {
           headers: {
@@ -301,7 +301,7 @@ function unfollowUser() {
       const parsed = JSON.parse(storedUser);
   axios
   .post(
-      "http://bayan.railway.internal:4000/followingUser",
+      "bayan-production-9dd3.up.railway.app:4000/followingUser",
       {  IdUser: parsed.id,
     idFollowedUser:idOtherUser },
     {
@@ -328,7 +328,7 @@ function unfollowUser() {
       const parsed = JSON.parse(storedUser);
   axios
   .post(
-      "http://bayan.railway.internal:4000/unfollowingUser",
+      "bayan-production-9dd3.up.railway.app:4000/unfollowingUser",
       {  IdUser: parsed.id,
     idFollowedUser:idOtherUser },
     {
@@ -374,7 +374,7 @@ const saveIMG = async (imgid, base64Image) => {
 function updataWithServer(Updatable, status) {
   axios
     .post(
-      "http://bayan.railway.internal:4000/editProfile",
+      "bayan-production-9dd3.up.railway.app:4000/editProfile",
       { Updatable, status },
       {
         headers: {
@@ -564,7 +564,7 @@ const handleCancelCropped = async () => {
         await saveImages();
 
       await axios.post(
-        "http://bayan.railway.internal:4000/saveposts",
+        "bayan-production-9dd3.up.railway.app:4000/saveposts",
         {
           autherID:
               JSON.parse(localStorage.getItem("me")).id,
