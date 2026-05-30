@@ -7,7 +7,6 @@ import { Link, useNavigate } from "react-router-dom";
 import earth from "../image/image0.svg";
 import { auth, googleProvider } from "./firebase.js";
 import { signInWithPopup } from "firebase/auth";
-import Notification from "./Notification";
 
 function Login() {
   const navigate = useNavigate();
@@ -16,13 +15,12 @@ function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [notification, setNotification] = useState(null);
 
   // Auto Auth when token exists
   useEffect(() => {
     axios
       .post(
-        "http://192.168.1.9:4000/auth",
+        "http://bayan.railway.internal:4000/auth",
         {},
         {
           headers: {
@@ -41,7 +39,7 @@ function Login() {
 
   // Handlers
   const handleLogin = () => {
-    const url = "http://192.168.1.9:4000/signin";
+    const url = "http://bayan.railway.internal:4000/signin";
     const data = { identifierUser: username, password };
 
     axios
@@ -75,7 +73,7 @@ function Login() {
       };
 
 
-      const url = "http://192.168.1.9:4000/auth/google";
+      const url = "http://bayan.railway.internal:4000/auth/google";
 
       axios
       .post(url, data, { headers: { "Content-Type": "application/json" } })
@@ -94,10 +92,7 @@ function Login() {
 
         navigate("/");
       }else{
-        setNotification({
-          message: res.data.message,
-          type: "error",
-        });
+        
 
       }
       })
@@ -177,13 +172,7 @@ function Login() {
           </button>
         </div>
       </div>
-       {notification && (
-        <Notification
-          message={notification.message}
-          type={notification.type}
-          onClose={() => setNotification(null)}
-        />
-      )}
+
     </div>
   );
 }

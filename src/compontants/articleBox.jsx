@@ -38,7 +38,6 @@ import Sidebar from "./sidebar.jsx";
 
 import InterestsPopup from "./interstetsModels.jsx";
 
-import SocialShare from "./SocialShare.jsx";
 
 import CircularLoader from "./loader.jsx";
 
@@ -1189,24 +1188,6 @@ const ArticleBox = () => {
                   selectedPost.content
                 }
               </h2>
-
-              <SocialShare
-                title={
-                  selectedPost.content
-                }
-                text={
-                  selectedPost.content
-                }
-                url={
-                  window.location.href
-                }
-                platforms={[
-                  "facebook",
-                  "twitter",
-                  "whatsapp",
-                  "telegram",
-                ]}
-              />
             </motion.div>
           </motion.div>
         )}

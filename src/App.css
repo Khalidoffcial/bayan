@@ -738,18 +738,6 @@ justify-content: flex-end;
 }
 
 
-/*Social shared*/
-
-.socialshared{
-    display: 'flex';
-    gap: '10px';
-    direction: 'rtl' ;
-}
-.socialshared img{
-    width: 30px;
-    height: 30px;
-}
-
 
 /* Sidebar */
 

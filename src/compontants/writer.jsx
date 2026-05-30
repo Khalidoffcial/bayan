@@ -1,6 +1,5 @@
 import React, { useState,useEffect } from "react";
 import "./writer.css";
-import ArticleDAO from "./Dao.js";
 import { storage } from './firebase.js';
 import cookie from "../databases/cookies_DAO.js";
 import axios from "axios";

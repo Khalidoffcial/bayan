@@ -25,8 +25,6 @@ import axios from "axios";
 
 import Top from "./top";
 
-import SocialShare from "./SocialShare.jsx";
-
 import PropellerAd from "./adsense.jsx";
 
 import { FaHeart, FaComment, FaShareAlt } from "react-icons/fa";
@@ -794,27 +792,6 @@ const saveImages = async () =>{
               Comment
             </button>
 
-
-        {/* SHARE */}
-
-        <SocialShare
-          title={
-            dataArticle.title
-          }
-          text={
-            dataArticle.descrip
-          }
-          url={
-            window.location.href
-          }
-          platforms={[
-            "facebook",
-            "twitter",
-            "whatsapp",
-            "linkedin",
-            "telegram",
-          ]}
-        />
 
         {/* PDF */}
 

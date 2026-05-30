@@ -33,7 +33,7 @@ function Signup() {
 
     axios
       .post(
-        "http://192.168.1.9:4000/auth",
+        "http://bayan.railway.internal:4000/auth",
         {},
         {
           headers: {
@@ -118,7 +118,7 @@ function Signup() {
     };
 
     axios
-      .post("http://192.168.1.9:4000/signup", data, {
+      .post("http://bayan.railway.internal:4000/signup", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {

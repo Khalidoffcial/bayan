@@ -2,7 +2,6 @@ import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from './homepage.jsx';
 import ArticleBox from './compontants/articleBox.jsx';
-import AdminArticle from './compontants/adminArticle.jsx';
 import Signup from './login_chat/signup.jsx';
 import Login from './login_chat/signin.jsx';
 import Profile from './compontants/profile.jsx';
@@ -19,9 +18,6 @@ function App() {
         <
         Route exact path = '/'
         element = { < HomePage / > }
-        /> <
-        Route path = '/a/666'
-        element = { < AdminArticle / > }
         /> <
         Route path = '/signup'
         element = { < Signup / > }
