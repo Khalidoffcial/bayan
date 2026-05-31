@@ -20,7 +20,7 @@ function Login() {
   useEffect(() => {
     axios
       .post(
-        "bayan-production-9dd3.up.railway.app:4000/auth",
+        "bayan-production-9dd3.up.railway.app/auth",
         {},
         {
           headers: {
@@ -39,7 +39,7 @@ function Login() {
 
   // Handlers
   const handleLogin = () => {
-    const url = "bayan-production-9dd3.up.railway.app:4000/signin";
+    const url = "bayan-production-9dd3.up.railway.app/signin";
     const data = { identifierUser: username, password };
 
     axios
@@ -73,7 +73,7 @@ function Login() {
       };
 
 
-      const url = "bayan-production-9dd3.up.railway.app:4000/auth/google";
+      const url = "bayan-production-9dd3.up.railway.app/auth/google";
 
       axios
       .post(url, data, { headers: { "Content-Type": "application/json" } })

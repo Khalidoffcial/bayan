@@ -33,7 +33,7 @@ function Signup() {
 
     axios
       .post(
-        "bayan-production-9dd3.up.railway.app:4000/auth",
+        "bayan-production-9dd3.up.railway.app/auth",
         {},
         {
           headers: {
@@ -118,7 +118,7 @@ function Signup() {
     };
 
     axios
-      .post("bayan-production-9dd3.up.railway.app:4000/signup", data, {
+      .post("bayan-production-9dd3.up.railway.app/signup", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
