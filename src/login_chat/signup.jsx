@@ -17,6 +17,8 @@ function Signup() {
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email_google, set_email] = useState("");
+  const [uid_google, set_uid] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -76,8 +78,8 @@ function Signup() {
       fullName,
       username: finalUsername,
       password,
-      email: null,
-      uid: null,
+      email: email_google,
+      uid: uid_google,
     };
 
     axios
@@ -112,15 +114,12 @@ function Signup() {
       const email = result.user.email;
       const uid = result.user.uid;
 
+      set_email(email)
+      set_uid(uid)
+
       console.log(email)
       console.log(uid)
-      const res = await axios.post(`${API}/authGoogle`, {
-        email,
-        uid,
-      });
 
-      
-      localStorage.setItem("me", JSON.stringify(res.data.userData));
 
     } catch (err) {
       console.error("Google login error:", err);
