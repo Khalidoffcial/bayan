@@ -1,5 +1,5 @@
 [deploy]
-startCommand = "node signup_signin_server.js"
+startCommand = "node mainServer.js"
 
 [variables]
 RAILPACK_NO_SPA = "1"
