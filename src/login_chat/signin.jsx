@@ -8,6 +8,7 @@ import earth from "../image/image0.svg";
 import { auth, googleProvider } from "./firebase.js";
 import { signInWithPopup } from "firebase/auth";
 
+const API = "https://bayan-production-9dd3.up.railway.app"
 function Login() {
   const navigate = useNavigate();
 
@@ -20,7 +21,7 @@ function Login() {
   useEffect(() => {
     axios
       .post(
-        "bayan-production-9dd3.up.railway.app/auth",
+        `${API}/auth`,
         {},
         {
           headers: {
@@ -39,7 +40,7 @@ function Login() {
 
   // Handlers
   const handleLogin = () => {
-    const url = "bayan-production-9dd3.up.railway.app/signin";
+    const url = `${API}/signin`;
     const data = { identifierUser: username, password };
 
     axios
@@ -73,7 +74,7 @@ function Login() {
       };
 
 
-      const url = "bayan-production-9dd3.up.railway.app/auth/google";
+      const url = `${API}/auth/google`;
 
       axios
       .post(url, data, { headers: { "Content-Type": "application/json" } })

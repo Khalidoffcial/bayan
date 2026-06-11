@@ -9,6 +9,8 @@ import cookie from "../databases/cookies_DAO.js";
 import { auth, googleProvider } from "./firebase.js";
 import { signInWithRedirect, getRedirectResult } from "firebase/auth";
 
+const API = "https://bayan-production-9dd3.up.railway.app"
+
 function Signup() {
   const navigate = useNavigate();
 
@@ -33,7 +35,7 @@ function Signup() {
 
     axios
       .post(
-        "bayan-production-9dd3.up.railway.app/auth",
+        `${API}/auth`,
         {},
         {
           headers: {
@@ -118,7 +120,7 @@ function Signup() {
     };
 
     axios
-      .post("bayan-production-9dd3.up.railway.app/signup", data, {
+      .post(`${API}/signup`, data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
