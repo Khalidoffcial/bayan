@@ -9,12 +9,11 @@ import cookie from "../databases/cookies_DAO.js";
 import { auth, googleProvider } from "./firebase.js";
 import { signInWithRedirect, getRedirectResult } from "firebase/auth";
 
-const API = "https://bayan-production-9dd3.up.railway.app"
+const API = "https://bayan-production-9dd3.up.railway.app";
 
 function Signup() {
   const navigate = useNavigate();
 
-  // States
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -23,13 +22,12 @@ function Signup() {
 
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [showConfirmError, setShowConfirmError] = useState(false);
-  const [googleUser, setGoogleUser] = useState(null);
 
-  // -------------------------
-  // Auth check (JWT)
-  // -------------------------
+  // ==============================
+  // CHECK AUTH TOKEN (on load)
+  // ==============================
   useEffect(() => {
-    const token = cookie("get");
+    const token = localStorage.getItem("Token") || cookie("get");
 
     if (!token) return;
 
@@ -39,12 +37,12 @@ function Signup() {
         {},
         {
           headers: {
-            Authorization: "Bearer " + token,
+            Authorization: `Bearer ${token}`,
           },
         }
       )
       .then((res) => {
-        if (res.status === 200 && res.data.userData) {
+        if (res.status === 200) {
           localStorage.setItem("me", JSON.stringify(res.data.userData));
           navigate("/");
         }
@@ -52,22 +50,25 @@ function Signup() {
       .catch(() => {});
   }, [navigate]);
 
-  // -------------------------
-  // Google redirect result handler
-  // -------------------------
+  // ==============================
+  // GOOGLE REDIRECT RESULT ONLY
+  // ==============================
   useEffect(() => {
     const handleGoogleResult = async () => {
       try {
-        const result = await signInWithRedirect(auth,googleProvider);
+        const result = await getRedirectResult(auth);
 
         if (result?.user) {
-          const user = {
+          const googleData = {
             email: result.user.email,
             uid: result.user.uid,
           };
 
-          setGoogleUser(user);
-          localStorage.setItem("googleUser", JSON.stringify(user));
+          const res = await axios.post(`${API}/auth/google`, googleData);
+
+
+          localStorage.setItem("me", JSON.stringify(res.data.userData));
+
         }
       } catch (err) {
         console.error("Google redirect error:", err);
@@ -75,20 +76,20 @@ function Signup() {
     };
 
     handleGoogleResult();
-  }, []);
+  }, [navigate]);
 
-  // -------------------------
-  // Handlers
-  // -------------------------
+  // ==============================
+  // HANDLERS
+  // ==============================
   const handleFullName = (e) => setFullName(e.target.value);
   const handleUsername = (e) => setUsername(e.target.value);
   const handlePassword = (e) => setPassword(e.target.value);
   const handleConfirmPassword = (e) => setConfirmPassword(e.target.value);
   const handleRememberMe = (e) => setRememberMe(e.target.checked);
 
-  // -------------------------
-  // Signup
-  // -------------------------
+  // ==============================
+  // SIGNUP
+  // ==============================
   const handleSignup = () => {
     const uppercaseRegex = /[A-Z]/;
 
@@ -109,22 +110,18 @@ function Signup() {
       ? username
       : "@" + username;
 
-    const googleData = JSON.parse(localStorage.getItem("googleUser"));
-
     const data = {
       fullName,
       username: finalUsername,
       password,
-      email: googleData?.email || null,
-      uid: googleData?.uid || null,
+      email: null,
+      uid: null,
     };
 
     axios
-      .post(`${API}/signup`, data, {
-        headers: { "Content-Type": "application/json" },
-      })
-      .then((response) => {
-        const token = response.data.token;
+      .post(`${API}/signup`, data)
+      .then((res) => {
+        const token = res.data.token;
 
         if (rememberMe) {
           cookie(token);
@@ -132,18 +129,17 @@ function Signup() {
           localStorage.setItem("Token", token);
         }
 
-        localStorage.setItem("me", JSON.stringify(response.data.userData));
-
+        localStorage.setItem("me", JSON.stringify(res.data.userData));
         navigate("/");
       })
-      .catch((error) => {
-        console.error("Signup Error:", error);
+      .catch((err) => {
+        console.error("Signup Error:", err);
       });
   };
 
-  // -------------------------
-  // Google login (Redirect only)
-  // -------------------------
+  // ==============================
+  // GOOGLE LOGIN (ONLY CLICK)
+  // ==============================
   const handleGoogleLogin = async () => {
     try {
       await signInWithRedirect(auth, googleProvider);
@@ -152,9 +148,9 @@ function Signup() {
     }
   };
 
-  // -------------------------
+  // ==============================
   // UI
-  // -------------------------
+  // ==============================
   return (
     <div className="log-page">
       <img className="background" src={earth} alt="bg" />
@@ -168,7 +164,6 @@ function Signup() {
             type="text"
             placeholder="Full Name"
             onChange={handleFullName}
-            autofill="false"
           />
 
           <input
@@ -199,7 +194,7 @@ function Signup() {
             <p className="error">Passwords do not match</p>
           )}
 
-          {/* Google */}
+          {/* GOOGLE */}
           <button
             type="button"
             className="login_with_google_btn"
@@ -208,13 +203,12 @@ function Signup() {
             Sign in with Google
           </button>
 
-          {/* Remember Me */}
+          {/* REMEMBER */}
           <div className="checkbox">
             <input
               type="checkbox"
               checked={rememberMe}
               onChange={handleRememberMe}
-              className="checkboxInput"
             />
             <h4 className="checkboxLabel">Remember Me</h4>
           </div>
