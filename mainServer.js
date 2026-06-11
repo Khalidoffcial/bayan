@@ -425,7 +425,8 @@ app.post("/signup", async (req, res) => {
         const existsName = await sign.logup_user_check_fsp(fullName, username, password);
         if (existsName) return res.status(409).json({ message: "Username already exists" });
 
-        const existingUser = await sign.findbyEmail(email);
+        const existingUser = await sign.findUserByEmailAndUid(email, uid);
+        
         if (existingUser) {
             const payload = { id: existingUser.Id_user, name: existingUser.F_user, username: existingUser.S_user, pass: existingUser.psw };
             const userData = {
