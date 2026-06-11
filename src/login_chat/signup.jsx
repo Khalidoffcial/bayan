@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import cookie from "../databases/cookies_DAO.js";
 
 import { auth, googleProvider } from "./firebase.js";
-import { signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 
 const API = "https://bayan-production-9dd3.up.railway.app";
 
@@ -24,11 +24,10 @@ function Signup() {
   const [showConfirmError, setShowConfirmError] = useState(false);
 
   // ==============================
-  // CHECK AUTH TOKEN (on load)
+  // AUTH CHECK (JWT)
   // ==============================
   useEffect(() => {
-    const token = localStorage.getItem("Token") || cookie("get");
-
+    const token = cookie("get") || localStorage.getItem("Token");
     if (!token) return;
 
     axios
@@ -42,7 +41,7 @@ function Signup() {
         }
       )
       .then((res) => {
-        if (res.status === 200) {
+        if (res.data?.userData) {
           localStorage.setItem("me", JSON.stringify(res.data.userData));
           navigate("/");
         }
@@ -51,44 +50,7 @@ function Signup() {
   }, [navigate]);
 
   // ==============================
-  // GOOGLE REDIRECT RESULT ONLY
-  // ==============================
-  useEffect(() => {
-    const handleGoogleResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-
-        if (result?.user) {
-          const googleData = {
-            email: result.user.email,
-            uid: result.user.uid,
-          };
-
-          const res = await axios.post(`${API}/auth/google`, googleData);
-
-
-          localStorage.setItem("me", JSON.stringify(res.data.userData));
-
-        }
-      } catch (err) {
-        console.error("Google redirect error:", err);
-      }
-    };
-
-    handleGoogleResult();
-  }, [navigate]);
-
-  // ==============================
   // HANDLERS
-  // ==============================
-  const handleFullName = (e) => setFullName(e.target.value);
-  const handleUsername = (e) => setUsername(e.target.value);
-  const handlePassword = (e) => setPassword(e.target.value);
-  const handleConfirmPassword = (e) => setConfirmPassword(e.target.value);
-  const handleRememberMe = (e) => setRememberMe(e.target.checked);
-
-  // ==============================
-  // SIGNUP
   // ==============================
   const handleSignup = () => {
     const uppercaseRegex = /[A-Z]/;
@@ -119,9 +81,11 @@ function Signup() {
     };
 
     axios
-      .post(`${API}/signup`, data)
-      .then((res) => {
-        const token = res.data.token;
+      .post(`${API}/signup`, data, {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((response) => {
+        const token = response.data.token;
 
         if (rememberMe) {
           cookie(token);
@@ -129,20 +93,33 @@ function Signup() {
           localStorage.setItem("Token", token);
         }
 
-        localStorage.setItem("me", JSON.stringify(res.data.userData));
+        localStorage.setItem("me", JSON.stringify(response.data.userData));
+
         navigate("/");
       })
-      .catch((err) => {
-        console.error("Signup Error:", err);
+      .catch((error) => {
+        console.error("Signup Error:", error);
       });
   };
 
   // ==============================
-  // GOOGLE LOGIN (ONLY CLICK)
+  // GOOGLE LOGIN (FIXED)
   // ==============================
   const handleGoogleLogin = async () => {
     try {
-      await signInWithRedirect(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+
+      const email = result.user.email;
+      const uid = result.user.uid;
+
+      const res = await axios.post(`${API}/auth/google`, {
+        email,
+        uid,
+      });
+
+      
+      localStorage.setItem("me", JSON.stringify(res.data.userData));
+
     } catch (err) {
       console.error("Google login error:", err);
     }
@@ -163,19 +140,19 @@ function Signup() {
           <input
             type="text"
             placeholder="Full Name"
-            onChange={handleFullName}
+            onChange={(e) => setFullName(e.target.value)}
           />
 
           <input
             type="text"
             placeholder="Username"
-            onChange={handleUsername}
+            onChange={(e) => setUsername(e.target.value)}
           />
 
           <input
             type="password"
             placeholder="Password"
-            onChange={handlePassword}
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           {showPasswordError && (
@@ -187,14 +164,14 @@ function Signup() {
           <input
             type="password"
             placeholder="Confirm Password"
-            onChange={handleConfirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
 
           {showConfirmError && (
             <p className="error">Passwords do not match</p>
           )}
 
-          {/* GOOGLE */}
+          {/* Google */}
           <button
             type="button"
             className="login_with_google_btn"
@@ -203,12 +180,13 @@ function Signup() {
             Sign in with Google
           </button>
 
-          {/* REMEMBER */}
+          {/* Remember Me */}
           <div className="checkbox">
             <input
               type="checkbox"
               checked={rememberMe}
-              onChange={handleRememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="checkboxInput"
             />
             <h4 className="checkboxLabel">Remember Me</h4>
           </div>
