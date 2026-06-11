@@ -23,11 +23,23 @@ const novel_categories = JSON.parse(fs.readFileSync("novel_categories.json", "ut
 // APP + HTTP SERVER + SOCKET.IO
 // ======================================================
 
+const allowedOrigins = [
+    "https://bayan-space.vercel.app",
+    "http://localhost:3000",
+];
+
+
 const app = express();
 const httpServer = createServer(app); // ✅ Express فوق نفس الـ httpServer
 const io = new Server(httpServer, {
-    cors: { origin: "*" },
+    cors: {
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true,
+    },
+    transports: ["websocket", "polling"],
 });
+
 
 const PORT = process.env.PORT || 4000;
 
@@ -36,10 +48,12 @@ const PORT = process.env.PORT || 4000;
 // ======================================================
 
 app.use(cors({
-    origin: "*",
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
 }));
+
+
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
@@ -56,12 +70,13 @@ const onlineUsers = new Map();
 (async () => {
     try {
         const redis = require("redis");
-        redisClient = redis.createClient({ url: "redis://127.0.0.1:6379" });
-
-        redisClient.on("error", () => {
-            if (useRedis) console.log("⚠ Redis disconnected -> Using Memory Cache");
-            useRedis = false;
+        redisClient = redis.createClient({
+            url: process.env.REDIS_URL
         });
+
+        if (!process.env.REDIS_URL) {
+    console.log("No Redis URL -> Memory Cache Enabled");
+}
 
         try {
             await redisClient.connect();
