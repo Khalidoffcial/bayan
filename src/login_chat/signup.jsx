@@ -58,7 +58,7 @@ function Signup() {
   useEffect(() => {
     const handleGoogleResult = async () => {
       try {
-        const result = await getRedirectResult(auth);
+        const result = await signInWithRedirect(auth,googleProvider);
 
         if (result?.user) {
           const user = {
