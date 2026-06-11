@@ -393,7 +393,7 @@ app.post("/signin", async (req, res) => {
 app.post("/authGoogle", async (req, res) => {
     const { email, uid } = req.body;
     if (!email || !uid) return res.status(400).json({ message: "Please enter all fields" });
-    console.log(enail)
+    console.log(email)
     console.log(uid)
 
     try {
