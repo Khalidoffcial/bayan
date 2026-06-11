@@ -4,7 +4,7 @@ import { signInWithPopup } from "firebase/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export default function GoogleLoginButton({ endpoint }) {
+export default function GoogleLoginButton() {
   const navigate = useNavigate();
 
   const handleGoogleLogin = async () => {
@@ -21,7 +21,7 @@ export default function GoogleLoginButton({ endpoint }) {
         uid: user.uid,
       };
 
-      const res = await axios.post(`bayan-production-9dd3.up.railway.app/${endpoint}`, googleUser, {
+      const res = await axios.post(`bayan-production-9dd3.up.railway.app/authGoogle`, googleUser, {
         headers: { "Content-Type": "application/json" },
       });
 
