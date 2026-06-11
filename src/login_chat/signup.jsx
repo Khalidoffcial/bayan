@@ -112,7 +112,7 @@ function Signup() {
       const email = result.user.email;
       const uid = result.user.uid;
 
-      const res = await axios.post(`${API}/auth/google`, {
+      const res = await axios.post(`${API}/authGoogle`, {
         email,
         uid,
       });

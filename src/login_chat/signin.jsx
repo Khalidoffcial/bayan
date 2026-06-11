@@ -74,7 +74,7 @@ function Login() {
       };
 
 
-      const url = `${API}/auth/google`;
+      const url = `${API}/authGoogle`;
 
       axios
       .post(url, data, { headers: { "Content-Type": "application/json" } })
