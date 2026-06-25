@@ -93,6 +93,7 @@ useEffect(() => {
         <div className="img"></div>
         <div className="company_name"><a href="/"> bayan </a></div>
       </div>
+      
     </header>
   );
 };

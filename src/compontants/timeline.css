@@ -85,14 +85,14 @@ body {
 
 /* صورة البروفايل */
 
-.profile-pic-wrapper-posts {
+.profile-pic-wrapper-Ideas {
     position: relative;
     width: 40px;
     height: 40px;
     margin: 0 7px;
 }
 
-.profile-pic-posts {
+.profile-pic-Ideas {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -102,7 +102,7 @@ body {
     transition: transform 0.2s;
 }
 
-.profile-pic-posts:hover {
+.profile-pic-Ideas:hover {
     transform: scale(1.05);
 }
 

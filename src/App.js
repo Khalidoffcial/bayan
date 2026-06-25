@@ -7,6 +7,7 @@ import Login from './login_chat/signin.jsx';
 import Profile from './compontants/profile.jsx';
 import Articlereading from './compontants/articlereading.jsx';
 import Postreading from './compontants/postreading.jsx';
+import Settings from './pages/Settings.jsx';
 // eslint-disable-next-line
 function App() {
     return (
@@ -25,10 +26,13 @@ function App() {
         Route path = '/signin'
         element = { < Login / > }
         /> <
+        Route path = '/settings'
+        element = { < Settings / > }
+        /> <
         Route path = '/p/:idOtherUser'
         element = { < Profile / > }
         /> <
-        Route path = ':typeArticle'
+        Route path = '/:typeArticle'
         element = { < ArticleBox / > }
         /> <
         Route path = '/r/:articleId'

@@ -123,7 +123,7 @@ const saveImages = async () =>{
   const uploadedImages = await saveImages(); // 🟢 كده تمام
  axios
         .post(
-          "bayan-production-9dd3.up.railway.app/saveposts",
+          "bayan-production-9dd3.up.railway.app/saveIdeas",
           { 
             autherID:DataUser.id,
             id: PostId,
