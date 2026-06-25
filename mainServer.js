@@ -534,14 +534,21 @@ app.post("/editProfile", async (req, res) => {
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
         if (err) return res.status(403).json({ message: "Invalid token" });
 
-        const buildUserData = (u) => ({
+const buildUserData = async (u) => {
+    const settings = await sign.getUserSettings(u.Id_user);
 
-
-            imgProfile: u.imgProfile, id: u.Id_user, name: u.F_user,
-            username: u.S_user, Bio: u.Bio, followers: u.followers,
-            following: u.following, IdPoster: u.Posters,settings:await sign.getUserSettings(u.Id_user)
-        });
-
+    return {
+        imgProfile: u.imgProfile,
+        id: u.Id_user,
+        name: u.F_user,
+        username: u.S_user,
+        Bio: u.Bio,
+        followers: u.followers,
+        following: u.following,
+        IdPoster: u.Posters,
+        settings
+    };
+};
         try {
             let updatedUser;
             if (status === "img") {
