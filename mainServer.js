@@ -407,10 +407,14 @@ app.post("/signin", async (req, res) => {
         if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
         const payload = { id: user.Id_user, name: user.F_user, username: user.S_user, pass: user.psw };
+        const settings =
+        await sign.getUserSettings(
+          user.Id_user
+        );
         const userData = {
             imgProfile: user.imgProfile, id: user.Id_user, name: user.F_user,
             username: user.S_user, Bio: user.Bio, followers: user.followers,
-            following: user.following, IdPoster: user.Posters,
+            following: user.following, IdPoster: user.Posters,settings
         };
 
         res.json({ message: "Login successful", accessToken: generateToken(payload), userData });
@@ -433,10 +437,14 @@ app.post("/authGoogle", async (req, res) => {
             return res.status(404).json({ message: "Invalid login credentials.", email, uid });
 
         const payload = { id: existingUser.Id_user, name: existingUser.F_user, username: existingUser.S_user, pass: existingUser.psw };
+        const settings =
+        await sign.getUserSettings(
+          user.Id_user
+        );
         const userData = {
             imgProfile: existingUser.imgProfile, id: existingUser.Id_user, name: existingUser.F_user,
             username: existingUser.S_user, Bio: existingUser.Bio, followers: existingUser.followers,
-            following: existingUser.following, IdPoster: existingUser.Posters,
+            following: existingUser.following, IdPoster: existingUser.Posters,settings
         };
 
         res.json({ message: "Login successful", accessToken: generateToken(payload), userData });
@@ -460,10 +468,14 @@ app.post("/signup", async (req, res) => {
         
         if (existingUser) {
             const payload = { id: existingUser.Id_user, name: existingUser.F_user, username: existingUser.S_user, pass: existingUser.psw };
+            const settings =
+        await sign.getUserSettings(
+          existingUser.Id_user
+        );
             const userData = {
                 imgProfile: existingUser.imgProfile, id: existingUser.Id_user, name: existingUser.F_user,
                 username: existingUser.S_user, Bio: existingUser.Bio, followers: existingUser.followers,
-                following: existingUser.following, IdPoster: existingUser.Posters,
+                following: existingUser.following, IdPoster: existingUser.Posters,settings
             };
             return res.json({ message: "Login successful", accessToken: generateToken(payload), userData });
         }
@@ -474,7 +486,7 @@ app.post("/signup", async (req, res) => {
         const userData = {
             imgProfile: user.imgProfile, id: user.Id_user, name: user.F_user,
             username: user.S_user, Bio: user.Bio, followers: user.followers,
-            following: user.following, IdPoster: user.Posters,
+            following: user.following, IdPoster: user.Posters,settings
         };
 
         res.status(201).json({ message: "Signup successful", token, userData });
@@ -493,13 +505,16 @@ app.post("/auth", (req, res) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
         if (err) return res.status(403).json({ message: "Invalid token" });
-
         try {
             const user = await sign.login_user(decoded.id, decoded.pass);
+const settings =
+        await sign.getUserSettings(
+          user.Id_user
+        );
             const userData = {
                 imgProfile: user.imgProfile, id: user.Id_user, name: user.F_user,
                 username: user.S_user, Bio: user.Bio, followers: user.followers,
-                following: user.following, IdPoster: user.Posters,
+                following: user.following, IdPoster: user.Posters,settings
             };
             res.json({ valid: true, userData });
         } catch (err) {
@@ -520,9 +535,11 @@ app.post("/editProfile", async (req, res) => {
         if (err) return res.status(403).json({ message: "Invalid token" });
 
         const buildUserData = (u) => ({
+
+
             imgProfile: u.imgProfile, id: u.Id_user, name: u.F_user,
             username: u.S_user, Bio: u.Bio, followers: u.followers,
-            following: u.following, IdPoster: u.Posters,
+            following: u.following, IdPoster: u.Posters,settings:await sign.getUserSettings(u.Id_user)
         });
 
         try {
@@ -561,11 +578,15 @@ app.post("/getuser", async (req, res) => {
     const { idOtherUser } = req.body;
     try {
         const updatedUser = await sign.findbyID(idOtherUser);
+        const settings =
+        await sign.getUserSettings(
+          updatedUser.Id_user
+        );
         res.json({
             userData: {
                 imgProfile: updatedUser.imgProfile, id: updatedUser.Id_user, name: updatedUser.F_user,
                 username: updatedUser.S_user, Bio: updatedUser.Bio, followers: updatedUser.followers,
-                following: updatedUser.following, IdPoster: updatedUser.Posters,
+                following: updatedUser.following, IdPoster: updatedUser.Posters,settings
             },
         });
     } catch (err) {
@@ -581,11 +602,15 @@ app.post("/followingUser", async (req, res) => {
         const updatedUser = await sign.IncreasingFollowing(IdUser, idFollowedUser);
         await sign.IncreasingFollowers(IdUser, idFollowedUser);
 
+        const settings =
+        await sign.getUserSettings(
+          updatedUser.Id_user
+        );
         res.json({
             userData: {
                 imgProfile: updatedUser.imgProfile, id: updatedUser.Id_user, name: updatedUser.F_user,
                 username: updatedUser.S_user, Bio: updatedUser.Bio, followers: updatedUser.followers,
-                following: updatedUser.following, IdPoster: updatedUser.Posters,
+                following: updatedUser.following, IdPoster: updatedUser.Posters,settings
             },
         });
     } catch (err) {
@@ -601,11 +626,15 @@ app.post("/unfollowingUser", async (req, res) => {
         const updatedUser = await sign.DecreaseFollowing(IdUser, idFollowedUser);
         await sign.DecreaseFollower(IdUser, idFollowedUser);
 
+        const settings =
+            await sign.getUserSettings(
+           updatedUser.Id_user
+        );
         res.json({
             userData: {
                 imgProfile: updatedUser.imgProfile, id: updatedUser.Id_user, name: updatedUser.F_user,
                 username: updatedUser.S_user, Bio: updatedUser.Bio, followers: updatedUser.followers,
-                following: updatedUser.following, IdPoster: updatedUser.Posters,
+                following: updatedUser.following, IdPoster: updatedUser.Posters,settings
             },
         });
     } catch (err) {
@@ -622,7 +651,7 @@ app.get(
 
       const settings =
         await sign.getUserSettings(
-          req.user.id
+          req.id
         );
 
       res.json(settings);
@@ -642,10 +671,11 @@ app.put(
   verifyToken,
   async (req, res) => {
     try {
-
+console.log( req.user.id,
+          req.body)
       const result =
         await sign.updateUserSettings(
-          req.user.id,
+          req.id,
           req.body
         );
 
