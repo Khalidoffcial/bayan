@@ -91,22 +91,75 @@ async function logup_user_check_fsp(first_name, second_name, password) {
     }
 }
 
+
+
+const defaultSettings = {
+  appearance: {
+    theme: "light",
+    fontSize: "medium",
+    fontFamily: "Inter",
+    language: "en",
+    direction: "ltr",
+  },
+
+  profile: {
+    name: "",
+    username: "",
+    email: "",
+    avatar: null,
+  },
+
+  notifications: {
+    likes: true,
+    comments: true,
+    followers: true,
+    newArticles: false,
+    newIdeas: true,
+    emailNotifications: false,
+  },
+
+  reading: {
+    focusMode: false,
+    hideLikeCounts: false,
+    hideNotificationsWhileReading: true,
+    minimalUI: false,
+    autoReadingMode: false,
+    readingGoal: 30,
+  },
+
+  creator: {
+    allowComments: true,
+    showAnalytics: true,
+    publicAuthorProfile: true,
+    allowMessages: false,
+  },
+
+  updatedAt: null,
+};
+
+
 // إدخال بيانات المستخدم
 async function logup_user_Insert(first_name, second_name, email, uid, id_user, password) {
     try {
         const hashedPassword = await hashPassword(password);
-        const newUser = {
-            F_user: first_name,
-            S_user: second_name,
-            email: email,
-            uid: uid,
-            Id_user: id_user,
-            psw: hashedPassword,
-            Bio: "",
-            followers: {},
-            following: {},
-            IdPoster: {}
-        };
+const newUser = {
+    F_user: first_name,
+    S_user: second_name,
+    email,
+    uid,
+    Id_user: id_user,
+    psw: hashedPassword,
+
+    Bio: "",
+
+    followers: {},
+    following: {},
+    IdPoster: {},
+
+    settings: {
+        ...defaultSettings
+    }
+};
 
         await set(ref(db, `user_data/Profile/${id_user}`), newUser);
         return newUser;
@@ -458,7 +511,50 @@ async function deletePostsFrom_User(idUser, content_id) {
     }
 }
 
+async function getUserSettings(userId) {
+    try {
+        const user = await findbyID(userId);
 
+        if (!user) return null;
+
+        return user.settings || defaultSettings;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function updateUserSettings(userId, settingsData) {
+    try {
+        await update(
+            ref(db, `user_data/Profile/${userId}`),
+            {
+                settings: {
+                    ...settingsData,
+                    updatedAt: new Date().toISOString(),
+                },
+            }
+        );
+
+        return await getUserSettings(userId);
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function resetUserSettings(userId) {
+    try {
+        await update(
+            ref(db, `user_data/Profile/${userId}`),
+            {
+                settings: defaultSettings,
+            }
+        );
+
+        return defaultSettings;
+    } catch (err) {
+        throw err;
+    }
+}
 
 module.exports = {
     login_user,
@@ -477,5 +573,8 @@ module.exports = {
     findbyEmail,
     findUserByEmailAndUid,
     addContentId_User,
-    deletePostsFrom_User
+    deletePostsFrom_User,
+    getUserSettings,
+updateUserSettings,
+resetUserSettings,
 };

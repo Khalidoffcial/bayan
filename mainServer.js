@@ -58,6 +58,37 @@ app.use(cors({
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
+
+
+function verifyToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
+        });
+    }
+
+    try {
+        const token = authHeader.split(" ")[1];
+
+        const decoded = jwt.verify(
+            token,
+            process.env.ACCESS_TOKEN_SECRET
+        );
+
+        req.user = decoded;
+
+        next();
+    } catch (err) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid token"
+        });
+    }
+}
+
 // ======================================================
 // REDIS + MEMORY CACHE
 // ======================================================
@@ -582,6 +613,53 @@ app.post("/unfollowingUser", async (req, res) => {
         res.status(500).json({ message: "Error unfollowing user" });
     }
 });
+
+app.get(
+  "/settings",
+  verifyToken,
+  async (req, res) => {
+    try {
+
+      const settings =
+        await sign.getUserSettings(
+          req.user.id
+        );
+
+      res.json(settings);
+
+    } catch (err) {
+
+      res.status(500).json({
+        error: err.message
+      });
+
+    }
+  }
+);
+
+app.put(
+  "/settings",
+  verifyToken,
+  async (req, res) => {
+    try {
+
+      const result =
+        await sign.updateUserSettings(
+          req.user.id,
+          req.body
+        );
+
+      res.json(result);
+
+    } catch (err) {
+
+      res.status(500).json({
+        error: err.message
+      });
+
+    }
+  }
+);
 
 // ======================================================
 // SOCKET.IO EVENTS
