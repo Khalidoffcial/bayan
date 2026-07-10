@@ -9,9 +9,9 @@ import menu from "../icons/menu.png";
 import setting from "../icons/setting.png";
 import settingOutline from "../icons/settingoutline.png";
 
-// Ideas
-import ideaIcon from "../icons/idea.png";
-import ideaIconOutline from "../icons/ideaOutline.png";
+// Posts
+import PostIcon from "../icons/idea.png";
+import PostIconOutline from "../icons/PostOutline.png";
 
 // Articles
 import articleIcon from "../icons/article.png";
@@ -35,9 +35,9 @@ const Sidebar = () => {
 
   const channels = [
     {
-      name: "Ideas",
-      activeIcon: ideaIcon,
-      inactiveIcon: ideaIconOutline,
+      name: "Posts",
+      activeIcon: PostIcon,
+      inactiveIcon: PostIconOutline,
     },
     {
       name: "Articles",

@@ -72,7 +72,7 @@ export default function Profile() {
   const [cropMode, setCropMode] = useState(false);
   const [croppedImage, setCroppedImage] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("Ideas");
+  const [activeTab, setActiveTab] = useState("Posts");
   const [crop, setCrop] = useState({ x: 0, y: 0 });
 const [zoom, setZoom] = useState(1);
 const [showImage, setShowImage] = useState(false);
@@ -94,7 +94,7 @@ const [feed, set_feed] = useState([]);
 
   // LIKES
 
-  const [likedIdeas, setLikedIdeas] =
+  const [likedPosts, setLikedPosts] =
     useState({});
 
       const [liked, setLiked] = useState(false);
@@ -564,7 +564,7 @@ const handleCancelCropped = async () => {
         await saveImages();
 
       await axios.post(
-        "bayan-production-9dd3.up.railway.app/saveIdeas",
+        "bayan-production-9dd3.up.railway.app/savePosts",
         {
           autherID:
               JSON.parse(localStorage.getItem("me")).id,
@@ -578,7 +578,7 @@ const handleCancelCropped = async () => {
 
           content,
 
-          type: "Ideas",
+          type: "Posts",
         },
         {
           headers: {
@@ -697,7 +697,7 @@ function renderContent(item) {
           y: 0,
         }}
       >
-        {/* Ideas */}
+        {/* Posts */}
 
 
 
@@ -715,7 +715,7 @@ function renderContent(item) {
               <img
                 src={
                   item.userData?.imgProfile || default_img}
-                className="profile-pic-Ideas"
+                className="profile-pic-Posts"
                 alt=""
               />
 
@@ -793,7 +793,7 @@ function renderContent(item) {
                 }
                 style={{
                   color:
-                    likedIdeas[
+                    likedPosts[
                       item?.id
                     ]
                       ? "#d30000"
@@ -978,7 +978,7 @@ function renderContent(item) {
       {/* Tabs */}
       
       <div className="tabs">
-        {["Ideas","articles","novels"].map((tab) => (
+        {["Posts","articles","novels"].map((tab) => (
           <motion.button
             key={tab}
             onClick={() => setActiveTab(tab)}

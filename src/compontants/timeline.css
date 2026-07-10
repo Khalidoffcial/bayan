@@ -1,7 +1,5 @@
-
-
 body {
-  direction: rtl;
+    direction: rtl;
 }
 
 .service_home {
@@ -83,16 +81,17 @@ body {
     align-items: center;
 }
 
+
 /* صورة البروفايل */
 
-.profile-pic-wrapper-Ideas {
+.profile-pic-wrapper-Posts {
     position: relative;
     width: 40px;
     height: 40px;
     margin: 0 7px;
 }
 
-.profile-pic-Ideas {
+.profile-pic-Posts {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -102,7 +101,7 @@ body {
     transition: transform 0.2s;
 }
 
-.profile-pic-Ideas:hover {
+.profile-pic-Posts:hover {
     transform: scale(1.05);
 }
 
@@ -118,7 +117,7 @@ body {
     font-size: 18px;
     font-weight: 400;
     color: #000000;
-    line-height:20px;
+    line-height: 20px;
     margin: 0;
     padding: 0;
 }
@@ -238,6 +237,7 @@ body {
 
 
 /* Mobile */
+
 @media (max-width: 600px) {
     .box {
         flex-direction: column;
@@ -258,7 +258,9 @@ body {
     }
 }
 
+
 /* Tablet */
+
 @media (max-width: 992px) {
     .box {
         max-width: 90%;

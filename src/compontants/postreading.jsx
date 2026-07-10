@@ -251,7 +251,7 @@ const Postreading = () => {
         await saveImages();
 
       await axios.post(
-        "http://192.168.1.9:4000/saveIdeas",
+        "http://192.168.1.9:4000/savePosts",
         {
           autherID:
             getUserId(),
@@ -265,7 +265,7 @@ const Postreading = () => {
 
           content,
 
-          type: "Ideas",
+          type: "Posts",
         },
         {
           headers: {
@@ -745,7 +745,7 @@ const Postreading = () => {
                   ?.imgProfile ||
                 default_img
               }
-              className="profile-pic-Ideas"
+              className="profile-pic-Posts"
               alt=""
             />
 

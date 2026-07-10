@@ -147,7 +147,7 @@ const ArticleBox = () => {
 
   // LIKES
 
-  const [likedIdeas, setLikedIdeas] =
+  const [likedPosts, setLikedPosts] =
     useState({});
 
   const [likesCount, setLikesCount] =
@@ -339,7 +339,7 @@ const ArticleBox = () => {
         await saveImages();
 
       await axios.post(
-        "http://bayan.railway.internal:4000/saveIdeas",
+        "http://bayan.railway.internal:4000/savePosts",
         {
           autherID:
             getUserId(),
@@ -353,7 +353,7 @@ const ArticleBox = () => {
 
           content,
 
-          type: "Ideas",
+          type: "Posts",
         },
         {
           headers: {
@@ -380,7 +380,7 @@ const ArticleBox = () => {
   const handleLike = (
     postId
   ) => {
-    setLikedIdeas((prev) => ({
+    setLikedPosts((prev) => ({
       ...prev,
       [postId]:
         !prev[postId],
@@ -390,7 +390,7 @@ const ArticleBox = () => {
       ...prev,
       [postId]:
         prev[postId]
-          ? likedIdeas[postId]
+          ? likedPosts[postId]
             ? prev[postId] - 1
             : prev[postId] + 1
           : 1,
@@ -464,7 +464,7 @@ const ArticleBox = () => {
 
         type:
           typeArticle ||
-          "Ideas",
+          "Posts",
 
         cursor: 0,
 
@@ -517,7 +517,7 @@ const ArticleBox = () => {
 
             type:
               typeArticle ||
-              "Ideas",
+              "Posts",
 
             cursor,
 
@@ -614,7 +614,7 @@ const ArticleBox = () => {
   }, []);
 
   // ==================================================
-  // REALTIME Ideas
+  // REALTIME Posts
   // ==================================================
 
   useEffect(() => {
@@ -660,7 +660,7 @@ const ArticleBox = () => {
     if (!item) return null;
 
     const isPost =
-      item.type === "Ideas";
+      item.type === "Posts";
 
     const isNovel =
       item.type === "novel";
@@ -681,7 +681,7 @@ const ArticleBox = () => {
           y: 0,
         }}
       >
-        {/* Ideas */}
+        {/* Posts */}
 
         {isPost && (
           <div className="container_post">
@@ -701,7 +701,7 @@ const ArticleBox = () => {
                     ?.imgProfile ||
                   default_img
                 }
-                className="profile-pic-Ideas"
+                className="profile-pic-Posts"
                 alt=""
               />
 
@@ -792,7 +792,7 @@ const ArticleBox = () => {
                 }
                 style={{
                   color:
-                    likedIdeas[
+                    likedPosts[
                       item.id
                     ]
                       ? "#d30000"
@@ -864,7 +864,7 @@ const ArticleBox = () => {
                     ?.imgProfile ||
                   default_img
                 }
-                className="profile-pic-Ideas"
+                className="profile-pic-Posts"
                 alt=""
               />
 

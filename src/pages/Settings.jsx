@@ -13,29 +13,29 @@ import PremiumSettings      from "../components-settings/settings/PremiumSetting
 import StatisticsSettings   from "../components-settings/settings/StatisticsSettings.jsx";
 
 const NAV = [
-  { id: "account",       icon: "◉", label: "Account" },
+  // { id: "account",       icon: "◉", label: "Account" },
   { id: "appearance",    icon: "◈", label: "Appearance" },
   { id: "notifications", icon: "◎", label: "Notifications" },
-  { id: "reading",       icon: "◇", label: "Reading & Focus" },
-  { id: "creator",       icon: "◆", label: "Creator" },
+  // { id: "reading",       icon: "◇", label: "Reading & Focus" },
+  // { id: "creator",       icon: "◆", label: "Creator" },
   { id: "language",      icon: "◐", label: "Language" },
-  { id: "premium",       icon: "✦", label: "Premium", badge: "PRO" },
-  { id: "statistics",    icon: "▦", label: "Statistics" },
+  // { id: "premium",       icon: "✦", label: "Premium", badge: "PRO" },
+  // { id: "statistics",    icon: "▦", label: "Statistics" },
 ];
 
 const PANELS = {
-  account:       AccountSettings,
+  // account:       AccountSettings,
   appearance:    AppearanceSettings,
   notifications: NotificationsSettings,
-  reading:       ReadingFocusSettings,
-  creator:       CreatorSettings,
+  // reading:       ReadingFocusSettings,
+  // creator:       CreatorSettings,
   language:      LanguageSettings,
-  premium:       PremiumSettings,
-  statistics:    StatisticsSettings,
+  // premium:       PremiumSettings,
+  // statistics:    StatisticsSettings,
 };
 
 export default function Settings() {
-  const [active, setActive] = useState("account");
+  const [active, setActive] = useState("appearance");
   const { saveStatus, profile } = useSettings();
   const Panel = PANELS[active];
 
@@ -44,13 +44,6 @@ export default function Settings() {
     <Top/>
     <div className="settings-layout">
       <aside className="settings-sidebar">
-        <a href="#" className="sidebar-logo">
-          <div className="sidebar-logo-mark">ب</div>
-          <div>
-            <div className="sidebar-logo-text">Bayan Space</div>
-            <div className="sidebar-logo-sub">Settings</div>
-          </div>
-        </a>
 
         <div className="sidebar-section-label">Preferences</div>
         <nav className="sidebar-nav">

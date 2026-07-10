@@ -236,14 +236,14 @@ const saveImages = async () =>{
   const uploadedImages = await saveImages(); // 🟢 كده تمام
  axios
         .post(
-          "http://bayan.railway.internal:4000/saveIdeas",
+          "http://bayan.railway.internal:4000/savePosts",
           { 
             autherID:getUserId(),
             id: PostId_generated,
             comment_on:location.state.id,
             img:uploadedImages,
       content,
-      type:"Ideas"
+      type:"Posts"
     },
           {
             headers: {
