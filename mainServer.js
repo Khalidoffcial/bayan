@@ -99,7 +99,7 @@ let useRedis = false;
 const memoryCache = new Map();
 const onlineUsers = new Map();
 
-(async () => {
+(async() => {
     try {
         const redis = require("redis");
         redisClient = redis.createClient({
@@ -107,8 +107,8 @@ const onlineUsers = new Map();
         });
 
         if (!process.env.REDIS_URL) {
-    console.log("No Redis URL -> Memory Cache Enabled");
-}
+            console.log("No Redis URL -> Memory Cache Enabled");
+        }
 
         try {
             await redisClient.connect();
@@ -150,7 +150,7 @@ function paginate(data, limit = 10, cursor = 0) {
 function getTodayDate() {
     const today = new Date();
     const day = String(today.getDate()).padStart(2, "0");
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return `${day} ${months[today.getMonth()]} ${today.getFullYear()}`;
 }
 
@@ -270,9 +270,9 @@ async function getScore(content) {
 async function recommendFeed(user, type) {
     try {
         const interests =
-            type === "novels"
-                ? user?.interesting?.novels || []
-                : user?.interesting?.articles || [];
+            type === "novels" ?
+            user ? .interesting ? .novels || [] :
+            user ? .interesting ? .articles || [];
 
         let allContent = [];
 
@@ -290,7 +290,7 @@ async function recommendFeed(user, type) {
         }
 
         const scored = await Promise.all(
-            allContent.map(async (item) => ({ ...item, score: await getScore(item) }))
+            allContent.map(async(item) => ({...item, score: await getScore(item) }))
         );
 
         return scored.sort((a, b) => b.score - a.score);
@@ -302,10 +302,10 @@ async function recommendFeed(user, type) {
 
 async function enrichContent(contentArray) {
     return Promise.all(
-        contentArray.map(async (item) => {
+        contentArray.map(async(item) => {
             try {
                 const profile = await getUser(item.autherID);
-                return { ...item, userData: profile || {} };
+                return {...item, userData: profile || {} };
             } catch {
                 return item;
             }
@@ -397,7 +397,7 @@ function classifyNovel(text, threshold = 2) {
 // ======================================================
 
 // ✅ تسجيل الدخول
-app.post("/signin", async (req, res) => {
+app.post("/signin", async(req, res) => {
     const { identifierUser, password } = req.body;
     if (!identifierUser || !password)
         return res.status(400).json({ message: "Please enter all fields" });
@@ -408,13 +408,19 @@ app.post("/signin", async (req, res) => {
 
         const payload = { id: user.Id_user, name: user.F_user, username: user.S_user, pass: user.psw };
         const settings =
-        await sign.getUserSettings(
-          user.Id_user
-        );
+            await sign.getUserSettings(
+                user.Id_user
+            );
         const userData = {
-            imgProfile: user.imgProfile, id: user.Id_user, name: user.F_user,
-            username: user.S_user, Bio: user.Bio, followers: user.followers,
-            following: user.following, IdPoster: user.Posters,settings
+            imgProfile: user.imgProfile,
+            id: user.Id_user,
+            name: user.F_user,
+            username: user.S_user,
+            Bio: user.Bio,
+            followers: user.followers,
+            following: user.following,
+            IdPoster: user.Posters,
+            settings
         };
 
         res.json({ message: "Login successful", accessToken: generateToken(payload), userData });
@@ -425,7 +431,7 @@ app.post("/signin", async (req, res) => {
 });
 
 // ✅ تسجيل الدخول بجوجل
-app.post("/authGoogle", async (req, res) => {
+app.post("/authGoogle", async(req, res) => {
     const { email, uid } = req.body;
     if (!email || !uid) return res.status(400).json({ message: "Please enter all fields" });
     console.log(email)
@@ -438,13 +444,19 @@ app.post("/authGoogle", async (req, res) => {
 
         const payload = { id: existingUser.Id_user, name: existingUser.F_user, username: existingUser.S_user, pass: existingUser.psw };
         const settings =
-        await sign.getUserSettings(
-          user.Id_user
-        );
+            await sign.getUserSettings(
+                user.Id_user
+            );
         const userData = {
-            imgProfile: existingUser.imgProfile, id: existingUser.Id_user, name: existingUser.F_user,
-            username: existingUser.S_user, Bio: existingUser.Bio, followers: existingUser.followers,
-            following: existingUser.following, IdPoster: existingUser.Posters,settings
+            imgProfile: existingUser.imgProfile,
+            id: existingUser.Id_user,
+            name: existingUser.F_user,
+            username: existingUser.S_user,
+            Bio: existingUser.Bio,
+            followers: existingUser.followers,
+            following: existingUser.following,
+            IdPoster: existingUser.Posters,
+            settings
         };
 
         res.json({ message: "Login successful", accessToken: generateToken(payload), userData });
@@ -455,7 +467,7 @@ app.post("/authGoogle", async (req, res) => {
 });
 
 // ✅ تسجيل حساب جديد
-app.post("/signup", async (req, res) => {
+app.post("/signup", async(req, res) => {
     const { fullName, username, email, uid, password } = req.body;
     if (!fullName || !username || !password)
         return res.status(400).json({ message: "Please enter all fields" });
@@ -465,17 +477,23 @@ app.post("/signup", async (req, res) => {
         if (existsName) return res.status(409).json({ message: "Username already exists" });
 
         const existingUser = await sign.findUserByEmailAndUid(email, uid);
-        
+
         if (existingUser) {
             const payload = { id: existingUser.Id_user, name: existingUser.F_user, username: existingUser.S_user, pass: existingUser.psw };
             const settings =
-        await sign.getUserSettings(
-          existingUser.Id_user
-        );
+                await sign.getUserSettings(
+                    existingUser.Id_user
+                );
             const userData = {
-                imgProfile: existingUser.imgProfile, id: existingUser.Id_user, name: existingUser.F_user,
-                username: existingUser.S_user, Bio: existingUser.Bio, followers: existingUser.followers,
-                following: existingUser.following, IdPoster: existingUser.Posters,settings
+                imgProfile: existingUser.imgProfile,
+                id: existingUser.Id_user,
+                name: existingUser.F_user,
+                username: existingUser.S_user,
+                Bio: existingUser.Bio,
+                followers: existingUser.followers,
+                following: existingUser.following,
+                IdPoster: existingUser.Posters,
+                settings
             };
             return res.json({ message: "Login successful", accessToken: generateToken(payload), userData });
         }
@@ -484,9 +502,15 @@ app.post("/signup", async (req, res) => {
         const user = await sign.logup_user_Insert(fullName, username, email, uid, uniqueId, password);
         const token = generateToken({ id: uniqueId, username, pass: password });
         const userData = {
-            imgProfile: user.imgProfile, id: user.Id_user, name: user.F_user,
-            username: user.S_user, Bio: user.Bio, followers: user.followers,
-            following: user.following, IdPoster: user.Posters,settings
+            imgProfile: user.imgProfile,
+            id: user.Id_user,
+            name: user.F_user,
+            username: user.S_user,
+            Bio: user.Bio,
+            followers: user.followers,
+            following: user.following,
+            IdPoster: user.Posters,
+            settings: user.settings
         };
 
         res.status(201).json({ message: "Signup successful", token, userData });
@@ -498,23 +522,29 @@ app.post("/signup", async (req, res) => {
 
 // ✅ تحقق من الـ Token
 app.post("/auth", (req, res) => {
-    if (!req.headers.authorization?.startsWith("Bearer "))
+    if (!req.headers.authorization ? .startsWith("Bearer "))
         return res.status(401).json({ message: "No token provided" });
 
     const token = req.headers.authorization.split(" ")[1];
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err, decoded) => {
         if (err) return res.status(403).json({ message: "Invalid token" });
         try {
             const user = await sign.login_user(decoded.id, decoded.pass);
-const settings =
-        await sign.getUserSettings(
-          user.Id_user
-        );
+            const settings =
+                await sign.getUserSettings(
+                    user.Id_user
+                );
             const userData = {
-                imgProfile: user.imgProfile, id: user.Id_user, name: user.F_user,
-                username: user.S_user, Bio: user.Bio, followers: user.followers,
-                following: user.following, IdPoster: user.Posters,settings
+                imgProfile: user.imgProfile,
+                id: user.Id_user,
+                name: user.F_user,
+                username: user.S_user,
+                Bio: user.Bio,
+                followers: user.followers,
+                following: user.following,
+                IdPoster: user.Posters,
+                settings
             };
             res.json({ valid: true, userData });
         } catch (err) {
@@ -524,31 +554,31 @@ const settings =
 });
 
 // ✅ تعديل الملف الشخصي
-app.post("/editProfile", async (req, res) => {
+app.post("/editProfile", async(req, res) => {
     const { Updatable, status } = req.body;
-    if (!req.headers.authorization?.startsWith("Bearer "))
+    if (!req.headers.authorization ? .startsWith("Bearer "))
         return res.status(401).json({ message: "No token provided" });
 
     const token = req.headers.authorization.split(" ")[1];
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err, decoded) => {
         if (err) return res.status(403).json({ message: "Invalid token" });
 
-const buildUserData = async (u) => {
-    const settings = await sign.getUserSettings(u.Id_user);
+        const buildUserData = async(u) => {
+            const settings = await sign.getUserSettings(u.Id_user);
 
-    return {
-        imgProfile: u.imgProfile,
-        id: u.Id_user,
-        name: u.F_user,
-        username: u.S_user,
-        Bio: u.Bio,
-        followers: u.followers,
-        following: u.following,
-        IdPoster: u.Posters,
-        settings
-    };
-};
+            return {
+                imgProfile: u.imgProfile,
+                id: u.Id_user,
+                name: u.F_user,
+                username: u.S_user,
+                Bio: u.Bio,
+                followers: u.followers,
+                following: u.following,
+                IdPoster: u.Posters,
+                settings
+            };
+        };
         try {
             let updatedUser;
             if (status === "img") {
@@ -570,30 +600,36 @@ const buildUserData = async (u) => {
 });
 
 // ✅ حفظ مقال أو رواية
-app.post("/saveArticle_novels", async (req, res) => {
+app.post("/saveArticle_novels", async(req, res) => {
     await saveContent_Article_Novels(req.body);
 });
 
 // ✅ حفظ بوست
-app.post("/saveposts", async (req, res) => {
+app.post("/saveposts", async(req, res) => {
     await saveContent_Posts(req.body);
     console.log(req.body);
 });
 
 // ✅ البحث عن مستخدم
-app.post("/getuser", async (req, res) => {
+app.post("/getuser", async(req, res) => {
     const { idOtherUser } = req.body;
     try {
         const updatedUser = await sign.findbyID(idOtherUser);
         const settings =
-        await sign.getUserSettings(
-          updatedUser.Id_user
-        );
+            await sign.getUserSettings(
+                updatedUser.Id_user
+            );
         res.json({
             userData: {
-                imgProfile: updatedUser.imgProfile, id: updatedUser.Id_user, name: updatedUser.F_user,
-                username: updatedUser.S_user, Bio: updatedUser.Bio, followers: updatedUser.followers,
-                following: updatedUser.following, IdPoster: updatedUser.Posters,settings
+                imgProfile: updatedUser.imgProfile,
+                id: updatedUser.Id_user,
+                name: updatedUser.F_user,
+                username: updatedUser.S_user,
+                Bio: updatedUser.Bio,
+                followers: updatedUser.followers,
+                following: updatedUser.following,
+                IdPoster: updatedUser.Posters,
+                settings
             },
         });
     } catch (err) {
@@ -603,21 +639,27 @@ app.post("/getuser", async (req, res) => {
 });
 
 // ✅ متابعة مستخدم
-app.post("/followingUser", async (req, res) => {
+app.post("/followingUser", async(req, res) => {
     const { IdUser, idFollowedUser } = req.body;
     try {
         const updatedUser = await sign.IncreasingFollowing(IdUser, idFollowedUser);
         await sign.IncreasingFollowers(IdUser, idFollowedUser);
 
         const settings =
-        await sign.getUserSettings(
-          updatedUser.Id_user
-        );
+            await sign.getUserSettings(
+                updatedUser.Id_user
+            );
         res.json({
             userData: {
-                imgProfile: updatedUser.imgProfile, id: updatedUser.Id_user, name: updatedUser.F_user,
-                username: updatedUser.S_user, Bio: updatedUser.Bio, followers: updatedUser.followers,
-                following: updatedUser.following, IdPoster: updatedUser.Posters,settings
+                imgProfile: updatedUser.imgProfile,
+                id: updatedUser.Id_user,
+                name: updatedUser.F_user,
+                username: updatedUser.S_user,
+                Bio: updatedUser.Bio,
+                followers: updatedUser.followers,
+                following: updatedUser.following,
+                IdPoster: updatedUser.Posters,
+                settings
             },
         });
     } catch (err) {
@@ -627,7 +669,7 @@ app.post("/followingUser", async (req, res) => {
 });
 
 // ✅ إلغاء متابعة مستخدم
-app.post("/unfollowingUser", async (req, res) => {
+app.post("/unfollowingUser", async(req, res) => {
     const { IdUser, idFollowedUser } = req.body;
     try {
         const updatedUser = await sign.DecreaseFollowing(IdUser, idFollowedUser);
@@ -635,13 +677,19 @@ app.post("/unfollowingUser", async (req, res) => {
 
         const settings =
             await sign.getUserSettings(
-           updatedUser.Id_user
-        );
+                updatedUser.Id_user
+            );
         res.json({
             userData: {
-                imgProfile: updatedUser.imgProfile, id: updatedUser.Id_user, name: updatedUser.F_user,
-                username: updatedUser.S_user, Bio: updatedUser.Bio, followers: updatedUser.followers,
-                following: updatedUser.following, IdPoster: updatedUser.Posters,settings
+                imgProfile: updatedUser.imgProfile,
+                id: updatedUser.Id_user,
+                name: updatedUser.F_user,
+                username: updatedUser.S_user,
+                Bio: updatedUser.Bio,
+                followers: updatedUser.followers,
+                following: updatedUser.following,
+                IdPoster: updatedUser.Posters,
+                settings
             },
         });
     } catch (err) {
@@ -651,51 +699,51 @@ app.post("/unfollowingUser", async (req, res) => {
 });
 
 app.get(
-  "/settings",
-  verifyToken,
-  async (req, res) => {
-    try {
+    "/settings",
+    verifyToken,
+    async(req, res) => {
+        try {
 
-      const settings =
-        await sign.getUserSettings(
-          req.id
-        );
+            const settings =
+                await sign.getUserSettings(
+                    req.id
+                );
 
-      res.json(settings);
+            res.json(settings);
 
-    } catch (err) {
+        } catch (err) {
 
-      res.status(500).json({
-        error: err.message
-      });
+            res.status(500).json({
+                error: err.message
+            });
 
+        }
     }
-  }
 );
 
 app.put(
-  "/settings",
-  verifyToken,
-  async (req, res) => {
-    try {
-console.log( req.user.id,
-          req.body)
-      const result =
-        await sign.updateUserSettings(
-          req.id,
-          req.body
-        );
+    "/settings",
+    verifyToken,
+    async(req, res) => {
+        try {
+            console.log(req.user.id,
+                req.body)
+            const result =
+                await sign.updateUserSettings(
+                    req.id,
+                    req.body
+                );
 
-      res.json(result);
+            res.json(result);
 
-    } catch (err) {
+        } catch (err) {
 
-      res.status(500).json({
-        error: err.message
-      });
+            res.status(500).json({
+                error: err.message
+            });
 
+        }
     }
-  }
 );
 
 // ======================================================
@@ -710,7 +758,7 @@ io.on("connection", (socket) => {
     }
 
     // SET INTERESTS
-    socket.on("setInterests", async (idUser, interests) => {
+    socket.on("setInterests", async(idUser, interests) => {
         try {
             await DaoForDbUser.updateUserToInsertInteresting(idUser, interests);
 
@@ -720,8 +768,8 @@ io.on("connection", (socket) => {
                 memoryCache.delete(`user:${idUser}`);
             }
 
-            interests?.articles?.forEach((i) => socket.join(`room:${i}`));
-            interests?.novels?.forEach((i) => socket.join(`room:${i}`));
+            interests ? .articles ? .forEach((i) => socket.join(`room:${i}`));
+            interests ? .novels ? .forEach((i) => socket.join(`room:${i}`));
 
             socket.emit("result", { status: "ok" });
         } catch (err) {
@@ -731,25 +779,25 @@ io.on("connection", (socket) => {
     });
 
     // JOIN ROOMS
-    socket.on("JOIN_ROOMS", async (userId) => {
+    socket.on("JOIN_ROOMS", async(userId) => {
         try {
             const user = await getUser(userId);
             if (!user) return;
 
-            (user?.interesting?.articles || []).forEach((i) => socket.join(`room:${i}`));
-            (user?.interesting?.novels || []).forEach((i) => socket.join(`room:${i}`));
+            (user ? .interesting ? .articles || []).forEach((i) => socket.join(`room:${i}`));
+            (user ? .interesting ? .novels || []).forEach((i) => socket.join(`room:${i}`));
         } catch (err) {
             console.log("JOIN_ROOMS error:", err.message);
         }
     });
 
     // TRACK ENGAGEMENT
-    socket.on("ENGAGEMENT", async ({ contentId, userId, type }) => {
+    socket.on("ENGAGEMENT", async({ contentId, userId, type }) => {
         await trackEngagement(contentId, userId, type);
     });
 
     // MY CONTENT
-    socket.on("MYCONTENT", async ({ idUser, type }) => {
+    socket.on("MYCONTENT", async({ idUser, type }) => {
         try {
             const contentIds = await DaoForDbUser.find_ContentUser_byID(type, idUser);
             const userData = await DaoForDbUser.findbyID(idUser);
@@ -774,7 +822,7 @@ io.on("connection", (socket) => {
     });
 
     // GET FEED
-    socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 10 }) => {
+    socket.on("GET_FEED", async({ userId, type = "posts", cursor = 0, limit = 10 }) => {
         try {
             const user = await getUser(userId);
             if (!user) return socket.emit("FEED_RESULT", { items: [], nextCursor: null });
@@ -790,7 +838,7 @@ io.on("connection", (socket) => {
     });
 
     // NEW POST LIVE
-    socket.on("NEW_POST", async ({ category, post }) => {
+    socket.on("NEW_POST", async({ category, post }) => {
         try {
             io.to(`room:${category}`).emit("NEW_POST", post);
         } catch (err) {
@@ -799,7 +847,7 @@ io.on("connection", (socket) => {
     });
 
     // FOLLOW USER
-    socket.on("followUser", async ({ idUser, idFollowedUser }) => {
+    socket.on("followUser", async({ idUser, idFollowedUser }) => {
         try {
             await sign.IncreasingFollowing(idUser, idFollowedUser);
             await sign.IncreasingFollowers(idUser, idFollowedUser);
@@ -814,7 +862,7 @@ io.on("connection", (socket) => {
     });
 
     // UNFOLLOW USER
-    socket.on("unfollowUser", async ({ idUser, idFollowedUser }) => {
+    socket.on("unfollowUser", async({ idUser, idFollowedUser }) => {
         try {
             await sign.DecreaseFollowing(idUser, idFollowedUser);
             await sign.DecreaseFollower(idUser, idFollowedUser);
