@@ -10,7 +10,7 @@ import setting from "../icons/setting.png";
 import settingOutline from "../icons/settingoutline.png";
 
 // Posts
-import PostIcon from "../icons/idea.png";
+import PostIcon from "../icons/post.png";
 import PostIconOutline from "../icons/PostOutline.png";
 
 // Articles
