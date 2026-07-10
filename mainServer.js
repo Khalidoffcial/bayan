@@ -271,8 +271,8 @@ async function recommendFeed(user, type) {
     try {
         const interests =
             type === "novels" ?
-            user ? .interesting ? .novels || [] :
-            user ? .interesting ? .articles || [];
+            user?.interesting?.novels || [] :
+            user?.interesting?.articles || [];
 
         let allContent = [];
 
@@ -522,7 +522,7 @@ app.post("/signup", async(req, res) => {
 
 // ✅ تحقق من الـ Token
 app.post("/auth", (req, res) => {
-    if (!req.headers.authorization ? .startsWith("Bearer "))
+    if (!req.headers.authorization?.startsWith("Bearer "))
         return res.status(401).json({ message: "No token provided" });
 
     const token = req.headers.authorization.split(" ")[1];
@@ -556,7 +556,7 @@ app.post("/auth", (req, res) => {
 // ✅ تعديل الملف الشخصي
 app.post("/editProfile", async(req, res) => {
     const { Updatable, status } = req.body;
-    if (!req.headers.authorization ? .startsWith("Bearer "))
+    if (!req.headers.authorization?.startsWith("Bearer "))
         return res.status(401).json({ message: "No token provided" });
 
     const token = req.headers.authorization.split(" ")[1];
@@ -768,8 +768,8 @@ io.on("connection", (socket) => {
                 memoryCache.delete(`user:${idUser}`);
             }
 
-            interests ? .articles ? .forEach((i) => socket.join(`room:${i}`));
-            interests ? .novels ? .forEach((i) => socket.join(`room:${i}`));
+            interests?.articles?.forEach((i) => socket.join(`room:${i}`));
+            interests?.novels?.forEach((i) => socket.join(`room:${i}`));
 
             socket.emit("result", { status: "ok" });
         } catch (err) {
@@ -784,8 +784,8 @@ io.on("connection", (socket) => {
             const user = await getUser(userId);
             if (!user) return;
 
-            (user ? .interesting ? .articles || []).forEach((i) => socket.join(`room:${i}`));
-            (user ? .interesting ? .novels || []).forEach((i) => socket.join(`room:${i}`));
+            (user?.interesting?.articles || []).forEach((i) => socket.join(`room:${i}`));
+            (user?.interesting?.novels || []).forEach((i) => socket.join(`room:${i}`));
         } catch (err) {
             console.log("JOIN_ROOMS error:", err.message);
         }
