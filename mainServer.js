@@ -495,7 +495,7 @@ app.post("/signup", async(req, res) => {
                 IdPoster: existingUser.Posters,
                 settings
             };
-            return res.json({ message: "Login successful", accessToken: generateToken(payload), userData });
+            return res.json({ message: "Login successful", token: generateToken(payload), userData });
         }
 
         const uniqueId = generateUniqueId();
