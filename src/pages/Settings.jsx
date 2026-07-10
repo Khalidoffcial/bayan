@@ -24,7 +24,7 @@ const NAV = [
 ];
 
 const PANELS = {
-  // account:       AccountSettings,
+  account:       AccountSettings,
   appearance:    AppearanceSettings,
   notifications: NotificationsSettings,
   // reading:       ReadingFocusSettings,
