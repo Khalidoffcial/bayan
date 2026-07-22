@@ -445,7 +445,7 @@ app.post("/authGoogle", async(req, res) => {
         const payload = { id: existingUser.Id_user, name: existingUser.F_user, username: existingUser.S_user, pass: existingUser.psw };
         const settings =
             await sign.getUserSettings(
-                user.Id_user
+                existingUser.Id_user
             );
         const userData = {
             imgProfile: existingUser.imgProfile,
