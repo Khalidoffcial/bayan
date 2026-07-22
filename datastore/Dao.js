@@ -461,57 +461,72 @@ async function hasUserLiked(postId, userId) {
 async function getAllContent(type, limit = 20) {
     try {
 
-        // categories/articles
-        // categories/posts
-        // categories/novels
+        console.log("TYPE:", type);
+
         const categoriesRef = ref(db, `categories/${type}`);
         const categoriesSnapshot = await get(categoriesRef);
 
-        if (!categoriesSnapshot.exists()) return [];
+        console.log("Categories exists:", categoriesSnapshot.exists());
+
+        if (!categoriesSnapshot.exists()) {
+            console.log("categories not found");
+            return [];
+        }
+
         const categories = categoriesSnapshot.val();
-        console.log("categories: ",categories)
-        
+
+        console.log("Categories:", Object.keys(categories));
+
         let ids = [];
-        
-        // جمع جميع الـ IDs من كل Category
-        for (const categoryName of Object.keys(categories)) {
-            
-            const categoryIds = categories[categoryName];
-            
-            if (Array.isArray(categoryIds)) {
-                ids.push(...categoryIds);
+
+        for (const category of Object.keys(categories)) {
+
+            console.log("Reading category:", category);
+
+            const list = categories[category];
+
+            console.log(list);
+
+            if (Array.isArray(list)) {
+                ids.push(...list);
             }
-            
+
         }
-        
-        // إزالة التكرار
+
+        console.log("IDs count:", ids.length);
+
         ids = [...new Set(ids)];
-        
-        // ترتيب عشوائي
+
         ids.sort(() => Math.random() - 0.5);
-        
-        // تحديد العدد المطلوب
+
         ids = ids.slice(0, limit);
-        
+
         const content = [];
-        
+
         for (const id of ids) {
-            
-            const contentRef = ref(db, `${type}/${type}${id}`);
-            const snapshot = await get(contentRef);
-            
-            if (snapshot.exists()) {
-                content.push(snapshot.val());
+
+            const path = `${type}/${type}${id}`;
+
+            console.log("Reading:", path);
+
+            const snap = await get(ref(db, path));
+
+            console.log(path, snap.exists());
+
+            if (snap.exists()) {
+                content.push(snap.val());
             }
-            
+
         }
-        console.log("content: ",content)
-        
+
+        console.log("Content count:", content.length);
+
         return content;
 
     } catch (err) {
 
-        console.error("Error fetching random content:", err);
+        console.log(err);
+
         return [];
 
     }

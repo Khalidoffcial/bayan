@@ -266,6 +266,7 @@ async function getScore(content) {
         return 0;
     }
 }
+
 async function recommendFeed(user, type) {
     try {
 
@@ -885,6 +886,7 @@ socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 10 })
                 nextCursor: null
             });
         }
+        console.log("Recommend Feed TYPE:", type);
 
         let feed = await recommendFeed(user, type);
         console.log("Recommend Feed:", feed);
