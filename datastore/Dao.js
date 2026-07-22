@@ -457,23 +457,62 @@ async function hasUserLiked(postId, userId) {
 
 
 
+// GET RANDOM CONTENT FROM CATEGORIES
 async function getAllContent(type, limit = 20) {
     try {
-        const contentRef = ref(db, type);
-        const snapshot = await get(contentRef);
 
-        if (!snapshot.exists()) return [];
+        // categories/articles
+        // categories/posts
+        // categories/novels
+        const categoriesRef = ref(db, `categories/${type}`);
+        const categoriesSnapshot = await get(categoriesRef);
 
-        const data = Object.values(snapshot.val());
+        if (!categoriesSnapshot.exists()) return [];
+
+        const categories = categoriesSnapshot.val();
+
+        let ids = [];
+
+        // جمع جميع الـ IDs من كل Category
+        for (const categoryName of Object.keys(categories)) {
+
+            const categoryIds = categories[categoryName];
+
+            if (Array.isArray(categoryIds)) {
+                ids.push(...categoryIds);
+            }
+
+        }
+
+        // إزالة التكرار
+        ids = [...new Set(ids)];
 
         // ترتيب عشوائي
-        data.sort(() => Math.random() - 0.5);
+        ids.sort(() => Math.random() - 0.5);
 
-        return data.slice(0, limit);
+        // تحديد العدد المطلوب
+        ids = ids.slice(0, limit);
+
+        const content = [];
+
+        for (const id of ids) {
+
+            const contentRef = ref(db, `${type}/${type}${id}`);
+            const snapshot = await get(contentRef);
+
+            if (snapshot.exists()) {
+                content.push(snapshot.val());
+            }
+
+        }
+
+        return content;
 
     } catch (err) {
-        console.error("Error fetching all content:", err);
+
+        console.error("Error fetching random content:", err);
         return [];
+
     }
 }
 
