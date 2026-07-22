@@ -468,44 +468,45 @@ async function getAllContent(type, limit = 20) {
         const categoriesSnapshot = await get(categoriesRef);
 
         if (!categoriesSnapshot.exists()) return [];
-
         const categories = categoriesSnapshot.val();
-
+        console.log("categories: ",categories)
+        
         let ids = [];
-
+        
         // جمع جميع الـ IDs من كل Category
         for (const categoryName of Object.keys(categories)) {
-
+            
             const categoryIds = categories[categoryName];
-
+            
             if (Array.isArray(categoryIds)) {
                 ids.push(...categoryIds);
             }
-
+            
         }
-
+        
         // إزالة التكرار
         ids = [...new Set(ids)];
-
+        
         // ترتيب عشوائي
         ids.sort(() => Math.random() - 0.5);
-
+        
         // تحديد العدد المطلوب
         ids = ids.slice(0, limit);
-
+        
         const content = [];
-
+        
         for (const id of ids) {
-
+            
             const contentRef = ref(db, `${type}/${type}${id}`);
             const snapshot = await get(contentRef);
-
+            
             if (snapshot.exists()) {
                 content.push(snapshot.val());
             }
-
+            
         }
-
+        console.log("content: ",content)
+        
         return content;
 
     } catch (err) {
