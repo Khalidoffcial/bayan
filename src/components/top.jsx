@@ -91,8 +91,8 @@ useEffect(() => {
      
 
       <div className="logo-center">
-        {/* <div className="img"></div> */}
-        <div className="company_name"><a href="/"> <img src={logo} alt="" srcset="" /> </a></div>
+        <div className="img"></div>
+        {/* <div className="company_name"><a href="/"> bayan </a></div> */}
       </div>
       
     </header>
