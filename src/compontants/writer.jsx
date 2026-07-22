@@ -123,7 +123,7 @@ const saveImages = async () =>{
   const uploadedImages = await saveImages(); // 🟢 كده تمام
  axios
         .post(
-          "bayan-production-036e.up.railway.app/saveIdeas",
+          `${process.env.SERVER_API}/saveIdeas`,
           { 
             autherID:DataUser.id,
             id: PostId,
@@ -170,7 +170,7 @@ const saveImages = async () =>{
     };
     axios
         .post(
-          "bayan-production-036e.up.railway.app/saveArticle_novels",newArticle,
+          `${process.env.SERVER_API}/saveArticle_novels`,newArticle,
           {
             headers: {
               Authorization: "Bearer " + cookie("get"),
