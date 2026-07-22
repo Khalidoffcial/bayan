@@ -25,7 +25,6 @@ import axios from "axios";
 
 import Top from "./top";
 
-import PropellerAd from "./adsense.jsx";
 
 import { FaHeart, FaComment, FaShareAlt } from "react-icons/fa";
 

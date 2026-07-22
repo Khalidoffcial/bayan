@@ -170,7 +170,10 @@ const ArticleBox = () => {
 
   useEffect(() => {
     socketRef.current = io(
-      SOCKET_URL
+      SOCKET_URL,{
+          transports: ["websocket", "polling"],
+  secure: true,
+      }
     );
 
     return () => {
