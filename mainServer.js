@@ -821,21 +821,37 @@ io.on("connection", (socket) => {
         }
     });
 
-    // GET FEED
-    socket.on("GET_FEED", async({ userId, type = "posts", cursor = 0, limit = 10 }) => {
-        try {
-            const user = await getUser(userId);
-            if (!user) return socket.emit("FEED_RESULT", { items: [], nextCursor: null });
+socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 10 }) => {
+    try {
 
-            let feed = await recommendFeed(user, type);
-            feed = await enrichContent(feed);
+        console.log("User ID:", userId);
 
-            socket.emit("FEED_RESULT", paginate(shuffle(feed), limit, cursor));
-        } catch (err) {
-            console.log("GET_FEED error:", err.message);
-            socket.emit("FEED_RESULT", { items: [], nextCursor: null });
+        const user = await getUser(userId);
+        console.log("User:", user);
+
+        if (!user) {
+            console.log("User not found");
+            return socket.emit("FEED_RESULT", {
+                items: [],
+                nextCursor: null
+            });
         }
-    });
+
+        let feed = await recommendFeed(user, type);
+        console.log("Recommend Feed:", feed);
+
+        feed = await enrichContent(feed);
+        console.log("Enriched Feed:", feed);
+
+        const result = paginate(shuffle(feed), limit, cursor);
+        console.log("Final Result:", result);
+
+        socket.emit("FEED_RESULT", result);
+
+    } catch (err) {
+        console.log("GET_FEED error:", err);
+    }
+});
 
     // NEW POST LIVE
     socket.on("NEW_POST", async({ category, post }) => {
