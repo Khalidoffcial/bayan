@@ -310,6 +310,8 @@ async function recommendFeed(user, type) {
             console.log("No personalized feed found. Loading random content...");
 
             allContent = await dao.getAllContent(type, 20);
+            console.log("All content: ",allContent);
+
         }
 
         // =====================================
