@@ -891,11 +891,15 @@ socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 10 })
         let feed = await recommendFeed(user, type);
         console.log("Recommend Feed:", feed);
 
+        console.log("Feed Length:", feed.length);
+console.log(feed.map(x => x.id || x.Id || x.postId));
+
         feed = await enrichContent(feed);
         console.log("Enriched Feed:", feed);
 
         const result = paginate(shuffle(feed), limit, cursor);
         console.log("Final Result:", result);
+console.log("Paginated:", result.items.length);
 
         socket.emit("FEED_RESULT", result);
 
