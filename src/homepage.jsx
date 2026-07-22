@@ -1,6 +1,6 @@
-import Sidebar from './compontants/sidebar.jsx';
-import Content from './compontants/content';
-import Top from './compontants/top.jsx';
+import Sidebar from './components/sidebar.jsx';
+import Content from './components/content';
+import Top from './components/top.jsx';
 import React, { useState, useEffect } from "react";
 import cookie from "./databases/cookies_DAO.js";
 import axios from "axios";

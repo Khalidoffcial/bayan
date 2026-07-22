@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSettings } from "../context/SettingsContext";
 import "../styles/settings.css";
-import Top from '../compontants/top.jsx';
+import Top from '../components/top.jsx';
 
 import AccountSettings      from "../components-settings/settings/AccountSettings.jsx";
 import AppearanceSettings   from "../components-settings/settings/AppearanceSettings.jsx";
