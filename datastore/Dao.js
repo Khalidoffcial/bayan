@@ -256,6 +256,8 @@ async function addContentCategory(type, contentObj) {
     const { id, category } = contentObj;
 
     try {
+            type = type.toLowerCase();
+
         // أضف المحتوى نفسه
         const contentRef = ref(db, `${type}/${type}${id}`);
         await set(contentRef, contentObj);
@@ -282,6 +284,8 @@ async function addContentCategory(type, contentObj) {
 //GET 
 async function getContentByCategory(type, category, limit) {
     try {
+            type = type.toLowerCase();
+
         const catRef = ref(db, `categories/${type}/${category}`);
         const snapshot = await get(catRef);
 
@@ -305,6 +309,8 @@ async function getContentByCategory(type, category, limit) {
 //UPDATE
 async function updateContent(type, id, updatedFields) {
     try {
+            type = type.toLowerCase();
+
         const contentRef = ref(db, `${type}/${type}${id}`);
         await update(contentRef, updatedFields);
 
@@ -343,6 +349,8 @@ async function updateContent(type, id, updatedFields) {
 //DELETE
 async function deleteContent(type, id) {
     try {
+            type = type.toLowerCase();
+
         const contentRef = ref(db, `${type}/${type}${id}`);
         const snapshot = await get(contentRef);
 
@@ -460,6 +468,7 @@ async function hasUserLiked(postId, userId) {
 // GET RANDOM CONTENT FROM CATEGORIES
 async function getAllContent(type, limit = 20) {
     try {
+    type = type.toLowerCase();
 
         console.log("TYPE:", type);
 
