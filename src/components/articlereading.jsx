@@ -235,7 +235,7 @@ const saveImages = async () =>{
   const uploadedImages = await saveImages(); // 🟢 كده تمام
  axios
         .post(
-          "http://bayan.railway.internal:4000/savePosts",
+          `${process.env.REACT_APP_SERVER_API}/savePosts`,
           { 
             autherID:getUserId(),
             id: PostId_generated,

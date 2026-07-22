@@ -342,7 +342,7 @@ const ArticleBox = () => {
         await saveImages();
 
       await axios.post(
-        "http://bayan.railway.internal:4000/savePosts",
+    `${process.env.REACT_APP_SERVER_API}/savePosts`,
         {
           autherID:
             getUserId(),

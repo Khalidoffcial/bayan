@@ -6,6 +6,7 @@ import user from "../icons/user_10374408.png";
 import {auth} from "./firebase.js";
 import { emit,on, off  } from './eventBus';
 import { Link, useNavigate } from "react-router-dom";
+import logo from "../icons/logo.jpeg"
 
 
 const Top = () => {
@@ -90,8 +91,8 @@ useEffect(() => {
      
 
       <div className="logo-center">
-        <div className="img"></div>
-        <div className="company_name"><a href="/"> bayan </a></div>
+        {/* <div className="img"></div> */}
+        <div className="company_name"><a href="/"> <img src={logo} alt="" srcset="" /> </a></div>
       </div>
       
     </header>
