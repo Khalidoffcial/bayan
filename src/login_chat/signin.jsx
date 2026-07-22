@@ -8,7 +8,7 @@ import earth from "../image/image0.svg";
 import { auth, googleProvider } from "./firebase.js";
 import { signInWithPopup } from "firebase/auth";
 
-const API = "https://bayan-production-9dd3.up.railway.app"
+const API = "https://bayan-production-036e.up.railway.app"
 function Login() {
   const navigate = useNavigate();
 

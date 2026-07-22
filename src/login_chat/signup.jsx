@@ -9,7 +9,7 @@ import cookie from "../databases/cookies_DAO.js";
 import { auth, googleProvider } from "./firebase.js";
 import { signInWithPopup } from "firebase/auth";
 
-const API = "https://bayan-production-9dd3.up.railway.app";
+const API = "https://bayan-production-036e.up.railway.app";
 
 function Signup() {
   const navigate = useNavigate();

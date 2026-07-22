@@ -21,7 +21,7 @@ export default function GoogleLoginButton() {
         uid: user.uid,
       };
 
-      const res = await axios.post(`bayan-production-9dd3.up.railway.app/authGoogle`, googleUser, {
+      const res = await axios.post(`bayan-production-036e.up.railway.app/authGoogle`, googleUser, {
         headers: { "Content-Type": "application/json" },
       });
 
