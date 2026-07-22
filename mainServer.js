@@ -266,9 +266,10 @@ async function getScore(content) {
         return 0;
     }
 }
-
 async function recommendFeed(user, type) {
     try {
+
+        // استخراج الاهتمامات حسب نوع المحتوى
         const interests =
             type === "novels"
                 ? (user?.interesting?.novels || [])
@@ -276,37 +277,54 @@ async function recommendFeed(user, type) {
 
         let allContent = [];
 
-        // ==========================
+        // =====================================
         // Personalized Feed
-        // ==========================
+        // =====================================
         if (interests.length > 0) {
 
-            for (const cat of interests) {
+            for (const category of interests) {
 
-                const cacheKey = `${type}:${cat}`;
+                const cacheKey = `${type}:${category}`;
 
                 let results = await cacheGet(cacheKey);
 
                 if (!results) {
-                    results = await dao.getContentByCategory(type, cat, 20);
-                    await cacheSet(cacheKey, results, 60);
+                    results = await dao.getContentByCategory(type, category, 20);
+
+                    if (results && results.length > 0) {
+                        await cacheSet(cacheKey, results, 60);
+                    }
                 }
 
-                if (Array.isArray(results))
+                if (Array.isArray(results) && results.length > 0) {
                     allContent.push(...results);
+                }
             }
         }
 
-        // ==========================
-        // Fallback
-        // ==========================
+        // =====================================
+        // إذا لم توجد اهتمامات أو لم ينتج عنها محتوى
+        // =====================================
         if (allContent.length === 0) {
 
-            console.log("No interests found, loading random feed...");
+            console.log("No personalized feed found. Loading random content...");
 
-            allContent = await dao.getRandomContent(type, 20);
+            allContent = await dao.getAllContent(type, 20);
         }
 
+        // =====================================
+        // إزالة المحتويات المكررة
+        // =====================================
+        allContent = allContent.filter(
+            (item, index, self) =>
+                index === self.findIndex(
+                    (t) => t.id === item.id || t.Id === item.Id
+                )
+        );
+
+        // =====================================
+        // حساب الـ Score لكل محتوى
+        // =====================================
         const scored = await Promise.all(
             allContent.map(async (item) => ({
                 ...item,
@@ -314,10 +332,17 @@ async function recommendFeed(user, type) {
             }))
         );
 
-        return scored.sort((a, b) => b.score - a.score);
+        // =====================================
+        // ترتيب حسب الـ Score
+        // =====================================
+        scored.sort((a, b) => b.score - a.score);
+
+        return scored;
 
     } catch (err) {
-        console.log("recommendFeed error:", err);
+
+        console.error("recommendFeed error:", err);
+
         return [];
     }
 }

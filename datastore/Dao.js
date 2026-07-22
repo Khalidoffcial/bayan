@@ -457,16 +457,25 @@ async function hasUserLiked(postId, userId) {
 
 
 
-async function getRandomContent(type, limit = 20) {
-const snapshot = await get(ref(db, type));
+async function getAllContent(type, limit = 20) {
+    try {
+        const contentRef = ref(db, type);
+        const snapshot = await get(contentRef);
 
-const data = Object.values(snapshot.val() || {});
+        if (!snapshot.exists()) return [];
 
-return data
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 20);
+        const data = Object.values(snapshot.val());
+
+        // ترتيب عشوائي
+        data.sort(() => Math.random() - 0.5);
+
+        return data.slice(0, limit);
+
+    } catch (err) {
+        console.error("Error fetching all content:", err);
+        return [];
+    }
 }
-
 
 module.exports = {
     updateArticle,
@@ -490,5 +499,5 @@ module.exports = {
     likeContent,
     unlikeContent,
     hasUserLiked,
-    getRandomContent
+    getAllContent
 }
