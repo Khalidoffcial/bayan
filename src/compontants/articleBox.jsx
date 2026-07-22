@@ -48,7 +48,7 @@ import default_img from "../icons/user_10374408.png";
 // ======================================================
 
 const SOCKET_URL =
-  "https://bayan-production-9dd3.up.railway.app";
+  "https://bayan-production-036e.up.railway.app";
 
 // ======================================================
 // TEXT DIRECTION
