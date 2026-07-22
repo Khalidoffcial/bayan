@@ -16,7 +16,7 @@ const HomePage = () => {
   useEffect(() => {
     axios
       .post(
-        "https://bayan-production-9dd3.up.railway.app/auth",
+        "https://bayan-production-036e.up.railway.app/auth",
         {},
         {
           headers: {

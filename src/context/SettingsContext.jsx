@@ -59,7 +59,7 @@ export const SettingsProvider = ({ children }) => {
       setLoading(true);
 
       const response = await fetch(
-        `https://bayan-production-9dd3.up.railway.app/settings`,
+        `https://bayan-production-036e.up.railway.app/settings`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -196,7 +196,7 @@ export const SettingsProvider = ({ children }) => {
     try {
       triggerSave();
 
-      const endpoint = `https://bayan-production-9dd3.up.railway.app/settings`;
+      const endpoint = `https://bayan-production-036e.up.railway.app/settings`;
 
       const method =  "PUT";
 
