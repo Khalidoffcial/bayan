@@ -490,4 +490,5 @@ module.exports = {
     likeContent,
     unlikeContent,
     hasUserLiked,
+    getRandomContent
 }
