@@ -457,6 +457,15 @@ async function hasUserLiked(postId, userId) {
 
 
 
+async function getRandomContent(type, limit = 20) {
+const snapshot = await get(ref(db, type));
+
+const data = Object.values(snapshot.val() || {});
+
+return data
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 20);
+}
 
 
 module.exports = {

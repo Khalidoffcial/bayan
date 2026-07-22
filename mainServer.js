@@ -270,32 +270,54 @@ async function getScore(content) {
 async function recommendFeed(user, type) {
     try {
         const interests =
-            type === "novels" ?
-            user?.interesting?.novels || [] :
-            user?.interesting?.articles || [];
+            type === "novels"
+                ? (user?.interesting?.novels || [])
+                : (user?.interesting?.articles || []);
 
         let allContent = [];
 
-        for (const cat of interests) {
-            const cacheKey = `${type}:${cat}`;
-            const cached = await cacheGet(cacheKey);
+        // ==========================
+        // Personalized Feed
+        // ==========================
+        if (interests.length > 0) {
 
-            let results = cached;
-            if (!results) {
-                results = await dao.getContentByCategory(type, cat, 10);
-                await cacheSet(cacheKey, results, 60);
+            for (const cat of interests) {
+
+                const cacheKey = `${type}:${cat}`;
+
+                let results = await cacheGet(cacheKey);
+
+                if (!results) {
+                    results = await dao.getContentByCategory(type, cat, 20);
+                    await cacheSet(cacheKey, results, 60);
+                }
+
+                if (Array.isArray(results))
+                    allContent.push(...results);
             }
+        }
 
-            allContent.push(...results);
+        // ==========================
+        // Fallback
+        // ==========================
+        if (allContent.length === 0) {
+
+            console.log("No interests found, loading random feed...");
+
+            allContent = await dao.getRandomContent(type, 20);
         }
 
         const scored = await Promise.all(
-            allContent.map(async(item) => ({...item, score: await getScore(item) }))
+            allContent.map(async (item) => ({
+                ...item,
+                score: await getScore(item)
+            }))
         );
 
         return scored.sort((a, b) => b.score - a.score);
+
     } catch (err) {
-        console.log("recommendFeed error:", err.message);
+        console.log("recommendFeed error:", err);
         return [];
     }
 }
