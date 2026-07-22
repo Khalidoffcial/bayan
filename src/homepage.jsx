@@ -16,7 +16,7 @@ const HomePage = () => {
   useEffect(() => {
     axios
       .post(
-        `${process.env.SERVER_API}/auth`,
+        `${process.env.REACT_APP_SERVER_API}/auth`,
         {},
         {
           headers: {

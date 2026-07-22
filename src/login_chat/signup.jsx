@@ -9,7 +9,7 @@ import cookie from "../databases/cookies_DAO.js";
 import { auth, googleProvider } from "./firebase.js";
 import { signInWithPopup } from "firebase/auth";
 
-const API = process.env.SERVER_API;
+const API = process.env.REACT_APP_SERVER_API;
 
 function Signup() {
   const navigate = useNavigate();

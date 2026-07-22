@@ -32,7 +32,7 @@ import default_img from "../icons/user_10374408.png";
 // ======================================================
 
 const SOCKET_URL =
-  "bayan-production-9dd3.up.railway.app";
+  process.env.REACT_APP_SERVER_API;
 
 
 // ======================================================

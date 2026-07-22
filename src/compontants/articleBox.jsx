@@ -48,7 +48,7 @@ import default_img from "../icons/user_10374408.png";
 // ======================================================
 
 const SOCKET_URL =
-  process.env.SERVER_API;
+  process.env.REACT_APP_SERVER_API;
 
 // ======================================================
 // TEXT DIRECTION

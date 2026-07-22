@@ -8,7 +8,7 @@ import earth from "../image/image0.svg";
 import { auth, googleProvider } from "./firebase.js";
 import { signInWithPopup } from "firebase/auth";
 
-const API = process.env.SERVER_API
+const API = process.env.REACT_APP_SERVER_API
 function Login() {
   const navigate = useNavigate();
 

@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import "./interstetsModels.css";
 
 const socket = io(
-  process.env.SERVER_API
+  process.env.REACT_APP_SERVER_API
 );
 export default function InterestsPopup() {
   const [showModal, setShowModal] = useState(true);

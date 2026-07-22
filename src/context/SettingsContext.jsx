@@ -59,7 +59,7 @@ export const SettingsProvider = ({ children }) => {
       setLoading(true);
 
       const response = await fetch(
-        `${process.env.SERVER_API}/settings`,
+        `${process.env.REACT_APP_SERVER_API}/settings`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -196,7 +196,7 @@ export const SettingsProvider = ({ children }) => {
     try {
       triggerSave();
 
-      const endpoint = `${process.env.SERVER_API}/settings`;
+      const endpoint = `${process.env.REACT_APP_SERVER_API}/settings`;
 
       const method =  "PUT";
 
