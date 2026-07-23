@@ -379,6 +379,7 @@ async function enrichContent(contentArray) {
                 return {...item, userData: { F_user:profile.F_user , Id_user:profile.Id_user, S_user:profile.S_user} || {F_user:"Unknown User" , Id_user:"333666999", S_user:"known_user"}};
             } catch {
                 return item;
+                return {...item, userData: {F_user:"Unknown User" , Id_user:"333666999", S_user:"known_user"}};
             }
         })
     );
