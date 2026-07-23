@@ -375,8 +375,8 @@ async function enrichContent(contentArray) {
             try {
                 console.log("item: ",item.autherID);
                 const profile = await getUser(item.autherID);
-                console.log("profile: ",profile);
-                return {...item, userData: profile || {} };
+
+                return {...item, userData: { F_user:profile.F_user , Id_user:profile.Id_user, S_user:profile.S_user} || {F_user:"Unknown User" , Id_user:"333666999", S_user:"known_user"}};
             } catch {
                 return item;
             }
