@@ -196,7 +196,7 @@ async function cacheSet(key, value, ttl = 60) {
 
 async function getUser(userId) {
     try {
-        
+
         userId = Number(userId);
 
         // التحقق من صحة الرقم
@@ -373,7 +373,9 @@ async function enrichContent(contentArray) {
     return Promise.all(
         contentArray.map(async(item) => {
             try {
+                console.log("item: ",item);
                 const profile = await getUser(item.autherID);
+                console.log("profile: ",profile);
                 return {...item, userData: profile || {} };
             } catch {
                 return item;
