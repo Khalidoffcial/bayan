@@ -311,22 +311,30 @@ async function recommendFeed(user, type) {
             console.log("No personalized feed found. Loading random content...");
 
             allContent = await dao.getAllContent(type, 20);
-            console.log("All content: ",allContent);
-
+            console.log("All content: ",allContent.length);
+                
         }
-
+        
         // =====================================
         // إزالة المحتويات المكررة
         // =====================================
-        allContent = allContent.filter(
-            (item, index, self) =>
-                index === self.findIndex(
-                    (t) => t.id === item.id || t.Id === item.Id
-                )
-        );
+        console.log("Before filter:", allContent.length);
 
-        // =====================================
-        // حساب الـ Score لكل محتوى
+        const seen = new Set();
+
+allContent = allContent.filter(item => {
+
+    if (seen.has(item.id)) return false;
+
+    seen.add(item.id);
+
+    return true;
+
+});
+
+            console.log("After filter:", allContent.length);
+            // =====================================
+            // حساب الـ Score لكل محتوى
         // =====================================
         const scored = await Promise.all(
             allContent.map(async (item) => ({
@@ -334,12 +342,14 @@ async function recommendFeed(user, type) {
                 score: await getScore(item)
             }))
         );
-
+        console.log("All scored: ",scored.length);
+        
         // =====================================
         // ترتيب حسب الـ Score
         // =====================================
         scored.sort((a, b) => b.score - a.score);
-
+        
+        console.log("All scored2: ",scored.length);
         return scored;
 
     } catch (err) {
