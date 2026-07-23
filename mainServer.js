@@ -368,19 +368,19 @@ allContent = allContent.filter(item => {
         return [];
     }
 }
-
 async function enrichContent(contentArray) {
     return Promise.all(
-        contentArray.map(async(item) => {
-            try {
-                console.log("item: ",item.autherID);
-                const profile = await getUser(item.autherID);
+        contentArray.map(async (item) => {
+            const profile = await getUser(item.autherID);
 
-                return {...item, userData: { F_user:profile.F_user , Id_user:profile.Id_user, S_user:profile.S_user} || {F_user:"Unknown User" , Id_user:"333666999", S_user:"known_user"}};
-            } catch {
-                return item;
-                return {...item, userData: {F_user:"Unknown User" , Id_user:"333666999", S_user:"known_user"}};
-            }
+            return {
+                ...item,
+                userData: {
+                    F_user: profile?.F_user ?? "Unknown User",
+                    Id_user: profile?.Id_user ?? "000000000",
+                    S_user: profile?.S_user ?? "@unknown_user",
+                },
+            };
         })
     );
 }
