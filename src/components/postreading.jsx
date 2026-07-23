@@ -265,7 +265,7 @@ const Postreading = () => {
 
           content,
 
-          type: "Posts",
+          type: "posts",
         },
         {
           headers: {

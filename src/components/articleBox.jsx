@@ -356,7 +356,7 @@ const ArticleBox = () => {
 
           content,
 
-          type: "Posts",
+          type: "posts",
         },
         {
           headers: {
@@ -467,7 +467,7 @@ const ArticleBox = () => {
 
         type:
           typeArticle ||
-          "Posts",
+          "posts",
 
         cursor: 0,
 
@@ -518,9 +518,7 @@ const ArticleBox = () => {
           {
             userId,
 
-            type:
-              typeArticle ||
-              "Posts",
+            type: (typeArticle || "posts").toLowerCase(),
 
             cursor,
 
@@ -663,7 +661,7 @@ console.log(res);
     if (!item) return null;
 
     const isPost =
-      item.type === "Posts";
+      item.type === "posts";
 
     const isNovel =
       item.type === "novel";
@@ -711,9 +709,7 @@ console.log(res);
               <div className="names">
                 <h2 className="nameacc">
                   {
-                    item
-                      .userData
-                      ?.F_user
+                    item.userData?.F_user
                   }
                 </h2>
 
