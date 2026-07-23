@@ -140,7 +140,7 @@ function shuffle(arr) {
     return arr.sort(() => Math.random() - 0.5);
 }
 
-function paginate(data, limit = 10, cursor = 0) {
+function paginate(data, limit = 20, cursor = 0) {
     return {
         items: data.slice(cursor, cursor + limit),
         nextCursor: cursor + limit < data.length ? cursor + limit : null,
@@ -196,6 +196,15 @@ async function cacheSet(key, value, ttl = 60) {
 
 async function getUser(userId) {
     try {
+        
+        userId = Number(userId);
+
+        // التحقق من صحة الرقم
+        if (Number.isNaN(userId)) {
+            console.error("Invalid userId:", userId);
+            return null;
+        }
+
         const cached = await cacheGet(`user:${userId}`);
         if (cached) return cached;
 
@@ -881,7 +890,7 @@ io.on("connection", (socket) => {
         }
     });
 
-socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 10 }) => {
+socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 20 }) => {
     try {
 
         console.log("User ID:", userId);
@@ -896,20 +905,13 @@ socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 10 })
                 nextCursor: null
             });
         }
-        console.log("Recommend Feed TYPE:", type);
 
         let feed = await recommendFeed(user, type);
-        console.log("Recommend Feed:", feed);
-
-        console.log("Feed Length:", feed.length);
-console.log(feed.map(x => x.id || x.Id || x.postId));
 
         feed = await enrichContent(feed);
-        console.log("Enriched Feed:", feed.length);
 
         const result = paginate(shuffle(feed), limit, cursor);
-        console.log("Final Result:", result.items.length);
-console.log("Paginated:", result.items.length);
+
 
         socket.emit("FEED_RESULT", result);
 
