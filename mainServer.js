@@ -373,7 +373,7 @@ async function enrichContent(contentArray) {
     return Promise.all(
         contentArray.map(async(item) => {
             try {
-                console.log("item: ",item);
+                console.log("item: ",item.autherID);
                 const profile = await getUser(item.autherID);
                 console.log("profile: ",profile);
                 return {...item, userData: profile || {} };
