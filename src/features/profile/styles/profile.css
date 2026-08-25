@@ -1,0 +1,249 @@
+.profile-container {
+  direction: ltr;
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+  padding-top: 100px;
+  color: #222;
+  background: #f7f7f7;
+  border-radius: 20px;
+}
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Profile Picture */
+.profile-pic-wrapper {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 16px;
+}
+
+.profile-pic {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #1da1f2;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.profile-pic:hover {
+  transform: scale(1.05);
+}
+
+.edit-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #1da1f2;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.image-dropdown {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+}
+
+.image-dropdown button {
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.image-dropdown button:hover {
+  background: #f1f1f1;
+}
+
+/* Crop Modal */
+.crop-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.crop-container {
+  position: relative;
+  width: 90%;
+  max-width: 500px;
+  height: 400px;
+  background: #333;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.crop-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cancel-btn {
+  padding: 10px 20px;
+  background: #555;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.save-btn {
+  padding: 10px 20px;
+  background: #1da1f2;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.follow-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px auto;
+  padding: 10px 24px;
+  background: #1da1f2;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.unfollow-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px auto;
+  padding: 10px 24px;
+  background: #ffffff;
+  color: #1da1f2;
+  border: 1px solid #1da1f2;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Profile Info */
+.profile-info {
+  margin: 16px auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.display-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.edit-btn {
+  color: #1da1f2;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.edit-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-input,
+.edit-textarea {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 16px;
+  background: white;
+}
+
+/* Stats */
+.profile-stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px auto;
+  width: 80%;
+  font-weight: bold;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  color: #111;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #777;
+}
+
+/* Tabs */
+.profile-tabs {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  border-bottom: 2px solid #ddd;
+}
+
+.tab-item {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-item.active {
+  border-bottom: 3px solid #1da1f2;
+  color: #1da1f2;
+  font-weight: bold;
+}
+
+.profile-feed {
+  margin-top: 20px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .profile-container {
+    max-width: 100%;
+  }
+}

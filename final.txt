@@ -1,0 +1,32 @@
+{
+ "components": [
+  "article",
+  "auth",
+  "common",
+  "facebook.png",
+  "feed",
+  "layout",
+  "post",
+  "profile",
+  "refresh-page-option.png",
+  "remove.png",
+  "settings",
+  "writer"
+ ],
+ "article": [
+  "ArticleActions.jsx",
+  "ArticleBody.jsx",
+  "ArticleHeader.jsx",
+  "ArticleReading.jsx",
+  "styles"
+ ],
+ "feed": [
+  "cards",
+  "common",
+  "Feed.jsx",
+  "FeedItem.jsx",
+  "FeedList.jsx",
+  "skeleton",
+  "styles"
+ ]
+}

@@ -1,0 +1,105 @@
+:root {
+  /* Brand & Accent Colors */
+  --blue: #0097d9;
+  --blue-dim: #0098d983;
+  --blue-border: #0098d91c;
+  --teal: #27ade2;
+  --teal-dim: rgba(29, 158, 117, 0.12);
+  --purple: #7F77DD;
+  --purple-dim: rgba(127, 119, 221, 0.12);
+  --gold: #f59e0b;
+  --gold-dim: rgba(245, 158, 11, 0.12);
+  --orange-primary: #fa6a32;
+  --orange-secondary: #f17e11;
+
+  /* Border Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layout Sizes */
+  --sidebar-w: 260px;
+  --header-height: 50px;
+  --max-content-w: 820px;
+
+  /* Typography */
+  --font-primary: "Inter", sans-serif;
+  --font-arabic: "Cairo", "Zain", sans-serif;
+  --font-heading: "Zain", "Inter", sans-serif;
+}
+
+/* Light Theme (Default) */
+[data-theme="light"],
+:root {
+  --bg: #F6F5F2;
+  --bg-primary: #ffffff;
+  --bg2: #EFEDE9;
+  --bg3: #FFFFFF;
+  --bg4: #E8E5DF;
+  --surface: rgba(0, 0, 0, 0.03);
+  --surface-hover: rgba(0, 0, 0, 0.06);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-md: rgba(0, 0, 0, 0.12);
+  --text: #1A1B22;
+  --text-primary: #111827;
+  --text2: #5C5F70;
+  --text3: #9499AA;
+  --input-bg: rgba(0, 0, 0, 0.04);
+  --input-border: rgba(0, 0, 0, 0.12);
+  --card-bg: rgba(0, 0, 0, 0.02);
+  --glass: rgba(246, 245, 242, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --danger: #C53030;
+  --danger-dim: rgba(197, 48, 48, 0.1);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.06);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --bg: #0C0D10;
+  --bg-primary: #13141A;
+  --bg2: #13141A;
+  --bg3: #1A1B22;
+  --bg4: #222330;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.07);
+  --border-md: rgba(255, 255, 255, 0.12);
+  --text: #E8E9F0;
+  --text-primary: #f3f4f6;
+  --text2: #9499AA;
+  --text3: #52556A;
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --glass: rgba(20, 21, 28, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --danger: #E24B4A;
+  --danger-dim: rgba(226, 75, 74, 0.12);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Font Size Scales */
+[data-font-size="small"] {
+  --fs-base: 13px;
+}
+
+[data-font-size="medium"] {
+  --fs-base: 15px;
+}
+
+[data-font-size="large"] {
+  --fs-base: 17px;
+}

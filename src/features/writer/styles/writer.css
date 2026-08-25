@@ -1,0 +1,303 @@
+/* Writer Primary Trigger Button */
+.WriterBox {
+  width: 40%;
+  min-width: 280px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: 0.3s;
+  font-family: "Inter", sans-serif;
+  height: 50px;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  color: rgb(14, 14, 14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  cursor: text;
+}
+
+.WriterBox:hover {
+  background-color: #e4e4e4;
+}
+
+/* Writer Modal Dialog */
+.WriterModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+  background: #1b1b1b;
+  color: #fff;
+  width: 80%;
+  max-width: 800px;
+  max-height: 90vh;
+  border-radius: 12px;
+  padding: 25px;
+  z-index: 1001;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  font-family: "Inter", sans-serif;
+  overflow-y: auto;
+}
+
+/* Header */
+.WriterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.WriterHeader h3 {
+  margin: 0;
+  font-weight: 600;
+  color: #fff;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #aaa;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.closeBtn:hover {
+  color: #fff;
+}
+
+/* Type Selector */
+.TypeSelector {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.TypeSelector button {
+  background: #333333;
+  border: none;
+  color: #cccccc;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.TypeSelector button.active {
+  background: #007aff;
+  color: #ffffff;
+}
+
+/* Inputs */
+.WriterInput {
+  width: 100%;
+  min-height: 120px;
+  max-height: 350px;
+  background: #222222;
+  color: #ffffff;
+  padding: 12px 14px;
+  border: 1px solid #333333;
+  border-radius: 10px;
+  resize: vertical;
+  outline: none;
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+.sm_WriterInput {
+  width: 100%;
+  height: 46px;
+  background: #222222;
+  color: #ffffff;
+  padding: 10px 14px;
+  border: 1px solid #333333;
+  border-radius: 10px;
+  outline: none;
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  margin-bottom: 12px;
+}
+
+.series-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.series-section select {
+  flex: 1;
+  height: 46px;
+  background: #222222;
+  color: #ffffff;
+  border: 1px solid #333333;
+  border-radius: 10px;
+  padding: 0 12px;
+}
+
+.new-series-input {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.new-series-input button {
+  padding: 0 16px;
+  background: #007aff;
+  color: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Actions */
+.WriterActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.cancelBtn {
+  background: #444444;
+  color: #cccccc;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.submitBtn {
+  background: #007aff;
+  color: #ffffff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Backdrop */
+.Backdrop {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  z-index: 1000;
+}
+
+/* Image Uploads */
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.upload-card {
+  width: 140px;
+  height: 140px;
+  border: 2px dashed #555555;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #aaaaaa;
+  cursor: pointer;
+  transition: 0.3s;
+  background: #1b1b1b;
+}
+
+.upload-card:hover {
+  border-color: #007aff;
+  color: #007aff;
+}
+
+.image-card {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #111111;
+}
+
+.image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background: rgba(255, 0, 0, 0.8);
+}
+
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.fullscreen-image {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+/* CKEditor Custom Styling */
+.ck.ck-editor__main {
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.ck.ck-editor__editable {
+  min-height: 200px !important;
+  color: #222222 !important;
+  background: #ffffff !important;
+}
