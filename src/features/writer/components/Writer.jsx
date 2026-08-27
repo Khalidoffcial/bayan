@@ -30,6 +30,7 @@ export const Writer = () => {
     customSeries,
     setCustomSeries,
     isSubmitting,
+    successMessage,
     handleImageChange,
     handleRemoveImage,
     handleClose,
@@ -42,6 +43,19 @@ export const Writer = () => {
       <motion.div className="WriterBox" onClick={() => setActive(true)}>
         <h5>Share your thoughts — write a post, article, or novels...</h5>
       </motion.div>
+
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            className="writer-toast-success"
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+          >
+            <span>{successMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {active && (

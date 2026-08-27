@@ -10,10 +10,11 @@ export const getDirection = (text = "") => {
 };
 
 /**
- * Generates a random numeric ID.
- * @returns {number} - A random 4-digit ID.
+ * Generates a random 9-digit numeric ID.
+ * @returns {string} - A random 9-digit ID.
  */
-export const generateID = () => Math.floor(1000 + Math.random() * 9000);
+export const generateID = () =>
+  String(Math.floor(100000000 + Math.random() * 900000000));
 
 /**
  * Truncates text to a specified length.

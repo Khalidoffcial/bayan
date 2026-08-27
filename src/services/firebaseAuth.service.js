@@ -14,7 +14,7 @@ const firebaseConfig = {
   measurementId: "G-PLBHJ8PNR5"
 };
 
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const app = getApps().find(a => a.name === "[DEFAULT]") || initializeApp(firebaseConfig);
 
 export const db = getDatabase(app);
 export const storage = getStorage(app);

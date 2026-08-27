@@ -5,6 +5,7 @@ import {
   signInWithCredentials,
   signUpUser,
   signInWithGoogle,
+  getGoogleFirebaseUser,
 } from "../services/auth.service";
 import cookie from "../../../utils/cookies";
 
@@ -46,7 +47,7 @@ export const useAuthForm = (type = "login") => {
       const accessToken = data.accessToken;
       localStorage.setItem("me", JSON.stringify(data.userData));
 
-      if (rememberMe) {
+      if (rememberMe) { 
         cookie(accessToken);
       } else {
         localStorage.setItem("token", accessToken);
@@ -110,28 +111,45 @@ export const useAuthForm = (type = "login") => {
 
   const handleGoogleAuth = useCallback(async () => {
     setLoading(true);
+    setErrorMsg("");
     try {
-      const { firebaseUser, apiData, status } = await signInWithGoogle();
       if (type === "signup") {
-        setEmailGoogle(firebaseUser.email);
-        setUidGoogle(firebaseUser.uid);
-      } else if (apiData && status === 200) {
-        const accessToken = apiData.accessToken;
-        localStorage.setItem("me", JSON.stringify(apiData.userData));
-
-        if (rememberMe) {
-          cookie(accessToken);
-        } else {
-          localStorage.setItem("token", accessToken);
+        const firebaseUser = await getGoogleFirebaseUser();
+        if (firebaseUser) {
+          setEmailGoogle(firebaseUser.email || "");
+          setUidGoogle(firebaseUser.uid || "");
+          if (!fullName && firebaseUser.displayName) {
+            setFullName(firebaseUser.displayName);
+          }
         }
-        navigate("/");
+      } else {
+        const { apiData } = await signInWithGoogle();
+        if (apiData?.accessToken) {
+          const accessToken = apiData.accessToken;
+          localStorage.setItem("me", JSON.stringify(apiData.userData));
+
+          if (rememberMe) {
+            cookie(accessToken);
+          } else {
+            localStorage.setItem("token", accessToken);
+          }
+          navigate("/");
+        }
       }
     } catch (err) {
-      console.error("Google Auth error:", err);
+      if (err?.code === "auth/popup-closed-by-user") {
+        return;
+      }
+      if (err?.response?.status === 404) {
+        setErrorMsg("Google account is not registered yet. Please sign up first.");
+      } else {
+        console.error("Google Auth error:", err);
+        setErrorMsg("Google authentication failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
-  }, [type, rememberMe, navigate]);
+  }, [type, fullName, rememberMe, navigate]);
 
   return {
     fullName,

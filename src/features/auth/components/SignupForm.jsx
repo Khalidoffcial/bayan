@@ -20,6 +20,7 @@ export const SignupForm = () => {
     setRememberMe,
     showPasswordError,
     showConfirmError,
+    errorMsg,
     loading,
     handleSignup,
     handleGoogleAuth,
@@ -73,6 +74,12 @@ export const SignupForm = () => {
           )}
 
           <GoogleAuthButton onClick={handleGoogleAuth} disabled={loading} />
+
+          {errorMsg && (
+            <p className="error" style={{ textAlign: "center", margin: "10px 0" }}>
+              {errorMsg}
+            </p>
+          )}
 
           <div className="checkbox">
             <input

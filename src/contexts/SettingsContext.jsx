@@ -7,6 +7,7 @@ import React, {
   useCallback,
 } from "react";
 import { fetchUserSettings, updateUserSettings } from "../services/settings.service";
+import cookie from "../utils/cookies";
 
 const SettingsContext = createContext(null);
 
@@ -62,6 +63,13 @@ export const SettingsProvider = ({ children }) => {
   const [saveStatus, setSaveStatus] = useState(null);
 
   const loadSettings = useCallback(async () => {
+    const token = cookie("get");
+    // If unauthenticated / no token, do not make an unauthorized request to protected /settings
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const data = await fetchUserSettings();
@@ -114,7 +122,12 @@ export const SettingsProvider = ({ children }) => {
         }
       );
     } catch (error) {
-      console.error("Load settings error:", error);
+      // If 401 Unauthorized (expired/invalid token), clean up stale session token gracefully
+      if (error?.response?.status === 401) {
+        cookie("remove");
+      } else {
+        console.error("Load settings error:", error);
+      }
     } finally {
       setLoading(false);
     }

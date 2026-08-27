@@ -3,6 +3,8 @@
 header.top {
   position: fixed;
   top: 0;
+  right: 0;
+  left: 0;
   width: 100%;
   height: var(--header-height, 50px);
   background-color: #ffffff;
@@ -45,7 +47,6 @@ header.top {
 .logo-center {
   display: flex;
   align-items: center;
-  flex: 1;
   justify-content: flex-start;
   position: relative;
   z-index: 10000;

@@ -1,14 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { io } from "socket.io-client";
 import { sharePost } from "../services/post.service";
 import useAuth from "../../../hooks/useAuth";
-import { API_BASE_URL } from "../../../constants/apiEndpoints";
+import useSocket from "../../../hooks/useSocket";
 
 export const usePost = () => {
   const { postId } = useParams();
   const location = useLocation();
-  const socketRef = useRef(null);
+  const socketRef = useSocket();
   const { user } = useAuth();
 
   const [dataPost, setDataPost] = useState(null);
@@ -17,11 +16,6 @@ export const usePost = () => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [commented, setCommented] = useState(false);
-
-  useEffect(() => {
-    socketRef.current = io(API_BASE_URL);
-    return () => socketRef.current?.disconnect();
-  }, []);
 
   useEffect(() => {
     if (location.state) {

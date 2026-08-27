@@ -38,9 +38,22 @@ export const signUpUser = async (data) => {
   return response.data;
 };
 
-export const signInWithGoogle = async () => {
+export const getGoogleFirebaseUser = async () => {
   const result = await signInWithPopup(auth, googleProvider);
-  const user = result.user;
+  return result.user;
+};
+
+export const authenticateGoogleUserApi = async (data) => {
+  const response = await axios.post(
+    API_ENDPOINTS.AUTH_GOOGLE,
+    data,
+    { headers: { "Content-Type": "application/json" } }
+  );
+  return response.data;
+};
+
+export const signInWithGoogle = async () => {
+  const user = await getGoogleFirebaseUser();
 
   const data = {
     email: user.email,
@@ -48,11 +61,6 @@ export const signInWithGoogle = async () => {
     name: user.displayName,
   };
 
-  const response = await axios.post(
-    API_ENDPOINTS.AUTH_GOOGLE,
-    data,
-    { headers: { "Content-Type": "application/json" } }
-  );
-
-  return { firebaseUser: user, apiData: response.data, status: response.status };
+  const apiData = await authenticateGoogleUserApi(data);
+  return { firebaseUser: user, apiData, status: 200 };
 };

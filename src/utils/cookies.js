@@ -1,17 +1,22 @@
 import Cookies from 'js-cookie';
 
 export default function cookie(any) {
-    console.log(any)
-    if (any === "get") {
-        if (Cookies.get('token')){
-            return Cookies.get('token');
-        }else{
-            return localStorage.getItem("Token")
-        }
-    } else if (any === "remove") {
-        return Cookies.remove('token');
-    } else if (any.startsWith("ey")) {
-        console.log(any)
-        Cookies.set('token', any, { expires: 60, secure: true });
-    }
+  if (any === "get") {
+    return (
+      Cookies.get('token') ||
+      localStorage.getItem("token") ||
+      localStorage.getItem("Token") ||
+      null
+    );
+  } else if (any === "remove") {
+    Cookies.remove('token');
+    localStorage.removeItem("token");
+    localStorage.removeItem("Token");
+  } else if (typeof any === "string" && (any.startsWith("ey") || any.length > 10)) {
+    Cookies.set('token', any, {
+      expires: 60,
+      secure: typeof window !== "undefined" && window.location.protocol === "https:",
+      sameSite: "Lax",
+    });
+  }
 }

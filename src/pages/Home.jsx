@@ -43,6 +43,7 @@ export const HomePage = () => {
       <div className="homepage">
         <Content />
         <Sidebar />
+        
       </div>
     </div>
   );

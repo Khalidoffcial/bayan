@@ -14,6 +14,7 @@ export const LoginForm = () => {
     setPassword,
     rememberMe,
     setRememberMe,
+    errorMsg,
     loading,
     handleLogin,
     handleGoogleAuth,
@@ -48,6 +49,12 @@ export const LoginForm = () => {
         </div>
 
         <GoogleAuthButton onClick={handleGoogleAuth} disabled={loading} />
+
+        {errorMsg && (
+          <p className="error" style={{ textAlign: "center", margin: "10px 0" }}>
+            {errorMsg}
+          </p>
+        )}
 
         <div className="checkbox">
           <input

@@ -31,4 +31,16 @@ describe('Settings Feature Panels', () => {
     );
     expect(screen.getByText(/choose what activity you want to be notified about/i)).toBeInTheDocument();
   });
+
+  test('does not throw or produce unhandled errors when unauthenticated', () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('Token');
+    expect(() => {
+      render(
+        <SettingsProvider>
+          <AppearanceSettings />
+        </SettingsProvider>
+      );
+    }).not.toThrow();
+  });
 });

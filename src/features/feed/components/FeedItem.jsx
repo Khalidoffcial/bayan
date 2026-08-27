@@ -14,9 +14,10 @@ export const FeedItem = ({
 }) => {
   if (!item) return null;
 
-  const isPost = item.type === "posts";
-  const isNovel = item.type === "novel";
-  const isArticle = item.type === "article";
+  const itemType = String(item.type || "").toLowerCase().trim();
+  const isNovel = itemType === "novel" || itemType === "novels";
+  const isArticle = itemType === "article" || itemType === "articles";
+  const isPost = itemType === "posts" || itemType === "post" || (!isNovel && !isArticle);
 
   return (
     <motion.div

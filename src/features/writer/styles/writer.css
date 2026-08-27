@@ -301,3 +301,23 @@
   color: #222222 !important;
   background: #ffffff !important;
 }
+/* Toast Notification */
+.writer-toast-success {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #10b981;
+  color: #ffffff;
+  padding: 12px 26px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+  font-size: 15px;
+  font-weight: 600;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Inter", sans-serif;
+  direction: rtl;
+}

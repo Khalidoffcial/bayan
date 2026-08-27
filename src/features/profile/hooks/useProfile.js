@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { io } from "socket.io-client";
+import useSocket from "../../../hooks/useSocket";
 import {
   fetchUserProfile,
   updateUserProfileField,
@@ -8,7 +8,6 @@ import {
   unfollowUserApi,
   uploadProfileImageBlob,
 } from "../services/profile.service";
-import { API_BASE_URL } from "../../../constants/apiEndpoints";
 
 export const useProfile = () => {
   const { idOtherUser } = useParams();
@@ -42,7 +41,7 @@ export const useProfile = () => {
   const [likesMap, setLikesMap] = useState({});
   const [commented, setCommented] = useState(false);
 
-  const socketRef = useRef(null);
+  const socketRef = useSocket();
 
   // 1. Initial Data Load
   useEffect(() => {
@@ -89,18 +88,64 @@ export const useProfile = () => {
     }
   }, [userDataMain, idOtherUser]);
 
-  // 3. Socket Setup
+  // 3. Socket Setup & Real-time Content
   useEffect(() => {
-    socketRef.current = io(API_BASE_URL);
+    const socket = socketRef?.current;
+    if (!socket) return;
 
-    socketRef.current.on("newFollower", () => setFollowersCount((prev) => prev + 1));
-    socketRef.current.on("lostFollower", () => setFollowersCount((prev) => Math.max(0, prev - 1)));
-
+    const handleNewFollower = () => setFollowersCount((prev) => prev + 1);
+    const handleLostFollower = () => setFollowersCount((prev) => Math.max(0, prev - 1));
     const handleContent = (data) => setFeed(Array.isArray(data) ? [...data].reverse() : []);
-    socketRef.current.on("CONTENT_RESULT", handleContent);
 
-    return () => socketRef.current?.disconnect();
-  }, []);
+    const handleNewPost = (post) => {
+      if (!post || typeof post !== "object") return;
+      const targetId = idOtherUser || userDataMain.id;
+      const postAuthorId =
+        post.autherID ||
+        post.authorId ||
+        post.userId ||
+        post.userData?.Id_user ||
+        post.userData?.id;
+
+      if (targetId && String(postAuthorId) === String(targetId)) {
+        const currentTab = String(activeTab || "Posts").toLowerCase();
+        const postType = String(post.type || "post").toLowerCase();
+
+        const matchesTab =
+          (currentTab.includes("post") && (postType.includes("post") || !post.type)) ||
+          (currentTab.includes("article") && postType.includes("article")) ||
+          (currentTab.includes("novel") && postType.includes("novel"));
+
+        if (matchesTab) {
+          setFeed((prev) => {
+            const exists = prev.some(
+              (p) => String(p.id ?? p._id ?? p.id_post ?? "") === String(post.id ?? post._id ?? "")
+            );
+            if (exists) return prev;
+            return [post, ...prev];
+          });
+        }
+      }
+    };
+
+    const handleLocalNewPost = (event) => {
+      if (event.detail) handleNewPost(event.detail);
+    };
+
+    socket.on("newFollower", handleNewFollower);
+    socket.on("lostFollower", handleLostFollower);
+    socket.on("CONTENT_RESULT", handleContent);
+    socket.on("NEW_POST", handleNewPost);
+    window.addEventListener("BAYAN_NEW_POST", handleLocalNewPost);
+
+    return () => {
+      socket.off("newFollower", handleNewFollower);
+      socket.off("lostFollower", handleLostFollower);
+      socket.off("CONTENT_RESULT", handleContent);
+      socket.off("NEW_POST", handleNewPost);
+      window.removeEventListener("BAYAN_NEW_POST", handleLocalNewPost);
+    };
+  }, [socketRef, activeTab, idOtherUser, userDataMain.id]);
 
   // 4. Fetch Content for Profile Tab
   useEffect(() => {

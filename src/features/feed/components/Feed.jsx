@@ -5,6 +5,7 @@ import { useParams, useLocation } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 import useFeed from "../hooks/useFeed";
 import { getDirection } from "../../../utils/helpers";
+import { FEED_PREFETCH_THRESHOLD_PX } from "../../../constants/feedConfig";
 
 // Shared Layout & UI Components
 import Top from "../../../components/layout/Top";
@@ -25,6 +26,8 @@ export const Feed = () => {
   const {
     feed,
     loading,
+    hasMore,
+    error,
     fetchFeed,
     resetFeed,
   } = useFeed(typeArticle || "posts", user?.id);
@@ -35,21 +38,31 @@ export const Feed = () => {
   const [commented, setCommented] = useState(false);
   const [activeCommentId, setActiveCommentId] = useState(null);
 
-  // Initial Load & Reset
+  // Initial Load & Reset on route/filter changes
   useEffect(() => {
     resetFeed();
     fetchFeed(true);
-  }, [location.pathname, typeArticle, fetchFeed, resetFeed]);
+  }, [location.pathname, typeArticle, user?.id, fetchFeed, resetFeed]);
 
-  // Infinite Scroll
+  // Intelligent Infinite Scroll & Prefetch
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-      if (scrollTop + clientHeight >= scrollHeight - 200) {
-        fetchFeed();
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+          // Trigger prefetch when reaching threshold near the end of the cached batch
+          if (scrollTop + clientHeight >= scrollHeight - FEED_PREFETCH_THRESHOLD_PX) {
+            fetchFeed();
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
-    window.addEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [fetchFeed]);
 
@@ -101,6 +114,24 @@ export const Feed = () => {
         />
 
         {loading && <Loader />}
+
+        {error && (
+          <div className="feed-error-container" style={{ textAlign: "center", padding: "16px" }}>
+            <p style={{ color: "#ef4444", marginBottom: "8px" }}>{error}</p>
+            <button
+              onClick={() => fetchFeed(feed.length === 0)}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "8px",
+                border: "1px solid #d1d5db",
+                background: "#f9fafb",
+                cursor: "pointer",
+              }}
+            >
+              إعادة المحاولة / Retry
+            </button>
+          </div>
+        )}
       </div>
 
       <CommentModal

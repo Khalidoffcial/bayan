@@ -3,10 +3,11 @@
 =========================== */
 
 .feed-container {
-  width: 100%;
+  width: 80%;
   min-height: 100vh;
   position: relative;
   direction: rtl;
+
 }
 
 .feed-main {

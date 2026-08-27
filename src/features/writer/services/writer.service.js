@@ -1,26 +1,34 @@
 import axios from "axios";
 import { uploadImages } from "../../../services/storage.service";
-import { API_BASE_URL } from "../../../constants/apiEndpoints";
+import { API_ENDPOINTS } from "../../../constants/apiEndpoints";
 import cookie from "../../../utils/cookies";
 
 export const saveArticleOrNovel = async (payload) => {
+  const token = cookie("get") || localStorage.getItem("token");
+  const headers = token ? { Authorization: "Bearer " + token } : {};
+
   const response = await axios.post(
-    `${API_BASE_URL}/saveArticle_novels`,
+    API_ENDPOINTS.SAVE_ARTICLE_NOVELS,
     payload,
-    { headers: { Authorization: "Bearer " + cookie("get") } }
+    { headers }
   );
   return response.data;
 };
 
 export const saveIdeaPost = async (payload) => {
+  const token = cookie("get") || localStorage.getItem("token");
+  const headers = token ? { Authorization: "Bearer " + token } : {};
+
   const response = await axios.post(
-    `${API_BASE_URL}/saveIdeas`,
+    API_ENDPOINTS.SAVE_POSTS,
     payload,
-    { headers: { Authorization: "Bearer " + cookie("get") } }
+    { headers }
   );
-  return response.data;
+  return response.data.message;
 };
 
 export const uploadWriterImages = async (images) => {
   return await uploadImages(images);
 };
+
+

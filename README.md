@@ -115,7 +115,7 @@ npm install
 ### Environment Configuration
 Create a `.env` file in the project root:
 ```env
-REACT_APP_SERVER_API=https://bayan-production-036e.up.railway.app
+REACT_APP_SERVER_API=https://bayan-production-d773.up.railway.app
 ```
 
 ### Available Scripts
@@ -149,7 +149,7 @@ $env:CI="true"; npm test -- --watchAll=false
 
 ---
 
-## ??ž?? Author & Contributions
+## ??ï¿½?? Author & Contributions
 
 **Khalid Asadany**
 - GitHub: [https://github.com/Khalidoffcial](https://github.com/Khalidoffcial)

@@ -7,4 +7,5 @@ export { FeedActions } from "./components/FeedActions";
 export { FeedUser } from "./components/FeedUser";
 export { useFeed } from "./hooks/useFeed";
 export * from "./services/feed.service";
+export * from "./constants/feed.constants";
 

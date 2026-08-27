@@ -1,4 +1,4 @@
-export const API_BASE_URL = process.env.REACT_APP_SERVER_API || 'https://bayan-production-036e.up.railway.app';
+export const API_BASE_URL = process.env.REACT_APP_SERVER_API || 'https://bayan-production-d773.up.railway.app';
 
 export const API_ENDPOINTS = {
   AUTH: `${API_BASE_URL}/auth`,
@@ -11,6 +11,5 @@ export const API_ENDPOINTS = {
   UNFOLLOW_USER: `${API_BASE_URL}/unfollowingUser`,
   SAVE_POSTS: `${API_BASE_URL}/savePosts`,
   SAVE_ARTICLE_NOVELS: `${API_BASE_URL}/saveArticle_novels`,
-  SAVE_IDEAS: `${API_BASE_URL}/saveIdeas`,
   SETTINGS: `${API_BASE_URL}/settings`,
 };

@@ -45,12 +45,12 @@ const Sidebar = () => {
             className={`sidebar-item ${location.pathname === "/" ? "active" : ""}`}
             onClick={() => setSidebarOpen(false)}
           >
+            <span>All</span>
             <img
               src={location.pathname === "/" ? allIcon : allOutline}
               alt="All"
               className="settings-icon"
             />
-            <span>All</span>
           </Link>
 
           {channels.map((channel) => {
@@ -63,12 +63,12 @@ const Sidebar = () => {
                 className={`sidebar-item ${isActive ? "active" : ""}`}
                 onClick={() => setSidebarOpen(false)}
               >
+                <span>{channel.name}</span>
                 <img
                   src={isActive ? channel.activeIcon : channel.inactiveIcon}
                   alt={channel.name}
                   className="settings-icon"
                 />
-                <span>{channel.name}</span>
               </Link>
             );
           })}
@@ -78,13 +78,13 @@ const Sidebar = () => {
           to="/settings"
           className={`sidebar-item settings-link ${location.pathname === "/settings" ? "active" : ""}`}
           onClick={() => setSidebarOpen(false)}
-        >
+          >
+          <span>Settings</span>
           <img
             src={location.pathname === "/settings" ? setting : settingOutline}
             alt="Settings"
             className="settings-icon"
           />
-          <span>Settings</span>
         </Link>
       </div>
     </>

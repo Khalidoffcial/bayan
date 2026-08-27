@@ -12,20 +12,32 @@ export const FeedList = ({
 }) => {
   if (!feed || feed.length === 0) return null;
 
+  const seenRenderKeys = new Set();
+
   return (
     <div className="feed-list">
-      {feed.map((item) => (
-        <FeedItem
-          key={item.id}
-          item={item}
-          liked={likedPosts?.[item.id]}
-          likesCount={likesCount?.[item.id]}
-          onLike={onLike}
-          onComment={onComment}
-          onShare={onShare}
-          getDirection={getDirection}
-        />
-      ))}
+      {feed.map((item, index) => {
+        const rawId = item.id ?? item._id ?? item.id_post ?? `feed-item-${index}`;
+        const itemId = String(rawId);
+
+        if (seenRenderKeys.has(itemId)) {
+          return null;
+        }
+        seenRenderKeys.add(itemId);
+
+        return (
+          <FeedItem
+            key={itemId}
+            item={item}
+            liked={likedPosts?.[itemId]}
+            likesCount={likesCount?.[itemId]}
+            onLike={onLike}
+            onComment={onComment}
+            onShare={onShare}
+            getDirection={getDirection}
+          />
+        );
+      })}
     </div>
   );
 };
