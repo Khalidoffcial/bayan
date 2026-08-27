@@ -1,0 +1,114 @@
+{
+    "Religious": [
+        "god","Allah", "faith", "spiritual", "religion", "holy", "prayer", "mosque", "church", "bible", "Qur’an","quran", "islam", "christianity",
+        "judaism", "worship", "fasting", "ramadan", "pilgrimage", "sin", "blessing", "heaven", "hell", "soul", "angels", "devil",
+        "belief", "sacrifice", "sermon", "prophet", "scripture", "peace", "forgiveness", "purity", "holy spirit", "divine",
+        "meditation", "charity", "grace", "spirituality", "saint", "religious", "ritual", "spirit", "salvation", "faithful",
+        "miracle", "temple", "pray", "deity", "sacred", "prophecy", "eternal", "paradise", "creator", "sabbath", "cross", "jesus",
+        "muhammad", "moses", "churches", "worshippers", "spiritual growth", "commandments", "rituals", "godly", "celestial",
+        "divinity", "soulful", "pilgrim", "belief system", "holy book", "revelation", "virtue", "repentance", "buddhism", "hinduism",
+        "monk", "nun", "shrine", "afterlife", "spiritual healing", "holy day", "faith community", "moral values", "religious ceremony",
+        "divine guidance", "sacred place", "religious belief", "religious freedom", "spiritual leader", "inner peace", "mysticism",
+        "spiritual teacher", "church service", "moral compass", "religious message", "religious teaching", "spiritual faith"
+    ],
+
+    "Educational": [
+        "school", "learning", "education", "students", "teacher", "knowledge", "classroom", "lecture", "course", "study", "curriculum",
+        "exam", "homework", "university", "college", "tutor", "subject", "training", "academic", "degree", "diploma", "certificate",
+        "lesson", "textbook", "library", "research", "scholar", "graduate", "pupil", "test", "class", "institute", "literacy",
+        "academy", "professor", "education system", "tutorial", "reading", "writing", "math", "science", "skills",
+        "online learning", "e-learning", "MOOC", "presentation", "seminar", "scholarship", "learning environment",
+        "critical thinking", "language learning", "education reform", "learning goals", "teaching methods",
+        "interactive learning", "remote learning", "digital classroom", "teacher training", "students engagement",
+        "open university", "educational material", "academic paper", "online education", "knowledge sharing", "STEM",
+        "distance learning", "learning assessment", "class project", "academic conference", "teacher evaluation",
+        "skill development", "curriculum design", "education policy", "school management", "academic progress",
+        "educational institution", "learning app", "virtual classroom", "education technology", "scholarly article"
+    ],
+
+    "Scientific": [
+        "science", "experiment", "research", "technology", "innovation", "laboratory", "scientist", "theory", "hypothesis", "data",
+        "biology", "chemistry", "physics", "mathematics", "astronomy", "geology", "genetics", "engineering", "robotics", "neuroscience",
+        "medicine", "analysis", "discovery", "quantum", "microscope", "DNA", "atom", "molecule", "scientific method", "thermodynamics",
+        "evolution", "climate", "planet", "telescope", "galaxy", "universe", "AI", "machine learning", "nanotech", "algorithm",
+        "scientific research", "space exploration", "scientific discovery", "scientific knowledge", "biotechnology", "environmental science",
+        "scientific innovation", "astronomical", "mathematical model", "medical research", "computational", "scientific publication",
+        "scientific theory", "energy", "particle physics", "laboratory experiment", "scientific community", "scientific conference",
+        "scientific revolution", "scientific explanation", "scientific principle", "research paper", "genetic engineering",
+        "artificial intelligence", "quantum mechanics", "scientific advancement", "scientific exploration"
+    ],
+
+    "Political": [
+        "government", "policy", "election", "minister", "law", "democracy", "politician", "parliament", "party", "vote", "president",
+        "campaign", "rights", "freedom", "justice", "corruption", "diplomacy", "governor", "republic", "reform", "movement",
+        "public opinion", "dictator", "authority", "constitution", "legislation", "protest", "conflict", "war", "peace", "negotiation",
+        "citizens", "sovereignty", "leadership", "prime minister", "voting", "foreign policy", "governance", "independence",
+        "human rights", "international relations", "political crisis", "civil rights", "law enforcement", "political decision",
+        "foreign affairs", "legislative power", "executive branch", "election results", "public service", "diplomatic", "national policy",
+        "political movement", "geopolitical", "political conflict", "domestic policy", "political party", "state power", "public debate",
+        "parliamentary session", "state administration", "election campaign", "political reform", "social justice", "opposition leader",
+        "civic rights", "governing body"
+    ],
+
+    "Economic": [
+        "money", "economy", "market", "trade", "finance", "business", "investment", "industry", "company", "stock", "bank", "budget",
+        "revenue", "profit", "tax", "entrepreneur", "economic", "growth", "inflation", "employment", "salary", "imports", "exports",
+        "commerce", "corporation", "capital", "production", "wealth", "consumer", "retail", "e-commerce", "startup", "venture capital",
+        "GDP", "banking", "monetary policy", "economic crisis", "global economy", "credit", "debt", "loan", "marketing", "real estate",
+        "business model", "finance market", "financial planning", "investment risk", "economic development", "macroeconomics",
+        "microeconomics", "market trends", "supply chain", "economic stability", "economic reform", "business management",
+        "financial growth", "business strategy", "economic performance", "economic outlook", "trade policy", "economic power",
+        "financial statement", "stock market", "economic sustainability", "market competition", "fiscal policy", "economic analysis"
+    ],
+
+    "Literary": [
+        "story", "poem", "novel", "writer", "character", "plot", "literature", "fiction", "poetry", "book", "author", "romance",
+        "mystery", "drama", "essay", "metaphor", "protagonist", "dialogue", "narrative", "storytelling", "creative writing", "fantasy",
+        "classic", "poet", "symbolism", "fictional", "romanticism", "historical novel", "science fiction", "modernism", "novelist",
+        "autobiography", "fictional world", "literary masterpiece", "writing style", "short story", "prose", "epic", "plot twist",
+        "literary theme", "literary form", "literary work", "imaginative writing", "literary creation", "literary journal",
+        "literary analysis", "literary award", "poetic expression", "narrative structure", "literary criticism", "literary heritage"
+    ],
+
+    "Technical": [
+        "software", "computer", "ai", "robot", "internet", "programming", "coding", "technology", "data", "machine learning",
+        "hardware", "system", "network", "server", "database", "app", "website", "developer", "framework", "algorithm", "api",
+        "frontend", "backend", "python", "javascript", "node", "react", "cloud", "cybersecurity", "digital", "innovation", "automation",
+        "it", "software engineer", "web development", "mobile app", "AI model", "neural network", "deep learning", "robotics", "IoT",
+        "data analysis", "virtual reality", "augmented reality", "source code", "debugging", "software testing", "data processing",
+        "software update", "UI", "UX", "IT solutions", "software architecture", "computer science", "programming logic",
+        "artificial intelligence", "data science", "data visualization", "API integration", "software project", "software deployment",
+        "software framework", "frontend engineer", "cloud computing", "AI training", "tech innovation", "tech startup"
+    ],
+
+    "Social": [
+        "family", "society", "friendship", "community", "people", "relationship", "communication", "love", "marriage", "trust",
+        "culture", "behavior", "support", "teamwork", "society issues", "gender equality", "volunteering", "solidarity",
+        "empathy", "kindness", "respect", "social change", "awareness", "cooperation", "leadership", "human rights",
+        "charity", "helping others", "neighborhood", "friend", "family bond", "social role", "public life", "shared values",
+        "human interaction", "compassion", "cultural identity", "family relations", "community service", "social event",
+        "communication skills", "team spirit", "mental health", "psychology", "human connection", "emotional support",
+        "social awareness", "interpersonal", "self-esteem", "trust building", "personal development", "social growth",
+        "relationship advice", "social psychology", "public behavior", "social harmony"
+    ],
+
+    "Entertainment": [
+        "movie", "music", "game", "show", "fun", "celebrity", "cinema", "concert", "dance", "song", "actor", "actress", "comedy",
+        "theater", "tv", "series", "festival", "party", "video", "performance", "art", "drama", "pop", "band", "musician", "film",
+        "funny", "celebration", "streaming", "media", "entertainment news", "animation", "video game", "pop culture",
+        "television show", "music video", "entertainer", "live event", "performer", "audience", "stand-up comedy", "gaming",
+        "movie trailer", "cinematic", "concert hall", "celebrity life", "entertainment platform", "film industry", "fun festival",
+        "entertainment media", "entertainment content", "online entertainment", "musical performance", "TV show", "blockbuster",
+        "streamer", "content creator", "digital entertainment"
+    ],
+
+    "Sports": [
+        "football", "match", "player", "team", "goal", "olympic", "athlete", "basketball", "tennis", "competition", "training",
+        "coach", "tournament", "championship", "game", "score", "fans", "stadium", "win", "lose", "fitness", "exercise", "athletics",
+        "sportsman", "medal", "runner", "cycling", "cricket", "volleyball", "boxing", "wrestling", "hockey", "swimming", "marathon",
+        "gym", "sport club", "physical activity", "performance", "sports event", "sports league", "sports team", "goalkeeper",
+        "champion", "world cup", "sports news", "referee", "team spirit", "athletic performance", "sports gear", "trophy",
+        "sports motivation", "football match", "training session", "player statistics", "sports competition", "sports injury",
+        "sports fans", "team management", "athletic training", "fitness program", "sports achievement"
+    ]
+}
