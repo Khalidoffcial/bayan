@@ -1,4 +1,4 @@
-export const API_BASE_URL = process.env.REACT_APP_SERVER_API || 'https://bayan-production-d773.up.railway.app';
+export const API_BASE_URL = 'https://bayan-production-0201.up.railway.app';
 
 export const API_ENDPOINTS = {
   AUTH: `${API_BASE_URL}/auth`,
