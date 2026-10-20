@@ -29,9 +29,22 @@ const allowedOrigins = [
     "http://localhost:3000",
 ];
 
-
 const app = express();
-const httpServer = createServer(app); // ✅ Express فوق نفس الـ httpServer
+const httpServer = createServer(app);
+
+// CORS لطلبات Express العادية مثل signup و login
+app.use(
+    cors({
+        origin: allowedOrigins,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
+    })
+);
+
+app.use(express.json());
+
+// CORS الخاص بـ Socket.IO
 const io = new Server(httpServer, {
     cors: {
         origin: allowedOrigins,
@@ -40,7 +53,6 @@ const io = new Server(httpServer, {
     },
     transports: ["websocket", "polling"],
 });
-
 
 const PORT = process.env.PORT || 4000;
 
