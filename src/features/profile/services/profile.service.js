@@ -1,8 +1,15 @@
 import axios from "axios";
 import { ref as storageRef, getDownloadURL, uploadBytes } from "firebase/storage";
 import { storage } from "../../../services/firebaseStorage.service";
-import { GET_USER,EDIT_PROFILE,FOLLOW_USER,UNFOLLOW_USER } from "../../../constants/apiEndpoints";
+import { API_ENDPOINTS } from "../../../constants/apiEndpoints";
 import cookie from "../../../utils/cookies";
+
+const {
+  GET_USER,
+  EDIT_PROFILE,
+  FOLLOW_USER,
+  UNFOLLOW_USER
+} = API_ENDPOINTS;
 
 export const fetchUserProfile = async (idOtherUser) => {
   const response = await axios.post(
