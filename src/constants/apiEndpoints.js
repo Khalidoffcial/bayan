@@ -11,5 +11,7 @@ export const API_ENDPOINTS = {
   UNFOLLOW_USER: `${API_BASE_URL}/unfollowingUser`,
   SAVE_POSTS: `${API_BASE_URL}/savePosts`,
   SAVE_ARTICLE_NOVELS: `${API_BASE_URL}/saveArticle_novels`,
+  EDIT_PROFILE_PHOTO: `${API_BASE_URL}/edit_profile_photo`,
+  EDIT_BIO: `${API_BASE_URL}/edit_bio`,
   SETTINGS: `${API_BASE_URL}/settings`,
 };

@@ -1,12 +1,12 @@
 import axios from "axios";
 import { ref as storageRef, getDownloadURL, uploadBytes } from "firebase/storage";
 import { storage } from "../../../services/firebaseStorage.service";
-import { API_BASE_URL } from "../../../constants/apiEndpoints";
+import { GET_USER,EDIT_PROFILE,FOLLOW_USER,UNFOLLOW_USER } from "../../../constants/apiEndpoints";
 import cookie from "../../../utils/cookies";
 
 export const fetchUserProfile = async (idOtherUser) => {
   const response = await axios.post(
-    `${API_BASE_URL}/getuser`,
+    `${GET_USER}`,
     { idOtherUser },
     { headers: { Authorization: "Bearer " + cookie("get") } }
   );
@@ -15,7 +15,7 @@ export const fetchUserProfile = async (idOtherUser) => {
 
 export const updateUserProfileField = async (value, field) => {
   const response = await axios.post(
-    `${API_BASE_URL}/editProfile`,
+    `${EDIT_PROFILE}`,
     { Updatable: value, status: field },
     { headers: { Authorization: "Bearer " + cookie("get") } }
   );
@@ -24,7 +24,7 @@ export const updateUserProfileField = async (value, field) => {
 
 export const followUserApi = async (IdUser, idFollowedUser) => {
   const response = await axios.post(
-    `${API_BASE_URL}/followingUser`,
+    `${FOLLOW_USER}`,
     { IdUser, idFollowedUser },
     { headers: { Authorization: "Bearer " + cookie("get") } }
   );
@@ -33,7 +33,7 @@ export const followUserApi = async (IdUser, idFollowedUser) => {
 
 export const unfollowUserApi = async (IdUser, idFollowedUser) => {
   const response = await axios.post(
-    `${API_BASE_URL}/unfollowingUser`,
+    `${UNFOLLOW_USER}`,
     { IdUser, idFollowedUser },
     { headers: { Authorization: "Bearer " + cookie("get") } }
   );
@@ -62,7 +62,37 @@ export const unfollowUser = async (IdUser, idFollowedUser) => {
 };
 
 export const uploadProfileImageBlob = async (blob, userId) => {
-  const imageRef = storageRef(storage, `ImagesProfile/image${userId}.jpg`);
-  await uploadBytes(imageRef, blob);
-  return await getDownloadURL(imageRef);
+if (!blob || !userId) {
+    throw new Error("Image and user ID are required");
+  }
+
+  const cloudName = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
+
+  if (!cloudName || !uploadPreset) {
+    throw new Error("Cloudinary environment variables are missing");
+  }
+
+  const formData = new FormData();
+  formData.append("file", blob, "profile.jpg");
+  formData.append("upload_preset", uploadPreset);
+  formData.append("folder", "bayan/profile");
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok || !result.secure_url) {
+    throw new Error(
+      result.error?.message || "Cloudinary image upload failed"
+    );
+  }
+
+  return result.secure_url;
 };
