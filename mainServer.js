@@ -42,8 +42,8 @@ app.use(
     })
 );
 
+app.options("*", cors()); // handle preflight (older Express)
 app.use(express.json());
-
 // CORS الخاص بـ Socket.IO
 const io = new Server(httpServer, {
     cors: {
@@ -391,6 +391,7 @@ async function enrichContent(contentArray) {
                     F_user: profile?.F_user ?? "Unknown User",
                     Id_user: profile?.Id_user ?? "000000000",
                     S_user: profile?.S_user ?? "@unknown_user",
+                    imgProfile: profile?.imgProfile ?? ""
                 },
             };
         })
@@ -675,7 +676,7 @@ app.post("/editProfile", async(req, res) => {
                 return res.status(400).json({ message: "Invalid status" });
             }
 
-            res.json({ message: "Profile updated", userData: buildUserData(updatedUser) });
+            res.json({ message: "Profile updated", userData: await buildUserData(updatedUser) });
         } catch (err) {
             console.error("Profile update error:", err);
             res.status(500).json({ message: "Error updating profile" });
@@ -695,6 +696,14 @@ app.post("/saveposts", async(req, res) => {
     await saveContent_Posts(req.body);
     console.log(req.body);
   res.status(200).json({ status: 'ok', message: 'Post saved successfully' });
+});
+
+app.post("/edit_profile_photo", async(req, res) => {
+
+});
+
+app.post("/edit_bio", async(req, res) => {
+
 });
 
 // ✅ البحث عن مستخدم
