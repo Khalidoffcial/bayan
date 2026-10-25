@@ -44,6 +44,6 @@
     "socket.io": "^4.8.3",
     "sqlite3": "^5.1.6",
     "to": "^0.2.9",
-    "whatsapp-web.js": "^1.26.0",
+    "whatsapp-web.js": "^1.26.0"
   }
 }
