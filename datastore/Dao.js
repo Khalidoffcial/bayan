@@ -406,7 +406,7 @@ async function incrementFieldTransaction(path, field, amount = 1) {
 
 
 async function likeContent(type,postId, userId) {
-    const postRef = ref(db, `${type}s/${type}s${postId}`);
+    const postRef = ref(db, `${type}/${type}${postId}`);
 
     try {
         await runTransaction(postRef, (content) => {
@@ -435,7 +435,7 @@ async function likeContent(type,postId, userId) {
 
 
 async function unlikeContent(type,postId, userId) {
-    const postRef = ref(db, `${type}s/${type}s${postId}`);
+    const postRef = ref(db, `${type}/${type}${postId}`);
 
     try {
         await runTransaction(postRef, (content) => {
