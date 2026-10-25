@@ -179,28 +179,100 @@ function getCurrentTime() {
 
 async function cacheGet(key) {
     try {
-        if (useRedis && redisClient) {
+        if (useRedis && redisClient?.isReady) {
             const data = await redisClient.get(key);
             return data ? JSON.parse(data) : null;
         }
-        return memoryCache.get(key) || null;
+
+        const entry = memoryCache.get(key);
+
+        if (!entry) return null;
+
+        // حذف العنصر عند انتهاء صلاحيته
+        if (Date.now() >= entry.expiresAt) {
+            memoryCache.delete(key);
+            return null;
+        }
+
+        return entry.value;
     } catch (err) {
-        console.log("cacheGet error:", err.message);
+        console.error("cacheGet error:", err.message);
         return null;
     }
 }
 
 async function cacheSet(key, value, ttl = 60) {
     try {
-        if (useRedis && redisClient) {
-            await redisClient.setEx(key, ttl, JSON.stringify(value));
+        if (useRedis && redisClient?.isReady) {
+            await redisClient.setEx(
+                key,
+                ttl,
+                JSON.stringify(value)
+            );
         } else {
-            memoryCache.set(key, value);
+            memoryCache.set(key, {
+                value,
+                expiresAt: Date.now() + ttl * 1000
+            });
         }
     } catch (err) {
-        console.log("cacheSet error:", err.message);
+        console.error("cacheSet error:", err.message);
     }
 }
+
+async function cacheDel(key) {
+    try {
+        if (useRedis && redisClient?.isReady) {
+            await redisClient.del(key);
+        }
+
+        memoryCache.delete(key);
+    } catch (err) {
+        console.error("cacheDel error:", err.message);
+    }
+}
+
+
+async function cacheDelPattern(pattern) {
+    // حذف المفاتيح المطابقة من Memory Cache
+    for (const key of memoryCache.keys()) {
+        if (key.startsWith(pattern.replace("*", ""))) {
+            memoryCache.delete(key);
+        }
+    }
+
+    // حذف المفاتيح المطابقة من Redis
+    if (useRedis && redisClient?.isReady) {
+        try {
+            for await (const key of redisClient.scanIterator({
+                MATCH: pattern,
+                COUNT: 100
+            })) {
+                await redisClient.del(key);
+            }
+        } catch (err) {
+            console.error("cacheDelPattern error:", err.message);
+        }
+    }
+}
+
+async function invalidateUserCache(userId) {
+    if (userId == null) return;
+    await cacheDel(`user:${Number(userId)}`);
+}
+
+async function invalidateFeedCache(type) {
+    await cacheDelPattern(`${type}:*`);
+}
+
+async function invalidateAllFeedCaches() {
+    await Promise.all([
+        invalidateFeedCache("posts"),
+        invalidateFeedCache("articles"),
+        invalidateFeedCache("novels")
+    ]);
+}
+
 
 // ======================================================
 // USER CACHE
@@ -676,6 +748,9 @@ app.post("/editProfile", async(req, res) => {
                 return res.status(400).json({ message: "Invalid status" });
             }
 
+            if (updatedUser?.Id_user != null) {
+                await invalidateUserCache(updatedUser.Id_user);
+}
             res.json({ message: "Profile updated", userData: await buildUserData(updatedUser) });
         } catch (err) {
             console.error("Profile update error:", err);
@@ -687,6 +762,10 @@ app.post("/editProfile", async(req, res) => {
 // ✅ حفظ مقال أو رواية
 app.post("/saveArticle_novels", async(req, res) => {
     await saveContent_Article_Novels(req.body);
+            // بعد نجاح الحفظ فقط
+        await invalidateFeedCache("articles");
+        await invalidateFeedCache("novels");
+
   res.status(200).json({ status: 'ok', message: 'Your content saved successfully' });
 
 });
@@ -694,6 +773,7 @@ app.post("/saveArticle_novels", async(req, res) => {
 // ✅ حفظ بوست
 app.post("/saveposts", async(req, res) => {
     await saveContent_Posts(req.body);
+    await invalidateFeedCache("posts");
     console.log(req.body);
   res.status(200).json({ status: 'ok', message: 'Post saved successfully' });
 });
