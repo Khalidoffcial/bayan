@@ -217,7 +217,7 @@ async function getArticle() {
 
 // حذف بوست
 async function deletePost(id) {
-    const articleRef = ref(db, `posts/post${id}`);
+    const articleRef = ref(db, `posts/posts${id}`);
     try {
         await remove(articleRef);
         console.log('Post deleted successfully');
