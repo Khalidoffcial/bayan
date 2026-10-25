@@ -970,6 +970,7 @@ io.on("connection", (socket) => {
     // TRACK ENGAGEMENT
     socket.on("ENGAGEMENT", async({ contentId, userId, type }) => {
         await trackEngagement(contentId, userId, type);
+        await invalidateAllFeedCaches()
     });
 
     // MY CONTENT
