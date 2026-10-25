@@ -306,13 +306,13 @@ async function getUser(userId) {
 // ======================================================
 
 async function increaseLike(postId, userId) {
-    const path = `posts/post${postId}`;
+    const path = `posts/posts${postId}`;
     await dao.incrementFieldTransaction(path, "likes", 1);
     await dao.likeContent("posts", postId, userId);
 }
 
 async function decreaseLike(postId, userId) {
-    const path = `posts/post${postId}`;
+    const path = `posts/posts${postId}`;
     await dao.incrementFieldTransaction(path, "likes", -1);
     await dao.unlikeContent("posts", postId, userId);
 }
