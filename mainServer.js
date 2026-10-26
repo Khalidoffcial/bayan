@@ -967,11 +967,79 @@ io.on("connection", (socket) => {
         }
     });
 
-    // TRACK ENGAGEMENT
-    socket.on("ENGAGEMENT", async({ contentId, userId, type }) => {
-        await trackEngagement(contentId, userId, type);
-        await invalidateAllFeedCaches()
+// TRACK ENGAGEMENT
+socket.on("ENGAGEMENT", async ({
+  contentId,
+  userId,
+  type,
+  contentType = "posts",
+}) => {
+  try {
+    if (!contentId || !userId) {
+      return socket.emit("ENGAGEMENT_ERROR", {
+        contentId,
+        message: "Missing contentId or userId",
+      });
+    }
+
+    if (!["like", "unlike"].includes(type)) {
+      return socket.emit("ENGAGEMENT_ERROR", {
+        contentId,
+        message: "Invalid engagement type",
+      });
+    }
+
+    // حفظ التفاعل في قاعدة البيانات
+    await trackEngagement(contentId, userId, type);
+
+    // إبطال الكاش بعد نجاح التحديث
+    await invalidateAllFeedCaches();
+
+    // جلب البوست المحدّث
+    let dataContent;
+
+    switch (contentType) {
+      case "posts":
+        dataContent = await dao.getPostID(contentId);
+        break;
+
+      case "articles":
+        dataContent = await dao.getArticleID(contentId);
+        break;
+
+      case "novels":
+        dataContent = await dao.getnovelsID(contentId);
+        break;
+
+      default:
+        return socket.emit("ENGAGEMENT_ERROR", {
+          contentId,
+          message: "Invalid content type",
+        });
+    }
+
+    if (!dataContent) {
+      return socket.emit("ENGAGEMENT_ERROR", {
+        contentId,
+        message: "Content not found after update",
+      });
+    }
+
+    // إرسال البوست المحدّث لجميع العملاء المتصلين
+    io.emit("LIKE_UPDATED", {
+      contentType,
+      post: dataContent,
     });
+
+  } catch (error) {
+    console.error("ENGAGEMENT error:", error);
+
+    socket.emit("ENGAGEMENT_ERROR", {
+      contentId,
+      message: "Failed to update engagement",
+    });
+  }
+});
 
     // MY CONTENT
     socket.on("MYCONTENT", async({ idUser, type }) => {
