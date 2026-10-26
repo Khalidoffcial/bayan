@@ -9,9 +9,10 @@ export const FeedList = ({
   onComment,
   onShare,
   getDirection,
+  userId
 }) => {
   if (!feed || feed.length === 0) return null;
-
+  
   const seenRenderKeys = new Set();
 
   return (
@@ -19,24 +20,31 @@ export const FeedList = ({
       {feed.map((item, index) => {
         const rawId = item.id ?? item._id ?? item.id_post ?? `feed-item-${index}`;
         const itemId = String(rawId);
-
+console.log("feeds: ",feed)
+console.log("item like count: ",item?.likesCount)
+console.log("----: ",item?.likesBy?.[userId] || false)
         if (seenRenderKeys.has(itemId)) {
           return null;
         }
         seenRenderKeys.add(itemId);
 
         return (
-          <FeedItem
-            key={itemId}
-            item={item}
-            liked={likedPosts?.[itemId]}
-            likesCount={likesCount?.[itemId]}
-            onLike={onLike}
-            onComment={onComment}
-            onShare={onShare}
-            getDirection={getDirection}
-          />
-        );
+  <FeedItem
+    key={itemId}
+    item={item}
+    liked={likedPosts?.[itemId] ?? Boolean(item?.likesBy?.[userId])}
+    likesCount={
+      likesCount?.[itemId] ??
+      item?.likesCount ??
+      item?.likes ??
+      0
+    }
+    onLike={onLike}
+    onComment={onComment}
+    onShare={onShare}
+    getDirection={getDirection}
+  />
+);
       })}
     </div>
   );

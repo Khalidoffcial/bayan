@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import useSocket from "../../../hooks/useSocket";
-import { requestFeed } from "../services/feed.service";
+import { requestFeed ,emitPostEngagement } from "../services/feed.service";
 import { FEED_BATCH_SIZE } from "../../../constants/feedConfig";
 
 /**
@@ -52,6 +52,7 @@ export const useFeed = (type, userId) => {
   const [cursor, setCursor] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
+  const [likesCount, setLikesCount] = useState(0);
 
   const socketRef = useSocket();
   const seenIds = useRef(new Set());
@@ -60,6 +61,19 @@ export const useFeed = (type, userId) => {
   const hasMoreRef = useRef(true);
   const typeRef = useRef(type);
   const userIdRef = useRef(userId);
+
+const sendEngagement = useCallback(
+  (contentId, engagementType) => {
+    emitPostEngagement(socketRef.current, {
+      contentId,
+      userId: userIdRef.current,
+      type: engagementType,
+    });
+  },
+  [socketRef]
+);
+
+
 
   // Sync refs when type or userId changes
   useEffect(() => {
@@ -99,7 +113,9 @@ export const useFeed = (type, userId) => {
       cursor: targetCursor,
       limit: FEED_BATCH_SIZE,
     });
-  }, [socketRef]);
+
+}, [socketRef]);
+
 
   useEffect(() => {
     const handleFeedResult = (res) => {
@@ -221,7 +237,7 @@ export const useFeed = (type, userId) => {
     }
   }, [socketRef, fetchFeed]);
 
-  return { feed, loading, hasMore, error, cursor, fetchFeed, resetFeed, socketRef };
+  return { feed, loading, hasMore, error, cursor, fetchFeed, resetFeed, sendEngagement, socketRef };
 };
 
 export default useFeed;

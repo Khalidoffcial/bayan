@@ -50,6 +50,7 @@ export const useProfile = () => {
       try {
         const parsed = JSON.parse(storedUser);
         setUserDataMain(parsed);
+        console.log(parsed)
         if (!idOtherUser || idOtherUser === parsed.id) {
           setName(parsed.name);
           setBio(parsed.Bio || "");

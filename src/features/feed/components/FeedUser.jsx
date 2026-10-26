@@ -4,7 +4,7 @@ import defaultImg from "../../../assets/icons/user_10374408.png";
 
 export const FeedUser = ({ userData }) => {
   const navigate = useNavigate();
-
+console.log(userData)
   return (
     <div
       className="account"

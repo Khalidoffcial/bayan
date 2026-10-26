@@ -61,6 +61,26 @@ export const PostReading = () => {
           imageUrl={imageUrl}
         />
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <PostBody
           content={dataPost.content}
           imageUrl={imageUrl}

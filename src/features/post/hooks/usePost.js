@@ -39,6 +39,7 @@ export const usePost = () => {
       userId: user?.id,
       type: newLiked ? "like" : "unlike",
     });
+    console.log("like",[liked, dataPost?.id, user?.id])
   }, [liked, dataPost?.id, user?.id]);
 
   const handleShare = useCallback(() => {

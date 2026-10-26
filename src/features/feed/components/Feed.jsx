@@ -30,6 +30,8 @@ export const Feed = () => {
     error,
     fetchFeed,
     resetFeed,
+    sendEngagement
+
   } = useFeed(typeArticle || "posts", user?.id);
 
   // Local UI State
@@ -67,15 +69,50 @@ export const Feed = () => {
   }, [fetchFeed]);
 
   // Handlers
-  const handleLike = useCallback((postId) => {
-    setLikedPosts((prev) => ({ ...prev, [postId]: !prev[postId] }));
+const handleLike = useCallback(
+  (postId) => {
+    if (!user?.id || !postId) return;
+
+    const post = feed.find(
+      (item) => String(item.id) === String(postId)
+    );
+
+    if (!post) return;
+
+    const wasLiked =
+      likedPosts[postId] ??
+      Boolean(post.likesBy?.[user.id]);
+
+    const currentCount = Number(
+      likesCount[postId] ??
+      post.likesCount ??
+      post.likes ??
+      0
+    );
+
+    // تحديث حالة اللايك واللون
+    setLikedPosts((prev) => ({
+      ...prev,
+      [postId]: !wasLiked,
+    }));
+
+    // تحديث العداد
     setLikesCount((prev) => ({
       ...prev,
-      [postId]: prev[postId]
-        ? likedPosts[postId] ? prev[postId] - 1 : prev[postId] + 1
-        : 1,
+      [postId]: Math.max(
+        0,
+        currentCount + (wasLiked ? -1 : 1)
+      ),
     }));
-  }, [likedPosts]);
+
+    // إرسال التفاعل للسيرفر
+    sendEngagement(
+      postId,
+      wasLiked ? "unlike" : "like"
+    );
+  },
+  [user?.id, feed, likedPosts, likesCount, sendEngagement]
+);
 
   const handleComment = useCallback((postId) => {
     setActiveCommentId(postId);
@@ -111,6 +148,7 @@ export const Feed = () => {
           onComment={handleComment}
           onShare={handleShare}
           getDirection={getDirection}
+          userId={user?.id}
         />
 
         {loading && <Loader />}

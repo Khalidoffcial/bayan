@@ -1,6 +1,6 @@
 import React from "react";
 import { FaHeart, FaComment, FaShareAlt } from "react-icons/fa";
-
+ 
 export const FeedActions = ({
   itemId,
   liked,
@@ -9,6 +9,9 @@ export const FeedActions = ({
   onComment,
   onShare,
 }) => {
+
+  
+  
   return (
     <div className="actions">
       <button
