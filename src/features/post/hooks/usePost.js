@@ -14,7 +14,7 @@ export const usePost = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(0);
+  const [likesCount, setLikesCount] = useState();
   const [commented, setCommented] = useState(false);
 
   useEffect(() => {
@@ -29,6 +29,31 @@ export const usePost = () => {
     }
   }, [postId, location.state]);
 
+    // مزامنة حالة اللايك والعداد مع بيانات البوست والمستخدم
+  useEffect(() => {
+    if (!dataPost) {
+      setLiked(false);
+      setLikesCount(0);
+      return;
+    }
+
+    const userId = user?.id;
+
+    setLiked(
+      userId != null
+        ? Boolean(dataPost.likesBy?.[userId])
+        : false
+    );
+
+    const initialCount = Number(
+      dataPost.likesCount ?? dataPost.likes ?? 0
+    );
+
+    setLikesCount(
+      Number.isFinite(initialCount) ? initialCount : 0
+    );
+  }, [dataPost, user?.id]);
+
   const handleLike = useCallback(() => {
     const newLiked = !liked;
     setLiked(newLiked);
@@ -39,9 +64,14 @@ export const usePost = () => {
       userId: user?.id,
       type: newLiked ? "like" : "unlike",
     });
-    console.log("like",[liked, dataPost?.id, user?.id])
+
+    console.log("like",[liked, dataPost?.likesCount + 1, user?.id]) 
+        console.log(dataPost)
+
   }, [liked, dataPost?.id, user?.id]);
 
+
+  
   const handleShare = useCallback(() => {
     sharePost({
       title: dataPost?.content?.slice(0, 50),
@@ -65,3 +95,4 @@ export const usePost = () => {
 };
 
 export default usePost;
+

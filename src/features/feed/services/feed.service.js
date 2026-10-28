@@ -1,14 +1,26 @@
 import { FEED_BATCH_SIZE } from "../../../constants/feedConfig";
 
+export const FEED_EVENTS = {
+  GET_FEED: "GET_FEED",
+  FEED_RESULT: "FEED_RESULT",
+  ENGAGEMENT: "ENGAGEMENT",
+  LIKE_UPDATED: "LIKE_UPDATED",
+};
+
 export const requestFeed = (
   socket,
-  { userId, type, cursor = 0, limit = FEED_BATCH_SIZE } = {}
+  {
+    userId,
+    type = "posts",
+    cursor = 0,
+    limit = FEED_BATCH_SIZE,
+  } = {}
 ) => {
   if (!socket) return;
 
-  socket.emit("GET_FEED", {
+  socket.emit(FEED_EVENTS.GET_FEED, {
     userId: userId || "",
-    type: type || "posts",
+    type,
     cursor,
     limit,
   });
@@ -16,13 +28,18 @@ export const requestFeed = (
 
 export const emitPostEngagement = (
   socket,
-  { contentId, userId, type }
+  { contentId, userId, type, contentType = "posts" } = {}
 ) => {
-  if (!socket || !userId || !contentId || !type) return;
+  if (!socket?.connected || !contentId || !userId) return false;
 
-  socket.emit("ENGAGEMENT", {
-    contentId,
-    userId,
+  if (!["like", "unlike"].includes(type)) return false;
+
+  socket.emit(FEED_EVENTS.ENGAGEMENT, {
+    contentId: String(contentId),
+    userId: String(userId),
     type,
+    contentType,
   });
+
+  return true;
 };

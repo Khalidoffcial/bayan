@@ -7,6 +7,7 @@ export const FeedItem = ({
   item,
   liked,
   likesCount,
+  commentsOpen = false,
   onLike,
   onComment,
   onShare,
@@ -18,6 +19,7 @@ export const FeedItem = ({
   const isNovel = itemType === "novel" || itemType === "novels";
   const isArticle = itemType === "article" || itemType === "articles";
   const isPost = itemType === "posts" || itemType === "post" || (!isNovel && !isArticle);
+  const commentsCount = Number(item.commentsCount ?? item.comments ?? item.comments_count ?? 0) || 0;
 
   return (
     <motion.div
@@ -33,6 +35,8 @@ export const FeedItem = ({
           item={item}
           liked={liked}
           likesCount={likesCount}
+          commentsCount={commentsCount}
+          commentsOpen={commentsOpen}
           onLike={onLike}
           onComment={onComment}
           onShare={onShare}

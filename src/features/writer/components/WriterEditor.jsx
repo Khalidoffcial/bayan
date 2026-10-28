@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
@@ -16,7 +16,16 @@ export const WriterEditor = ({
   customSeries,
   setCustomSeries,
   onAddSeries,
+  autoFocus = false,
 }) => {
+  const textInputRef = useRef(null);
+
+  useEffect(() => {
+    if (autoFocus && textInputRef.current) {
+      textInputRef.current.focus();
+    }
+  }, [autoFocus]);
+
   const editorConfiguration = {
     toolbar: [
       "heading",
@@ -48,11 +57,13 @@ export const WriterEditor = ({
     return (
       <>
         <input
+          ref={textInputRef}
           type="text"
           className="sm_WriterInput"
           placeholder="Address..."
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          aria-label="Title"
         />
 
         <textarea
@@ -102,10 +113,12 @@ export const WriterEditor = ({
 
   return (
     <textarea
+      ref={textInputRef}
       className="WriterInput"
       placeholder={`Write your ${type} here...`}
       value={content}
       onChange={(e) => setContent(e.target.value)}
+      aria-label={`Write your ${type} here...`}
     />
   );
 };

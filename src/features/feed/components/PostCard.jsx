@@ -1,18 +1,25 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../../hooks/useAuth";
+
 import FeedUser from "./FeedUser";
 import FeedActions from "./FeedActions";
+import InlineComments from "../../../components/common/InlineComments";
 
 export const PostCard = ({
   item,
   liked,
   likesCount,
+  commentsCount,
+  commentsOpen = false,
   onLike,
   onComment,
   onShare,
   getDirection,
 }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const dir = getDirection ? getDirection(item.content) : "ltr";
 
   return (
@@ -41,10 +48,13 @@ export const PostCard = ({
         itemId={item.id}
         liked={liked}
         likesCount={likesCount}
+        commentsCount={commentsCount}
         onLike={onLike}
         onComment={onComment}
         onShare={() => onShare(item)}
       />
+
+      {commentsOpen && <InlineComments userData={user} commentOnId={item.id} contentType="posts" />}
     </div>
   );
 };

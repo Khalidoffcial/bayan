@@ -1,0 +1,23 @@
+  console.error
+    Warning: `ReactDOMTestUtils.act` is deprecated in favor of `React.act`. Import `act` from `react` instead of `react-dom/test-utils`. See https://react.dev/warnings/react-dom-test-utils for more info.
+
+    [0m [90m  6 |[39m   test([32m'renders WriterToolbar with content types and handles selection'[39m[33m,[39m () [33m=>[39m {
+     [90m  7 |[39m     [36mconst[39m handleTypeChange [33m=[39m jest[33m.[39mfn()[33m;[39m
+    [31m[1m>[22m[39m[90m  8 |[39m     render([33m<[39m[33mWriterToolbar[39m activeType[33m=[39m[32m"post"[39m onTypeChange[33m=[39m{handleTypeChange} [33m/[39m[33m>[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m  9 |[39m
+     [90m 10 |[39m     expect(screen[33m.[39mgetByText([32m'Post'[39m))[33m.[39mtoBeInTheDocument()[33m;[39m
+     [90m 11 |[39m     expect(screen[33m.[39mgetByText([32m'Article'[39m))[33m.[39mtoBeInTheDocument()[33m;[39m[0m
+
+      at printWarning (node_modules/react-dom/cjs/react-dom-test-utils.development.js:71:30)
+      at error (node_modules/react-dom/cjs/react-dom-test-utils.development.js:45:7)
+      at actWithWarning (node_modules/react-dom/cjs/react-dom-test-utils.development.js:1736:7)
+      at node_modules/@testing-library/react/dist/act-compat.js:63:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:159:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:246:10)
+      at Object.<anonymous> (src/features/writer/writer.test.js:8:11)
+      at TestScheduler.scheduleTests (node_modules/@jest/core/build/TestScheduler.js:333:13)
+      at runJest (node_modules/@jest/core/build/runJest.js:404:19)
+      at _run10000 (node_modules/@jest/core/build/cli/index.js:320:7)
+      at runCLI (node_modules/@jest/core/build/cli/index.js:173:3)
+

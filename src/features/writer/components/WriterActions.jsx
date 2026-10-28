@@ -1,6 +1,6 @@
 import React from "react";
 
-export const WriterActions = ({ onCancel, onPublish, isSubmitting }) => {
+export const WriterActions = ({ onCancel, onPublish, isSubmitting, canPublish = true }) => {
   return (
     <div className="WriterActions">
       <button className="cancelBtn" onClick={onCancel} type="button">
@@ -9,7 +9,7 @@ export const WriterActions = ({ onCancel, onPublish, isSubmitting }) => {
       <button
         className="submitBtn"
         onClick={onPublish}
-        disabled={isSubmitting}
+        disabled={isSubmitting || !canPublish}
         type="button"
       >
         {isSubmitting ? "Publishing..." : "Publish"}

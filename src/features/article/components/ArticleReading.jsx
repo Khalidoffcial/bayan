@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Top from "../../../components/layout/Top";
-import CommentModal from "../../../components/common/CommentModal";
+import InlineComments from "../../../components/common/InlineComments";
 import Loader from "../../../components/ui/Loader";
 import ArticleHeader from "./ArticleHeader";
 import ArticleBody from "./ArticleBody";
@@ -73,18 +73,13 @@ export const ArticleReading = () => {
           liked={liked}
           likesCount={likesCount}
           onLike={handleLike}
-          onComment={() => setCommented(true)}
+          onComment={() => setCommented((prev) => !prev)}
           onShare={handleShare}
           onDownloadPDF={handleDownloadPDF}
         />
-      </div>
 
-      <CommentModal
-        isOpen={commented}
-        onClose={() => setCommented(false)}
-        commentOnId={dataArticle.id}
-        userId={user?.id}
-      />
+        {commented && <InlineComments userData={user} commentOnId={dataArticle.id} contentType="articles" />}
+      </div>
     </div>
   );
 };

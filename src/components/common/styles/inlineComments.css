@@ -1,0 +1,242 @@
+/* ================================================================
+   Inline Comments — attached beneath content cards / reading pages
+   Light surfaces, brand blue #0F8EE2, compact & minimal.
+   Scoped under .inline-comments to avoid affecting other components.
+   ================================================================ */
+
+.inline-comments {
+  border-top: 1px solid #efefef;
+  background: #f6f5f2;
+  padding: 14px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: "Inter", sans-serif;
+}
+
+/* ---------- Heading ---------- */
+
+.inline-comments-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inline-comments-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.inline-comments-count {
+  background: #eef4fb;
+  color: #0f8ee2;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+/* ---------- Composer ---------- */
+
+.inline-comments-composer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.inline-comments-avatar {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #eef4fb;
+  color: #0f8ee2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.inline-comments-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.inline-comments-avatar-sm {
+  width: 30px;
+  height: 30px;
+  font-size: 26px;
+}
+
+.inline-comments-input {
+  flex: 1;
+  min-width: 0;
+  background: #f9fafb;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 9px 13px;
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  max-height: 110px;
+  overflow-y: auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inline-comments-input::placeholder {
+  color: #9ca3af;
+}
+
+.inline-comments-input:focus {
+  border-color: #0f8ee2;
+  box-shadow: 0 0 0 3px rgba(15, 142, 226, 0.12);
+}
+
+.inline-comments-send {
+  background: #0f8ee2;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 14px;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.inline-comments-send:hover:not(:disabled) {
+  background: #0c7ac2;
+}
+
+.inline-comments-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- States ---------- */
+
+.inline-comments-error {
+  margin: 0;
+  font-size: 13px;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.inline-comments-state {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.inline-comments-state-error {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.inline-comments-retry {
+  background: #ffffff;
+  color: #0f8ee2;
+  border: 1px solid #0f8ee2;
+  border-radius: 10px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.inline-comments-retry:hover {
+  background: #eef4fb;
+}
+
+/* ---------- Comment list ---------- */
+
+.inline-comments-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inline-comments-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.inline-comments-bubble {
+  background: #f7f8fa;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.inline-comments-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f8ee2;
+}
+
+.inline-comments-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #1f2937;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.inline-comments-images {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.inline-comments-images img {
+  width: 76px;
+  height: 76px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Focus visibility */
+.inline-comments :focus-visible {
+  outline: 2px solid #0f8ee2;
+  outline-offset: 2px;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .inline-comments {
+    padding: 12px 14px 14px;
+  }
+
+  .inline-comments-input {
+    font-size: 16px;
+    /* prevents iOS zoom-on-focus */
+  }
+}

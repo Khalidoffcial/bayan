@@ -1,0 +1,28 @@
+url        http://localhost:3000
+http       200
+load       62244ms
+title      "bayan | مقالات، روايات وبوستات"
+bodyChars  194
+patchright C:\Users\ItShop\.vscode\extensions\danielsanmedium.dscodegpt-3.24.79\standalone/
+text       ❝ إن التحوّل أصلاً هو السلوك الجاد الحقيقي في الحياة. ❞ — محمد حسن علوان All Posts Articles Novels Exams Settings What's on your mind? Share an idea... All Posts Articles Novels Exams Settings
+script     "SCRIPT ERROR: page.evaluate: ReferenceError: clicked is not defined |     at eval (eval at evaluate (:337:30), <anonymous>:5:5) |     at UtilityScript.evaluate (<anonymous>:339:16) |     at UtilityScript.<anonymous> (<anonymous>:1:44)"
+
+console errors/warnings (15):
+  [error] Failed to load resource: the server responded with a status of 403 ()
+  [warning] WebSocket connection to 'wss://bayan-production-0201.up.railway.app/socket.io/?EIO=4&transport=websocket' failed: WebSocket is closed before the connection is established.
+  [warning] WebSocket connection to 'wss://bayan-production-0201.up.railway.app/socket.io/?EIO=4&transport=websocket' failed: WebSocket is closed before the connection is established.
+  [warning] WebSocket connection to 'wss://bayan-production-0201.up.railway.app/socket.io/?EIO=4&transport=websocket' failed: WebSocket is closed before the connection is established.
+  [warning] WebSocket connection to 'wss://bayan-production-0201.up.railway.app/socket.io/?EIO=4&transport=websocket' failed: WebSocket is closed before the connection is established.
+  [warning] WebSocket connection to 'wss://bayan-production-0201.up.railway.app/socket.io/?EIO=4&transport=websocket' failed: WebSocket is closed before the connection is established.
+  [error] The script has an unsupported MIME type ('text/html').
+  [error] WebSocket connection to 'ws://localhost:3000/ws' failed: Error in connection establishment: net::ERR_BLOCKED_BY_LOCAL_NETWORK_ACCESS_CHECKS
+  [error] Failed to load resource: the server responded with a status of 403 ()
+  [error] WebSocket connection to 'ws://localhost:3000/ws' failed: Error in connection establishment: net::ERR_BLOCKED_BY_LOCAL_NETWORK_ACCESS_CHECKS
+  [error] WebSocket connection to 'ws://localhost:3000/ws' failed: Error in connection establishment: net::ERR_BLOCKED_BY_LOCAL_NETWORK_ACCESS_CHECKS
+  [error] WebSocket connection to 'ws://localhost:3000/ws' failed: Error in connection establishment: net::ERR_BLOCKED_BY_LOCAL_NETWORK_ACCESS_CHECKS
+  [warning] WebSocket connection to 'wss://bayan-production-0201.up.railway.app/socket.io/?EIO=4&transport=websocket' failed: WebSocket is closed before the connection is established.
+  [warning] WebSocket connection to 'wss://bayan-production-0201.up.railway.app/socket.io/?EIO=4&transport=websocket' failed: WebSocket is closed before the connection is established.
+  [warning] WebSocket connection to 'wss://bayan-production-0201.up.railway.app/socket.io/?EIO=4&transport=websocket' failed: WebSocket is closed before the connection is established.
+
+requests failed (2):
+  HTTP 403 https://fedoq.com/401/9492138?oo=1&sw_version=v1.960.0-s&oaid=0803dc2167614f2cef4cb491ed1498f1&st=true

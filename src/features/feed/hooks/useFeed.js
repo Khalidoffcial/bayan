@@ -169,6 +169,7 @@ const sendEngagement = useCallback(
       setLoading(false);
     };
 
+    
     const handleNewPost = (post) => {
       if (!post || typeof post !== "object") return;
       const postId = normalizeId(post);
@@ -236,6 +237,49 @@ const sendEngagement = useCallback(
       };
     }
   }, [socketRef, fetchFeed]);
+
+  useEffect(() => {
+  const socket = socketRef.current;
+  if (!socket) return;
+
+  const handlePostUpdated = (payload) => {
+    const updatedPost = payload?.post;
+    if (!updatedPost?.id) return;
+
+    // تجاهل التحديث لو نوع المحتوى مختلف
+    if (
+      payload.contentType &&
+      payload.contentType !== typeRef.current
+    ) {
+      return;
+    }
+
+    const updatedId = String(updatedPost.id);
+
+    setFeed((currentFeed) =>
+      currentFeed.map((item) => {
+        const itemId = String(
+          item.id ?? item._id ?? item.id_post ?? ""
+        );
+
+        if (itemId !== updatedId) return item;
+
+        // استبدال بيانات البوست بالنسخة المحدّثة
+        return {
+          ...item,
+          ...updatedPost,
+          userData: updatedPost.userData ?? item.userData,
+        };
+      })
+    );
+  };
+
+  socket.on("LIKE_UPDATED", handlePostUpdated);
+
+  return () => {
+    socket.off("LIKE_UPDATED", handlePostUpdated);
+  };
+}, [socketRef]);
 
   return { feed, loading, hasMore, error, cursor, fetchFeed, resetFeed, sendEngagement, socketRef };
 };

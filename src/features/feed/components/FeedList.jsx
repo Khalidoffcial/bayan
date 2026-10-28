@@ -5,6 +5,7 @@ export const FeedList = ({
   feed,
   likedPosts,
   likesCount,
+  activeCommentId,
   onLike,
   onComment,
   onShare,
@@ -39,6 +40,7 @@ console.log("----: ",item?.likesBy?.[userId] || false)
       item?.likes ??
       0
     }
+    commentsOpen={activeCommentId === itemId}
     onLike={onLike}
     onComment={onComment}
     onShare={onShare}

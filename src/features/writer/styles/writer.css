@@ -1,78 +1,313 @@
-/* Writer Primary Trigger Button */
-.WriterBox {
-  width: 40%;
-  min-width: 280px;
-  padding: 15px;
-  text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: 0.3s;
+/* ================================================================
+   Writer — Inline Composer (Bayan Space)
+   Light surfaces, brand blue #0F8EE2, premium & minimal.
+   ================================================================ */
+
+/* ---------- Inline Composer (feed-integrated) ---------- */
+.InlineComposer {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.composer-card {
+  background: #ffffff;
+  border: 1px solid #ececec;
+  border-radius: 22px;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.composer-card:hover {
+  border-color: #dcdcdc;
+}
+
+/* Collapsed trigger row */
+.composer-collapsed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  cursor: text;
+  text-align: start;
   font-family: "Inter", sans-serif;
-  height: 50px;
-  border-radius: 8px;
-  background-color: #f0f0f0;
-  color: rgb(14, 14, 14);
+}
+
+.composer-collapsed:focus-visible {
+  outline: 2px solid #0f8ee2;
+  outline-offset: -2px;
+  border-radius: 22px;
+}
+
+.composer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #eef4fb;
+}
+
+.composer-placeholder {
+  flex: 1;
+  color: #8a94a6;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.composer-image-hint {
+  color: #0f8ee2;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Expanded state */
+.composer-expanded {
+  padding: 16px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.composer-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.composer-header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.composer-username {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.composer-visibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.composer-close {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: fixed;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  cursor: text;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.WriterBox:hover {
-  background-color: #e4e4e4;
+.composer-close:hover,
+.composer-close:focus-visible {
+  background: #f3f4f6;
+  color: #111827;
+  outline: none;
 }
 
-/* Writer Modal Dialog */
-.WriterModal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) !important;
-  background: #1b1b1b;
-  color: #fff;
-  width: 80%;
-  max-width: 800px;
-  max-height: 90vh;
-  border-radius: 12px;
-  padding: 25px;
-  z-index: 1001;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-  font-family: "Inter", sans-serif;
-  overflow-y: auto;
+.composer-editor-area:focus-visible {
+  outline: none;
 }
 
-/* Header */
-.WriterHeader {
+/* Type selector — light theme version for the composer */
+.composer-expanded .TypeSelector {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.WriterHeader h3 {
+  gap: 8px;
   margin: 0;
-  font-weight: 600;
-  color: #fff;
+  justify-content: flex-start;
 }
 
-.closeBtn {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  color: #aaa;
+.composer-expanded .TypeSelector button {
+  background: #f3f4f6;
+  border: 1px solid transparent;
+  color: #4b5563;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.closeBtn:hover {
-  color: #fff;
+.composer-expanded .TypeSelector button:hover {
+  background: #e8eef5;
 }
 
-/* Type Selector */
+.composer-expanded .TypeSelector button.active {
+  background: #0f8ee2;
+  border-color: #0f8ee2;
+  color: #ffffff;
+}
+
+.composer-expanded .TypeSelector button:focus-visible {
+  outline: 2px solid #0f8ee2;
+  outline-offset: 2px;
+}
+
+/* Light-theme overrides for editor inputs inside the composer */
+.composer-expanded .WriterInput,
+.composer-expanded .sm_WriterInput {
+  background: #f9fafb;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 0;
+}
+
+.composer-expanded .WriterInput:focus,
+.composer-expanded .sm_WriterInput:focus {
+  border-color: #0f8ee2;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 142, 226, 0.12);
+}
+
+.composer-expanded .WriterInput {
+  min-height: 90px;
+}
+
+.composer-expanded .series-section select {
+  background: #f9fafb;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+}
+
+.composer-expanded .new-series-input button {
+  background: #0f8ee2;
+  color: #ffffff;
+}
+
+.composer-expanded .upload-card {
+  width: 110px;
+  height: 110px;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 14px;
+  background: #f9fafb;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.composer-expanded .upload-card:hover,
+.composer-expanded .upload-card:focus-within {
+  border-color: #0f8ee2;
+  color: #0f8ee2;
+}
+
+.composer-expanded .image-card {
+  width: 110px;
+  height: 110px;
+  border-radius: 14px;
+  background: #f3f4f6;
+}
+
+.composer-expanded .image-gallery {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+/* Error / confirmation states */
+.composer-error {
+  margin: 0;
+  font-size: 13px;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.composer-discard-confirm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #374151;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.composer-discard-confirm .discard-yes,
+.composer-discard-confirm .discard-no {
+  border: none;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.composer-discard-confirm .discard-yes {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.composer-discard-confirm .discard-no {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Light-theme action buttons inside the composer */
+.composer-expanded .WriterActions {
+  justify-content: flex-end;
+  margin-top: 2px;
+}
+
+.composer-expanded .cancelBtn {
+  background: transparent;
+  color: #4b5563;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.composer-expanded .cancelBtn:hover {
+  background: #f3f4f6;
+}
+
+.composer-expanded .submitBtn {
+  background: #0f8ee2;
+  color: #ffffff;
+  padding: 9px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.composer-expanded .submitBtn:hover:not(:disabled) {
+  background: #0c7ac2;
+}
+
+.composer-expanded .submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Type Selector (legacy, outside composer context) */
 .TypeSelector {
   display: flex;
   justify-content: center;
@@ -96,7 +331,7 @@
   color: #ffffff;
 }
 
-/* Inputs */
+/* Inputs (legacy) */
 .WriterInput {
   width: 100%;
   min-height: 120px;
@@ -161,7 +396,7 @@
   cursor: pointer;
 }
 
-/* Actions */
+/* Actions (legacy) */
 .WriterActions {
   display: flex;
   justify-content: flex-end;
@@ -192,7 +427,7 @@
   cursor: not-allowed;
 }
 
-/* Backdrop */
+/* Backdrop (legacy) */
 .Backdrop {
   position: fixed;
   inset: 0;
@@ -200,13 +435,18 @@
   z-index: 1000;
 }
 
-/* Image Uploads */
+/* Image Uploads (shared) */
 .upload-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
   margin-bottom: 16px;
+}
+
+.composer-expanded .upload-container {
+  align-items: stretch;
+  margin-bottom: 0;
 }
 
 .image-gallery {
@@ -296,11 +536,16 @@
   margin-bottom: 14px;
 }
 
+.composer-expanded .ck.ck-editor__main {
+  margin-bottom: 0;
+}
+
 .ck.ck-editor__editable {
   min-height: 200px !important;
   color: #222222 !important;
   background: #ffffff !important;
 }
+
 /* Toast Notification */
 .writer-toast-success {
   position: fixed;
@@ -320,4 +565,51 @@
   gap: 10px;
   font-family: "Inter", sans-serif;
   direction: rtl;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .InlineComposer {
+    max-width: 100%;
+  }
+
+  .composer-collapsed {
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .composer-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .composer-placeholder {
+    font-size: 14px;
+  }
+
+  .composer-expanded {
+    padding: 14px 14px 12px;
+    gap: 10px;
+  }
+
+  .composer-expanded .TypeSelector button {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .composer-expanded .upload-card,
+  .composer-expanded .image-card {
+    width: 96px;
+    height: 96px;
+  }
+
+  .composer-expanded .WriterActions {
+    flex-wrap: wrap;
+  }
+
+  .composer-expanded .cancelBtn,
+  .composer-expanded .submitBtn {
+    flex: 1;
+    min-width: 120px;
+  }
 }

@@ -1,0 +1,11 @@
+PASS src/features/writer/writer.test.js
+  Writer Feature Components
+    √ renders WriterToolbar with content types and handles selection (356 ms)
+    √ renders WriterActions and handles publish/cancel triggers (75 ms)
+    √ renders WriterImages upload card (37 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        5.593 s, estimated 60 s
+Ran all test suites matching /writer/i.

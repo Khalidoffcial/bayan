@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation } from "react-router-dom";
 
+// Writer (inline composer)
+import Writer from "../../writer/components/Writer";
+
 // Hooks & Utils
 import useAuth from "../../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import useFeed from "../hooks/useFeed";
 import { getDirection } from "../../../utils/helpers";
 import { FEED_PREFETCH_THRESHOLD_PX } from "../../../constants/feedConfig";
@@ -12,7 +16,6 @@ import Top from "../../../components/layout/Top";
 import Sidebar from "../../../components/layout/Sidebar";
 import InterestsPopup from "../../../components/common/InterestsModal";
 import Loader from "../../../components/ui/Loader";
-import CommentModal from "../../../components/common/CommentModal";
 
 // Feature Components
 import FeedList from "./FeedList";
@@ -22,6 +25,8 @@ export const Feed = () => {
   const { typeArticle } = useParams();
   const location = useLocation();
   const { user } = useAuth();
+    const navigate = useNavigate();
+  
 
   const {
     feed,
@@ -37,7 +42,7 @@ export const Feed = () => {
   // Local UI State
   const [likedPosts, setLikedPosts] = useState({});
   const [likesCount, setLikesCount] = useState({});
-  const [commented, setCommented] = useState(false);
+  // Inline comments: single expanded section at a time (null = all collapsed).
   const [activeCommentId, setActiveCommentId] = useState(null);
 
   // Initial Load & Reset on route/filter changes
@@ -115,8 +120,8 @@ const handleLike = useCallback(
 );
 
   const handleComment = useCallback((postId) => {
-    setActiveCommentId(postId);
-    setCommented(true);
+    // Toggle inline comments for this card; collapses any other card's section.
+    setActiveCommentId((prev) => (prev === postId ? null : postId));
   }, []);
 
   const handleShare = useCallback(async (item) => {
@@ -140,10 +145,13 @@ const handleLike = useCallback(
       <InterestsPopup />
 
       <div className="feed-main">
+        <Writer />
+
         <FeedList
           feed={feed}
           likedPosts={likedPosts}
           likesCount={likesCount}
+          activeCommentId={activeCommentId}
           onLike={handleLike}
           onComment={handleComment}
           onShare={handleShare}
@@ -171,13 +179,6 @@ const handleLike = useCallback(
           </div>
         )}
       </div>
-
-      <CommentModal
-        isOpen={commented}
-        onClose={() => setCommented(false)}
-        commentOnId={activeCommentId}
-        userId={user?.id}
-      />
     </div>
   );
 };

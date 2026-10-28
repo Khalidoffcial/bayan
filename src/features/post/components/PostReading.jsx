@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Top from "../../../components/layout/Top";
 import Sidebar from "../../../components/layout/Sidebar";
-import CommentModal from "../../../components/common/CommentModal";
+import InlineComments from "../../../components/common/InlineComments";
 import Loader from "../../../components/ui/Loader";
 import PostHeader from "./PostHeader";
 import PostBody from "./PostBody";
@@ -10,9 +10,13 @@ import PostActions from "./PostActions";
 import usePost from "../hooks/usePost";
 import { getDirection } from "../../../utils/helpers";
 import "../styles/post.css";
+import useAuth from "../../../hooks/useAuth";
+
 
 export const PostReading = () => {
   const navigate = useNavigate();
+    const { user } = useAuth();
+
   const {
     dataPost,
     imageUrl,
@@ -61,26 +65,6 @@ export const PostReading = () => {
           imageUrl={imageUrl}
         />
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         <PostBody
           content={dataPost.content}
           imageUrl={imageUrl}
@@ -91,17 +75,12 @@ export const PostReading = () => {
           liked={liked}
           likesCount={likesCount}
           onLike={handleLike}
-          onComment={() => setCommented(true)}
+          onComment={() => setCommented((prev) => !prev)}
           onShare={handleShare}
         />
-      </div>
 
-      <CommentModal
-        isOpen={commented}
-        onClose={() => setCommented(false)}
-        commentOnId={dataPost.id}
-        userId={userId}
-      />
+        {commented && <InlineComments userData={user} commentOnId={dataPost.id} contentType="posts" />}
+      </div>
     </div>
   );
 };

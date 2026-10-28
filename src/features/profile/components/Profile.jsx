@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import Top from "../../../components/layout/Top";
 import Sidebar from "../../../components/layout/Sidebar";
-import CommentModal from "../../../components/common/CommentModal";
 import FeedList from "../../feed/components/FeedList";
 
 import ProfileHeader from "./ProfileHeader";
@@ -15,6 +14,8 @@ import { getDirection } from "../../../utils/helpers";
 import "../styles/profile.css";
 
 export const Profile = () => {
+  // Inline comments: single expanded section at a time (null = all collapsed).
+  const [activeCommentId, setActiveCommentId] = useState(null);
   const {
     idOtherUser,
     userDataMain,
@@ -100,8 +101,11 @@ export const Profile = () => {
             feed={feed}
             likedPosts={likesMap}
             likesCount={likesMap}
+            activeCommentId={activeCommentId}
             onLike={handleLike}
-            onComment={() => setCommented(true)}
+            onComment={(postId) =>
+              setActiveCommentId((prev) => (prev === postId ? null : postId))
+            }
             onShare={(item) =>
               navigator.share &&
               navigator.share({ title: item.content, url: window.location.href })
@@ -123,13 +127,6 @@ export const Profile = () => {
           onCancel={() => setCropMode(false)}
         />
       )}
-
-      <CommentModal
-        isOpen={commented}
-        onClose={() => setCommented(false)}
-        commentOnId={idOtherUser || userDataMain.id}
-        userId={userDataMain.id}
-      />
     </div>
   );
 };

@@ -5,6 +5,7 @@ export const FeedActions = ({
   itemId,
   liked,
   likesCount,
+  commentsCount = 0,
   onLike,
   onComment,
   onShare,
@@ -27,9 +28,10 @@ export const FeedActions = ({
       <button
         className="comment_action"
         onClick={onComment}
-        aria-label="Comment"
+        aria-label={`Comment${commentsCount ? ` (${commentsCount})` : ""}`}
       >
         <FaComment />
+        {commentsCount > 0 && <span>{commentsCount}</span>}
       </button>
 
       <button
