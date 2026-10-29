@@ -829,6 +829,7 @@ app.post("/saveposts", verifyToken, async (req, res) => {
       const result = await saveContent_Comment(payload);
 
       if (!result.success) {
+        console.error("POST /saveposts: reply failed —", result.message, result.reason || "");
         return res.status(400).json({
           status: "error",
           message: result.message,

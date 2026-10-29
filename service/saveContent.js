@@ -291,14 +291,18 @@ async function saveContent_Comment({
         timestamp: Date.now(),
         category: categoryObj, // required by the canonical posts schema
         // Display metadata only — never used for authorization.
-        userData: userData
+        // NOTE: never insert the key with an `undefined` value — Firebase RTDB
+        // rejects `set()` payloads containing undefined properties.
+        ...(userData
             ? {
-                Id_user: String(userData.Id_user ?? autherID),
-                F_user: userData.F_user || "",
-                S_user: userData.S_user || "",
-                imgProfile: userData.imgProfile || ""
+                userData: {
+                    Id_user: String(userData.Id_user ?? autherID),
+                    F_user: userData.F_user || "",
+                    S_user: userData.S_user || "",
+                    imgProfile: userData.imgProfile || ""
+                },
             }
-            : undefined,
+            : {}),
         replyCount: 0,
         parentUserData,
     };
@@ -310,7 +314,7 @@ async function saveContent_Comment({
         return { success: true, id: String(id), comment: replyRecord };
     } catch (err) {
         console.error("Reply save error:", err);
-        return { success: false, message: "Failed to save reply" };
+        return { success: false, message: "Failed to save reply", reason: err?.message };
     }
 }
 
@@ -342,7 +346,7 @@ try {
             content,
             type,
             img: Array.isArray(img) ? img : [],
-            media: Array.isArray(media) ? media : undefined,
+            ...(Array.isArray(media) && media.length ? { media } : {}),
             time: getCurrentTime(),
             date: getTodayDate(),
             timestamp: Date.now(),

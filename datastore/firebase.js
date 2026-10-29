@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 const { initializeApp } = require("firebase/app");
 const { getStorage } = require("firebase/storage");
-const { getDatabase, ref, set, get, update, child, push, query, equalTo, orderByChild } = require('firebase/database');
+const { getDatabase, ref, set, get, update, remove, child, push, query, equalTo, orderByChild } = require('firebase/database');
 
 const firebaseConfig = {
     apiKey: "AIzaSyBWMBlurKyunm81JkOKNLFcQxAWtqXJWkg",
@@ -18,4 +18,4 @@ const contentApp = initializeApp(firebaseConfig, "contentApp");
 const storage = getStorage(contentApp);
 const db = getDatabase(contentApp);
 
-module.exports = { db, storage, ref, set, get, update, child, push, query, equalTo, orderByChild };
+module.exports = { db, storage, ref, set, get, update, remove, child, push, query, equalTo, orderByChild };
