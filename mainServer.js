@@ -20,6 +20,7 @@ const sign = require("./datastore/signin_signupDao_firebase.js");
 const dao = require("./datastore/Dao.js");
 const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
 const { saveContent_Article_Novels, saveContent_Posts, saveContent_Comment } = require("./service/saveContent.js");
+const { getProfileContent } = require("./service/profileContentService.js");
 const {
     MEDIA_LIMITS,
     isConfigured,
@@ -374,52 +375,66 @@ async function getScore(content) {
 
 async function recommendFeed(user, type) {
     try {
-
-        // استخراج الاهتمامات حسب نوع المحتوى
-        const interests =
-            type === "novels"
-                ? (user?.interesting?.novels || [])
-                : (user?.interesting?.articles || []);
+        // "all" merges the three canonical collections; individual types keep
+        // the existing single-collection behavior.
+        const types =
+            String(type).toLowerCase() === "all"
+                ? ["posts", "articles", "novels"]
+                : [String(type).toLowerCase()];
 
         let allContent = [];
+        const collectionTypeById = new Map(); // id → المصدر الحقيقي للسجل
 
-        // =====================================
-        // Personalized Feed
-        // =====================================
-        if (interests.length > 0) {
+        for (const t of types) {
+            // استخراج الاهتمامات حسب نوع المحتوى
+            const interests =
+                t === "novels"
+                    ? (user?.interesting?.novels || [])
+                    : (user?.interesting?.articles || []);
 
-            for (const category of interests) {
+            // =====================================
+            // Personalized Feed
+            // =====================================
+            if (interests.length > 0) {
+                for (const category of interests) {
+                    const cacheKey = `${t}:${category}`;
 
-                const cacheKey = `${type}:${category}`;
+                    let results = await cacheGet(cacheKey);
 
-                let results = await cacheGet(cacheKey);
+                    if (!results) {
+                        results = await dao.getContentByCategory(t, category, 20);
 
-                if (!results) {
-                    results = await dao.getContentByCategory(type, category, 20);
+                        if (results && results.length > 0) {
+                            await cacheSet(cacheKey, results, 60);
+                        }
+                    }
 
-                    if (results && results.length > 0) {
-                        await cacheSet(cacheKey, results, 60);
+                    if (Array.isArray(results) && results.length > 0) {
+                        allContent.push(...results);
                     }
                 }
+            }
 
-                if (Array.isArray(results) && results.length > 0) {
-                    allContent.push(...results);
+            // =====================================
+            // إذا لم توجد اهتمامات أو لم ينتج عنها محتوى
+            // =====================================
+            if (allContent.length === 0) {
+                console.log("No personalized feed found. Loading random content...", t);
+                const fallback = await dao.getAllContent(t, 20);
+                allContent.push(...fallback);
+            }
+        }
+
+        // سجّل من أي مجموعة جاء كل id (للسجلات القديمة بلا حقل type)
+        for (const t of types) {
+            for (const item of allContent) {
+                if (item && item.id != null && !collectionTypeById.has(String(item.id))) {
+                    // تمييز تقريبي: المقالات/الروايات تحمل title + descrip، والبوستات لا
+                    if (t !== "posts" && item.title != null) collectionTypeById.set(String(item.id), t);
                 }
             }
         }
 
-        // =====================================
-        // إذا لم توجد اهتمامات أو لم ينتج عنها محتوى
-        // =====================================
-        if (allContent.length === 0) {
-
-            console.log("No personalized feed found. Loading random content...");
-
-            allContent = await dao.getAllContent(type, 20);
-            console.log("All content: ",allContent.length);
-                
-        }
-        
         // =====================================
         // إزالة المحتويات المكررة
         // =====================================
@@ -427,19 +442,25 @@ async function recommendFeed(user, type) {
 
         const seen = new Set();
 
-allContent = allContent.filter(item => {
+        allContent = allContent.filter(item => {
+            const key = String(item?.id ?? "");
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
 
-    if (seen.has(item.id)) return false;
+        console.log("After filter:", allContent.length);
 
-    seen.add(item.id);
+        // كل نوع يحمل نوعه الصريح — العميل يختار البطاقة المناسبة (PostCard vs ArticleCard).
+        // `sourceCollection` يحدد المسار الحقيقي الذي جاء منه السجل لأن records
+        // قد تفتقد حقل type (سجلات قديمة).
+        allContent = allContent.map((item) => ({
+            ...item,
+            type: item.type || collectionTypeById.get(String(item.id)) || "posts",
+        }));
 
-    return true;
-
-});
-
-            console.log("After filter:", allContent.length);
-            // =====================================
-            // حساب الـ Score لكل محتوى
+        // =====================================
+        // حساب الـ Score لكل محتوى
         // =====================================
         const scored = await Promise.all(
             allContent.map(async (item) => ({
@@ -447,14 +468,26 @@ allContent = allContent.filter(item => {
                 score: await getScore(item)
             }))
         );
-        console.log("All scored: ",scored.length);
-        
+        console.log("All scored: ", scored.length);
+
         // =====================================
-        // ترتيب حسب الـ Score
+        // ترتيب: الـ score أولًا، ثم الأحدث زمنيًا عند تساوي الـ score
+        // (السجلات القديمة بلا timestamp تذهب أخيرًا بأمان)
         // =====================================
-        scored.sort((a, b) => b.score - a.score);
-        
-        console.log("All scored2: ",scored.length);
+        const tsOf = (item) => {
+            const ts = Number(item?.timestamp);
+            if (Number.isFinite(ts) && ts > 0) return ts;
+            try {
+                if (item?.date) {
+                    const ms = new Date(`${item.date} ${item.time || ""}`.trim()).getTime();
+                    if (Number.isFinite(ms)) return ms;
+                }
+            } catch (_) { /* ignore */ }
+            return 0;
+        };
+        scored.sort((a, b) => (b.score - a.score) || (tsOf(b) - tsOf(a)));
+
+        console.log("All scored2: ", scored.length);
         return scored;
 
     } catch (err) {
@@ -750,23 +783,31 @@ app.post("/editProfile", async(req, res) => {
         };
         try {
             let updatedUser;
-            if (status === "img") {
-                updatedUser = await sign.logup_user_Insert_ImgProfile(Updatable, decoded.username, decoded.pass);
-            } else if (status === "name") {
-                updatedUser = await sign.logup_user_Insert_Name(Updatable, decoded.username, decoded.pass);
-            } else if (status === "bio") {
-                updatedUser = await sign.logup_user_Insert_BIO(Updatable, decoded.username, decoded.pass);
+            // تطبيع اسم الحقل: الواجهة قد ترسل "Bio" أو "bio" أو "name"/"img" بأي حالة.
+            const statusKey = String(status || "").toLowerCase();
+            const trimmedValue = typeof Updatable === "string" ? Updatable.trim() : Updatable;
+
+            if (statusKey === "img") {
+                updatedUser = await sign.logup_user_Insert_ImgProfile(trimmedValue, decoded.username, decoded.pass);
+            } else if (statusKey === "name") {
+                updatedUser = await sign.logup_user_Insert_Name(trimmedValue, decoded.username, decoded.pass);
+            } else if (statusKey === "bio") {
+                // فارغ مسموح (تصميم المنتج يسمح بمحيّة بدون بايو) — لكن ليس undefined/null.
+                if (trimmedValue == null)
+                    return res.status(400).json({ message: "Bio value is required (may be empty string)" });
+                updatedUser = await sign.logup_user_Insert_BIO(trimmedValue, decoded.username, decoded.pass);
             } else {
                 return res.status(400).json({ message: "Invalid status" });
             }
 
-            if (updatedUser?.Id_user != null) {
-                await invalidateUserCache(updatedUser.Id_user);
-}
+            if (!updatedUser || updatedUser.Id_user == null)
+                return res.status(500).json({ message: "Profile update did not return user data" });
+
+            await invalidateUserCache(updatedUser.Id_user);
             res.json({ message: "Profile updated", userData: await buildUserData(updatedUser) });
         } catch (err) {
             console.error("Profile update error:", err);
-            res.status(500).json({ message: "Error updating profile" });
+            res.status(500).json({ message: err?.message || "Error updating profile" });
         }
     });
 });
@@ -1193,6 +1234,15 @@ app.post("/deletePost", verifyToken, async (req, res) => {
 
         // حذف ردود البوست؟ — لا: الردود منشورات مستقلة (first-class)، تبقى كما هي.
 
+        // Realtime content-deleted broadcast so open feeds/profiles update
+        // without a full reload. The profile layer removes the item by id —
+        // ownership was verified server-side above, never trusted from client.
+        try {
+            io.emit("CONTENT_DELETED", { contentType, id: String(id) });
+        } catch (broadcastErr) {
+            console.warn("CONTENT_DELETED broadcast failed:", broadcastErr.message);
+        }
+
         return res.status(200).json({
             status: "ok",
             message: "Post deleted",
@@ -1469,28 +1519,14 @@ socket.on("ENGAGEMENT", async ({
   }
 });
 
-    // MY CONTENT
-    socket.on("MYCONTENT", async({ idUser, type }) => {
+    // MY CONTENT — unified profile feed (posts + replies + articles + novels)
+    socket.on("MYCONTENT", async({ idUser, type = "all", cursor = 0, limit = 10 }) => {
         try {
-            const contentIds = await DaoForDbUser.find_ContentUser_byID(type, idUser);
-            const userData = await DaoForDbUser.findbyID(idUser);
-            let content = [];
-
-            if (type === "posts") {
-                const posts = await Promise.all(contentIds.map((id) => dao.getPostID(id)));
-                content = posts.map((post) => ({ userData, ...post }));
-            } else if (type === "articles") {
-                const articles = await Promise.all(contentIds.map((id) => dao.getArticleID(id)));
-                content = articles.map((article) => ({ userData, ...article }));
-            } else if (type === "novels") {
-                const novels = await Promise.all(contentIds.map((id) => dao.getnovelsID(id)));
-                content = novels.map((novel) => ({ userData, ...novel }));
-            }
-
-            socket.emit("CONTENT_RESULT", content);
+            const result = await getProfileContent({ idUser, type, cursor, limit });
+            socket.emit("CONTENT_RESULT", result);
         } catch (err) {
             console.log("MYCONTENT ERROR:", err.message);
-            socket.emit("CONTENT_RESULT", []);
+            socket.emit("CONTENT_RESULT", { items: [], nextCursor: null, counts: {}, error: err.message });
         }
     });
 
@@ -1514,7 +1550,9 @@ socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 20 })
 
         feed = await enrichContent(feed);
 
-        const result = paginate(shuffle(feed), limit, cursor);
+        // لا خلط (shuffle): يكسر الترتيب الزمني ويكرر/يفقد عناصر بين الصفحات.
+        // الترتيب الآن: حسب الـ score ثم زمن الإنشاء داخل نفس الـ score تقريبًا.
+        const result = paginate(feed, limit, cursor);
 
 
         socket.emit("FEED_RESULT", result);

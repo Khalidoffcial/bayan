@@ -506,73 +506,16 @@ io.on("connection", (socket) => {
         // ==================================================
 socket.on(
     "MYCONTENT",
-    async ({ idUser, type }) => {
+    async ({ idUser, type = "all", cursor = 0, limit = 10 }) => {
         try {
-
-
-            console.log({ idUser, type })
-
-            const contentIds =
-                await DaoForDbUser.find_ContentUser_byID(type, idUser);
-                console.log(contentIds)
-
-            let content = [];
-
-            if (type === "posts") {
-
-                    const userData =
-        await DaoForDbUser.findbyID(idUser);
-
-        console.log(contentIds); // [ 4621, 8795 ]
-    const posts = await Promise.all(
-        contentIds.map((id) => dao.getPostID(id))
-    );
-    
-    
-    content = posts.map((post) => ({
-        userData,
-        ...post
-    }));
-    
-}
-
-if (type === "articles") {
-    const userData =
-    await DaoForDbUser.findbyID(idUser);
-    
-    const articles = await Promise.all(
-        contentIds.map((id) => dao.getArticleID(id))
-    );
-    console.log(contentIds);
-
-    content = articles.map((article) => ({
-        userData,
-        ...article
-    }));
-            }
-
-            if (type === "novels") {
-                    const userData =
-        await DaoForDbUser.findbyID(idUser);
-
-    const novels = await Promise.all(
-        contentIds.map((id) => dao.getnovelsID(id))
-    );
-
-    content = novels.map((novel) => ({
-        userData,
-        ...novel
-    }));
-            }
-
-            console.log(content);
-
-            socket.emit("CONTENT_RESULT", content);
-
+            // Unified aggregation: posts + replies + articles + novels,
+            // chronologically merged and paginated. Replies are included —
+            // they live in the author's own posts list.
+            const result = await getProfileContent({ idUser, type, cursor, limit });
+            socket.emit("CONTENT_RESULT", result);
         } catch (err) {
             console.log("MYCONTENT ERROR:", err.message);
-
-            socket.emit("CONTENT_RESULT", []);
+            socket.emit("CONTENT_RESULT", { items: [], nextCursor: null, counts: {}, error: err.message });
         }
     }
 );

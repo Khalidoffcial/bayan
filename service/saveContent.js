@@ -304,7 +304,7 @@ async function saveContent_Comment({
             }
             : {}),
         replyCount: 0,
-        parentUserData,
+        ...(parentUserData ? { parentUserData } : {}),
     };
 
     try {
