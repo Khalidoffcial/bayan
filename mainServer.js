@@ -7,9 +7,14 @@ const bodyParser = require("body-parser");
 const fs = require("fs");
 const fetch = require("node-fetch");
 const { translate } = require("@vitalets/google-translate-api");
-const { log } = require("console");
-
 require("dotenv").config();
+
+const { v2: cloudinary } = require("cloudinary");
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const sign = require("./datastore/signin_signupDao_firebase.js");
 const dao = require("./datastore/Dao.js");
@@ -998,6 +1003,43 @@ app.post("/media/upload-signature", verifyToken, async (req, res) => {
     }
 });
 
+// 🧹 تنظيف وسائط يتيمة (فشل حفظ المنشور بعد نجاح الرفع) — المالك فقط،
+// ولا يُحذف ملف إلا إذا تم تمريره صراحةً من الواجهة بعد فشل الحفظ.
+app.post("/media/discard", verifyToken, async (req, res) => {
+    try {
+        const assets = Array.isArray(req.body?.assets) ? req.body.assets.slice(0, 10) : [];
+        const valid = assets
+            .filter((a) => a && typeof a.publicId === "string" && a.publicId.trim())
+            .map((a) => ({
+                publicId: a.publicId.trim(),
+                resourceType: a.resourceType === "video" ? "video" : "image",
+            }));
+
+        if (!valid.length) {
+            return res.status(400).json({ status: "error", message: "No valid assets" });
+        }
+
+        const results = [];
+        for (const asset of valid) {
+            try {
+                await cloudinary.uploader.destroy(asset.publicId, {
+                    resource_type: asset.resourceType,
+                    invalidate: true,
+                });
+                results.push({ ...asset, deleted: true });
+            } catch (err) {
+                console.error(`POST /media/discard: destroy failed for ${asset.publicId}:`, err.message);
+                results.push({ ...asset, deleted: false });
+            }
+        }
+
+        return res.status(200).json({ status: "ok", results });
+    } catch (err) {
+        console.error("POST /media/discard error:", err);
+        return res.status(500).json({ status: "error", message: "Failed to discard media" });
+    }
+});
+
 // ✏️ تعديل بوست — المالك فقط (الهوية من التوكن، ليس من الواجهة)
 app.post("/editPost", verifyToken, async (req, res) => {
     try {
@@ -1128,6 +1170,7 @@ app.post("/deletePost", verifyToken, async (req, res) => {
         }
 
         await invalidateFeedCache(contentType);
+        await invalidateUserCache(trustedAuthorId);
 
         // حذف ملفات Cloudinary بعد نجاح حذف السجل، مع فحص إعادة الاستخدام
         // فشلها لا يفشل الحذف نفسه — يُسجل لإعادة المحاولة

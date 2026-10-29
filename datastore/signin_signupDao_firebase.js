@@ -491,7 +491,15 @@ async function deletePostsFrom_User(idUser, content_id) {
         if (snapshot.exists()) {
             const userData = snapshot.val();
 
-            posts = userData.posts.filter(id => id !== content_id); // للحذف
+            // Defensive: profile may lack `posts` (old accounts / articles / novels).
+            // Also handle Firebase storing an empty list as a missing field.
+            const currentPosts = Array.isArray(userData.posts) ? userData.posts : [];
+            const posts = currentPosts.filter((id) => String(id) !== String(content_id));
+
+            if (posts.length === currentPosts.length) {
+                console.log(`deletePostsFrom_User: id ${content_id} not in profile list — nothing to update`);
+                return userData;
+            }
 
             // 4️⃣ تحديث البيانات في Firebase
             await update(ref(db, `user_data/Profile/${idUser}`), { posts });

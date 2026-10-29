@@ -1,5 +1,0 @@
-No Redis URL -> Memory Cache Enabled
-✅ Unified Server running on port 4000
-   REST API  → http://localhost:4000
-   Socket.IO → ws://localhost:4000
-⚠ Redis not available -> Memory Cache Enabled
