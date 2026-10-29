@@ -800,8 +800,9 @@ app.post("/saveposts", verifyToken, async (req, res) => {
 
       return res.status(200).json({
         status: "ok",
-        message: "Comment saved successfully",
+        message: "Reply saved successfully",
         id: result.id,
+        comment: result.comment,
       });
     }
 
@@ -859,6 +860,78 @@ app.post("/getComments", verifyToken, async (req, res) => {
   }
 });
 
+
+// 💬 جلب ردود محتوى محدد (بما فيها ردود على ردود)
+app.post("/getReplies", verifyToken, async (req, res) => {
+  try {
+    const { parentId } = req.body;
+
+    if (!parentId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Missing parentId",
+      });
+    }
+
+    const replies = await dao.getRepliesFor(String(parentId));
+
+    return res.status(200).json({
+      status: "ok",
+      replies,
+    });
+  } catch (err) {
+    console.error("POST /getReplies error:", err);
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to fetch replies",
+    });
+  }
+});
+
+// 📄 جلب بوست/رد واحد بالـ ID (يدعم فتح رد من الرابط مباشرة)
+app.post("/getPostById", verifyToken, async (req, res) => {
+  try {
+    const { postId } = req.body;
+
+    if (!postId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Missing postId",
+      });
+    }
+
+    const post = await dao.getPostID(String(postId));
+
+    if (!post) {
+      return res.status(404).json({
+        status: "error",
+        message: "Post not found",
+      });
+    }
+
+    // دمج بيانات الكاتب لعرض الاسم والصورة
+    const profile = await getUser(post.autherID);
+    const enriched = profile
+      ? {
+          ...post,
+          userData: {
+            Id_user: profile.Id_user ?? post.autherID,
+            F_user: profile.F_user || "",
+            S_user: profile.S_user || "",
+            imgProfile: profile.imgProfile || "",
+          },
+        }
+      : post;
+
+    return res.status(200).json({ status: "ok", post: enriched });
+  } catch (err) {
+    console.error("POST /getPostById error:", err);
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to fetch post",
+    });
+  }
+});
 
 app.post("/edit_profile_photo", async(req, res) => {
 

@@ -218,9 +218,11 @@ async function saveContent_Article_Novels({
         }
 }
 
-// 💬 حفظ تعليق — يُخزَّن في مسار منفصل حتى لا يظهر كمحتوى عادي
-// Comments are recognized by a valid `comment_on` parent reference.
-// Author identity (autherID) is validated/normalized by the caller.
+// 💬 حفظ رد (Twitter/X-style first-class reply)
+// A reply IS a post: it lives in the canonical posts collection with its own
+// id, likes, replies, and author — plus a parent reference (`comment_on` +
+// `parentType`) linking it back to the conversation. Posts/articles/novels
+// remain untouched; nested replies reference the reply's own id as parent.
 async function saveContent_Comment({
     autherID,
     id,
@@ -237,18 +239,26 @@ async function saveContent_Comment({
         return { success: false, message: "Comment is too long (max 1000 characters)" };
 
     const allowedTypes = ["posts", "articles", "novels"];
-    const contentType = allowedTypes.includes(type) ? type : "posts";
+    const parentType = allowedTypes.includes(type) ? type : "posts";
 
-    const newComment = {
+    const classify = classifyMultipleCategories(
+        await translateToEnglish(content)
+    );
+    const categoryObj = {};
+    classify.forEach(cat => { categoryObj[cat] = true; });
+
+    const replyRecord = {
         autherID: String(autherID),
         id: String(id),
         comment_on: String(comment_on),
-        parentType: contentType,
+        parentType,
         content,
+        type: parentType, // keeps the reply in its parent's channel for reads
         img: Array.isArray(img) ? img : [],
         time: getCurrentTime(),
         date: getTodayDate(),
         timestamp: Date.now(),
+        category: categoryObj, // required by the canonical posts schema
         // Display metadata only — never used for authorization.
         userData: userData
             ? {
@@ -258,14 +268,17 @@ async function saveContent_Comment({
                 imgProfile: userData.imgProfile || ""
             }
             : undefined,
+        replyCount: 0,
     };
 
     try {
-        await dao.addComment(comment_on, newComment);
-        return { success: true, id: String(id), comment: newComment };
+        // First-class: stored in the main posts collection so every normal
+        // post reader/detail route works on replies unchanged.
+        await dao.addReply(replyRecord);
+        return { success: true, id: String(id), comment: replyRecord };
     } catch (err) {
-        console.error("Comment save error:", err);
-        return { success: false, message: "Failed to save comment" };
+        console.error("Reply save error:", err);
+        return { success: false, message: "Failed to save reply" };
     }
 }
 

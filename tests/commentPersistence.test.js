@@ -68,34 +68,56 @@ const validPayload = {
 
 console.log("\ncommentPersistence.test.js\n");
 
-run("1. Valid comment is persisted with comment_on and author ID", async () => {
+const runAsync = (name, fn) => {
+    fn()
+        .then(() => {
+            passed++;
+            console.log(`  ✓ ${name}`);
+        })
+        .catch((err) => {
+            console.error(`  ✗ ${name}`);
+            console.error(err.message);
+            process.exitCode = 1;
+        });
+};
+
+runAsync("1. Valid reply is persisted with comment_on and author ID", async () => {
     const result = await saveContent_Comment(validPayload);
     assert.strictEqual(result.success, true);
     assert.strictEqual(result.comment.comment_on, "4621");
     assert.strictEqual(result.comment.autherID, "463904916");
 });
 
-run("2. Invalid requests fail with a message (maps to HTTP 400)", () => {
-    const missing = saveContent_Comment({ ...validPayload, autherID: undefined });
+run("2. Invalid requests fail with a message (maps to HTTP 400)", async () => {
+    const missing = await saveContent_Comment({ ...validPayload, autherID: undefined });
     assert.strictEqual(missing.success, false);
 
-    const noParent = saveContent_Comment({ ...validPayload, comment_on: undefined });
+    const noParent = await saveContent_Comment({ ...validPayload, comment_on: undefined });
     assert.strictEqual(noParent.success, false);
 
-    const tooLong = saveContent_Comment({ ...validPayload, content: "x".repeat(1001) });
+    const tooLong = await saveContent_Comment({ ...validPayload, content: "x".repeat(1001) });
     assert.strictEqual(tooLong.success, false);
 });
 
-run("3. Type outside allowed list normalizes to 'posts'", async () => {
+runAsync("3. Type outside allowed list normalizes to 'posts'", async () => {
     const result = await saveContent_Comment({ ...validPayload, type: "hacker" });
     assert.strictEqual(result.success, true);
     assert.strictEqual(result.comment.parentType, "posts");
 });
 
-run("4. img normalizes to array", async () => {
+runAsync("4. img normalizes to array", async () => {
     const result = await saveContent_Comment({ ...validPayload, img: undefined });
     assert.strictEqual(result.success, true);
     assert.deepStrictEqual(result.comment.img, []);
+});
+
+runAsync("5. Reply carries canonical post fields (category, replyCount, timestamps)", async () => {
+    const result = await saveContent_Comment(validPayload);
+    assert.strictEqual(result.success, true);
+    assert.ok(result.comment.category && typeof result.comment.category === "object");
+    assert.strictEqual(result.comment.replyCount, 0);
+    assert.ok(result.comment.timestamp > 0);
+    assert.ok(result.comment.id);
 });
 
 console.log(`\n${passed} checks passed${process.exitCode ? " (with failures)" : ""}\n`);

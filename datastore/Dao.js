@@ -301,6 +301,75 @@ async function addComment(parentId, commentObj) {
     }
 }
 
+// ======================================================
+// REPLIES (Twitter/X-style first-class replies)
+// Replies ARE posts — stored in the canonical `posts` path
+// (`posts/posts{id}`) so all existing readers/detail routes work
+// unchanged. Parent linkage lives on the record itself:
+//   comment_on  → parent post/article/novel/reply id
+//   parentType  → "posts" | "articles" | "novels"
+// A per-parent index (`replyIndex/{parentId}/{replyId} → true`)
+// keeps “load replies for X” cheap without scanning all posts.
+// ======================================================
+
+// Persist a first-class reply in the main posts collection + reply index
+async function addReply(replyObj) {
+    try {
+        if (!replyObj?.id || !replyObj?.comment_on)
+            throw new Error("Missing reply id or parent reference");
+
+        const replyId = String(replyObj.id);
+        const parentId = String(replyObj.comment_on);
+
+        // Canonical posts path — replies are posts.
+        await set(ref(db, `posts/posts${replyId}`), replyObj);
+
+        // Cheap per-parent lookup index.
+        await set(ref(db, `replyIndex/${parentId}/${replyId}`), true);
+
+        // Maintain parent replyCount when the parent is itself a reply/post.
+        const parentSnap = await get(ref(db, `posts/posts${parentId}`));
+        if (parentSnap.exists()) {
+            const parent = parentSnap.val();
+            await update(ref(db, `posts/posts${parentId}`), {
+                replyCount: Number(parent.replyCount || 0) + 1,
+            });
+        }
+
+        return replyObj;
+    } catch (err) {
+        console.error("Error adding reply:", err);
+        throw err;
+    }
+}
+
+// Load replies for a parent (post, article, novel, or another reply)
+async function getRepliesFor(parentId) {
+    try {
+        if (!parentId) return [];
+
+        const indexRef = ref(db, `replyIndex/${parentId}`);
+        const snapshot = await get(indexRef);
+
+        if (!snapshot.exists()) return [];
+
+        const replyIds = Object.keys(snapshot.val() || {});
+        const replies = [];
+
+        for (const replyId of replyIds) {
+            const snap = await get(ref(db, `posts/posts${replyId}`));
+            if (snap.exists()) replies.push(snap.val());
+        }
+
+        // Newest first, matching feed expectations.
+        replies.sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
+        return replies;
+    } catch (err) {
+        console.error("Error fetching replies:", err);
+        throw err;
+    }
+}
+
 // Read all comments for a parent content item
 async function getComments(parentId) {
     try {
@@ -603,5 +672,7 @@ module.exports = {
     hasUserLiked,
     getAllContent,
     addComment,
-    getComments
+    getComments,
+    addReply,
+    getRepliesFor
 }
