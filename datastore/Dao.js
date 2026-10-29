@@ -281,6 +281,44 @@ async function addContentCategory(type, contentObj) {
     }
 }
 
+// ======================================================
+// COMMENTS — stored in a dedicated path so they never mix
+// with normal feed content (posts/articles/novels).
+// Schema: comments/{parentId}/{commentId} → comment object
+// ======================================================
+
+// Save a comment under its parent content
+async function addComment(parentId, commentObj) {
+    try {
+        if (!parentId || !commentObj?.id) throw new Error("Missing parentId or comment id");
+
+        const commentRef = ref(db, `comments/${parentId}/${commentObj.id}`);
+        await set(commentRef, commentObj);
+        return commentObj;
+    } catch (err) {
+        console.error("Error adding comment:", err);
+        throw err;
+    }
+}
+
+// Read all comments for a parent content item
+async function getComments(parentId) {
+    try {
+        if (!parentId) return [];
+
+        const commentsRef = ref(db, `comments/${parentId}`);
+        const snapshot = await get(commentsRef);
+
+        if (!snapshot.exists()) return [];
+
+        const raw = snapshot.val() || {};
+        return Object.values(raw);
+    } catch (err) {
+        console.error("Error fetching comments:", err);
+        throw err;
+    }
+}
+
 //GET 
 async function getContentByCategory(type, category, limit) {
     try {
@@ -563,5 +601,7 @@ module.exports = {
     likeContent,
     unlikeContent,
     hasUserLiked,
-    getAllContent
+    getAllContent,
+    addComment,
+    getComments
 }

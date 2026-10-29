@@ -12,7 +12,7 @@ const { log } = require("console");
 const sign = require("./datastore/signin_signupDao_firebase.js");
 const dao = require("./datastore/Dao.js");
 const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
-const { saveContent_Article_Novels, saveContent_Posts } = require("./service/saveContent.js");
+const { saveContent_Article_Novels, saveContent_Posts, saveContent_Comment } = require("./service/saveContent.js");
 
 require("dotenv").config();
 
@@ -770,13 +770,95 @@ app.post("/saveArticle_novels", async(req, res) => {
 
 });
 
-// ✅ حفظ بوست
-app.post("/saveposts", async(req, res) => {
-    await saveContent_Posts(req.body);
+// ✅ حفظ بوست — routes a comment payload to saveContent_Comment,
+// normal posts to the existing normal-post path.
+// Identity: the verified JWT payload `{ id, name, username, pass }` is the
+// authoritative author ID; a mismatching client-supplied autherID is overridden.
+app.post("/saveposts", verifyToken, async (req, res) => {
+  try {
+    const { comment_on } = req.body;
+
+    // 💬 Comment payloads carry `comment_on` — persist in the comments path.
+    if (comment_on) {
+      const trustedAuthorId = String(req.user?.id ?? "");
+      if (!trustedAuthorId) {
+        return res.status(401).json({ status: "error", message: "Unauthorized" });
+      }
+
+      const payload = { ...req.body, autherID: trustedAuthorId };
+      const result = await saveContent_Comment(payload);
+
+      if (!result.success) {
+        return res.status(400).json({
+          status: "error",
+          message: result.message,
+        });
+      }
+
+      // Realtime broadcast AFTER Firebase persistence succeeded.
+      io.emit("NEW_POST", result.comment);
+
+      return res.status(200).json({
+        status: "ok",
+        message: "Comment saved successfully",
+        id: result.id,
+      });
+    }
+
+    // 📝 Normal post — unchanged behavior.
+    const result = await saveContent_Posts(req.body);
+
+    if (!result.success) {
+      return res.status(400).json({
+        status: "error",
+        message: result.message,
+      });
+    }
+
     await invalidateFeedCache("posts");
-    console.log(req.body);
-  res.status(200).json({ status: 'ok', message: 'Post saved successfully' });
+
+    return res.status(200).json({
+      status: "ok",
+      message: "Content saved successfully",
+      id: result.id,
+    });
+  } catch (err) {
+    console.error("POST /saveposts error:", err);
+
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to save content",
+    });
+  }
 });
+
+// 💬 جلب تعليقات محتوى محدد
+app.post("/getComments", verifyToken, async (req, res) => {
+  try {
+    const { parentId } = req.body;
+
+    if (!parentId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Missing parentId",
+      });
+    }
+
+    const comments = await dao.getComments(String(parentId));
+
+    return res.status(200).json({
+      status: "ok",
+      comments,
+    });
+  } catch (err) {
+    console.error("POST /getComments error:", err);
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to fetch comments",
+    });
+  }
+});
+
 
 app.post("/edit_profile_photo", async(req, res) => {
 

@@ -218,6 +218,57 @@ async function saveContent_Article_Novels({
         }
 }
 
+// 💬 حفظ تعليق — يُخزَّن في مسار منفصل حتى لا يظهر كمحتوى عادي
+// Comments are recognized by a valid `comment_on` parent reference.
+// Author identity (autherID) is validated/normalized by the caller.
+async function saveContent_Comment({
+    autherID,
+    id,
+    comment_on,
+    img,
+    content,
+    type,
+    userData
+}) {
+    if (!autherID || !id || !comment_on || !content)
+        return { success: false, message: "Missing required fields" };
+
+    if (content.length > 1000)
+        return { success: false, message: "Comment is too long (max 1000 characters)" };
+
+    const allowedTypes = ["posts", "articles", "novels"];
+    const contentType = allowedTypes.includes(type) ? type : "posts";
+
+    const newComment = {
+        autherID: String(autherID),
+        id: String(id),
+        comment_on: String(comment_on),
+        parentType: contentType,
+        content,
+        img: Array.isArray(img) ? img : [],
+        time: getCurrentTime(),
+        date: getTodayDate(),
+        timestamp: Date.now(),
+        // Display metadata only — never used for authorization.
+        userData: userData
+            ? {
+                Id_user: String(userData.Id_user ?? autherID),
+                F_user: userData.F_user || "",
+                S_user: userData.S_user || "",
+                imgProfile: userData.imgProfile || ""
+            }
+            : undefined,
+    };
+
+    try {
+        await dao.addComment(comment_on, newComment);
+        return { success: true, id: String(id), comment: newComment };
+    } catch (err) {
+        console.error("Comment save error:", err);
+        return { success: false, message: "Failed to save comment" };
+    }
+}
+
 async function saveContent_Posts({
     autherID,
     id,
@@ -250,7 +301,7 @@ try {
             timestamp: Date.now(),
             category: categoryObj,
         };
-
+ 
         await dao.addContentCategory("posts", newPost);
         await sign.addContentId_User("posts", autherID,id);
         
@@ -261,5 +312,6 @@ try {
 
 module.exports = {
     saveContent_Article_Novels,
-    saveContent_Posts
+    saveContent_Posts,
+    saveContent_Comment
 };
