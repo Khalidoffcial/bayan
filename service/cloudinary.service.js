@@ -10,6 +10,8 @@ const { v2: cloudinary } = require("cloudinary");
 const crypto = require("crypto");
 const { db, ref, get } = require("../datastore/firebaseArticle.js");
 
+require("dotenv").config();
+
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -37,6 +39,27 @@ const isConfigured = () =>
     );
 
 /**
+ * Logs WHICH Cloudinary env var is missing (names only — never values).
+ * Helps Railway diagnosis without leaking secrets into the logs.
+ */
+function logCloudinaryConfigStatus() {
+    const missing = [
+        "CLOUDINARY_CLOUD_NAME",
+        "CLOUDINARY_API_KEY",
+        "CLOUDINARY_API_SECRET",
+        "CLOUDINARY_UPLOAD_PRESET",
+    ].filter((name) => !process.env[name]);
+
+    if (missing.length) {
+        console.error(
+            `[cloudinary] Missing environment variable(s): ${missing.join(", ")}. ` +
+            "Set them in the Railway service variables (values are never logged)."
+        );
+    }
+    return missing;
+}
+
+/**
  * Builds a signed-upload payload for a DIRECT (browser → Cloudinary) upload.
  * Signature covers ONLY the safe params below — the client cannot add
  * eager transformations, resource_type overrides, or public_id choices.
@@ -45,6 +68,7 @@ const isConfigured = () =>
  */
 function buildSignedUpload({ kind = "image" } = {}) {
     if (!isConfigured()) {
+        logCloudinaryConfigStatus();
         return { ok: false, message: "Cloudinary is not configured on the server" };
     }
 

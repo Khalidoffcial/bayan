@@ -150,13 +150,16 @@ async function saveContent_Article_Novels({
     img,
     series,
     content,
-    type
+    type,
+    media
 }) {
     console.log("سبف مقاله");
-    
+
     try {
-        if (!autherID || !id || !title || !content)
+        if (!autherID || !id || !title || !content) {
             console.log("في حاجه غلط");
+            return { success: false, message: "Missing required fields" };
+        }
     
             if (type === "article") {
                 const translate = await translateToEnglish(`${title} ${descrip} ${content}`);
@@ -186,7 +189,7 @@ async function saveContent_Article_Novels({
                 console.log(newArticle_novels);
                 await dao.addContentCategory("articles", newArticle_novels);
                 await sign.addContentId_User("articles", autherID,id);
-                
+                return { success: true, id: String(id), record: newArticle_novels };
                 
             } else if (type === "novels") {
                 const translate = await translateToEnglish(`${title} ${descrip} ${content}`);
@@ -210,11 +213,15 @@ async function saveContent_Article_Novels({
                 console.log(newArticle_novels);
                 await dao.addContentCategory("novels", newArticle_novels);
                 await sign.addContentId_User("novels", autherID,id);
-    
+                return { success: true, id: String(id), record: newArticle_novels };
+
+            } else {
+                return { success: false, message: "Invalid content type" };
             }
-    
+
         } catch (err) {
             console.error("Save error:", err);
+            return { success: false, message: "Failed to save content" };
         }
 }
 
@@ -317,7 +324,7 @@ async function saveContent_Posts({
 }) {
 try {
         if (!autherID || !id || !content)
-            return "Missing required fields";
+            return { success: false, message: "Missing required fields" };
 
         const translate = await translateToEnglish(content);
         console.log(translate);
@@ -330,23 +337,25 @@ try {
             categoryObj[cat] = true;
         });
         const newPost = {
-            autherID,
-            id,
+            autherID: String(autherID),
+            id: String(id),
             content,
             type,
-            img,
+            img: Array.isArray(img) ? img : [],
             media: Array.isArray(media) ? media : undefined,
             time: getCurrentTime(),
             date: getTodayDate(),
             timestamp: Date.now(),
             category: categoryObj,
         };
- 
+
         await dao.addContentCategory("posts", newPost);
         await sign.addContentId_User("posts", autherID,id);
-        
+
+        return { success: true, id: String(id), post: newPost };
     } catch (err) {
         console.error("Save error:", err);
+        return { success: false, message: "Failed to save post" };
     }
 }
 

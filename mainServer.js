@@ -9,6 +9,8 @@ const fetch = require("node-fetch");
 const { translate } = require("@vitalets/google-translate-api");
 const { log } = require("console");
 
+require("dotenv").config();
+
 const sign = require("./datastore/signin_signupDao_firebase.js");
 const dao = require("./datastore/Dao.js");
 const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
@@ -20,8 +22,6 @@ const {
     validateMediaManifest,
     deleteCloudinaryAssetsIfUnused,
 } = require("./service/cloudinary.service.js");
-
-require("dotenv").config();
 
 const categories = JSON.parse(fs.readFileSync("./categories.json", "utf8"));
 const novel_categories = JSON.parse(fs.readFileSync("novel_categories.json", "utf8"));
@@ -767,15 +767,33 @@ app.post("/editProfile", async(req, res) => {
 });
 
 
-// ✅ حفظ مقال أو رواية
-app.post("/saveArticle_novels", async(req, res) => {
-    await saveContent_Article_Novels(req.body);
-            // بعد نجاح الحفظ فقط
+// ✅ حفظ مقال أو رواية — الهوية من التوكن (لا نثق بالـ autherID من الواجهة)
+app.post("/saveArticle_novels", verifyToken, async (req, res) => {
+    try {
+        const trustedAuthorId = String(req.user?.id ?? "");
+        if (!trustedAuthorId) {
+            return res.status(401).json({ status: "error", message: "Unauthorized" });
+        }
+
+        const payload = { ...req.body, autherID: trustedAuthorId };
+        const result = await saveContent_Article_Novels(payload);
+
+        if (!result?.success) {
+            return res.status(400).json({
+                status: "error",
+                message: result?.message || "Failed to save content",
+            });
+        }
+
+        // بعد نجاح الحفظ فقط
         await invalidateFeedCache("articles");
         await invalidateFeedCache("novels");
 
-  res.status(200).json({ status: 'ok', message: 'Your content saved successfully' });
-
+        return res.status(200).json({ status: "ok", message: "Your content saved successfully", id: result.id });
+    } catch (err) {
+        console.error("POST /saveArticle_novels error:", err);
+        return res.status(500).json({ status: "error", message: "Failed to save content" });
+    }
 });
 
 
@@ -954,13 +972,16 @@ app.post("/getPostById", verifyToken, async (req, res) => {
 // العميل يختار النوع (image/video) فقط؛ لا يمكنه التلاعب بباراميترات التوقيع.
 app.post("/media/upload-signature", verifyToken, async (req, res) => {
     try {
-        const { kind } = req.body;
+        const kind = req.body?.kind;
 
         if (!isConfigured()) {
+            // logCloudinaryConfigStatus داخل buildSignedUpload يسجل أي متغير مفقود (الأسماء فقط)
+            console.error("POST /media/upload-signature: Cloudinary env vars missing (userId=" +
+                String(req.user?.id ?? "") + ")");
             return res.status(500).json({ status: "error", message: "Cloudinary not configured" });
         }
 
-        if (!["image", "video"].includes(kind)) {
+        if (!kind || !["image", "video"].includes(kind)) {
             return res.status(400).json({ status: "error", message: "Invalid media kind" });
         }
 
@@ -1039,44 +1060,100 @@ app.post("/editPost", verifyToken, async (req, res) => {
     }
 });
 
-// 🗑️ حذف بوست — المالك فقط
+// 🗑️ حذف بوست/رد — المالك فقط (الهوية من التوكن، ليست من الواجهة)
 app.post("/deletePost", verifyToken, async (req, res) => {
     try {
-        const { postId } = req.body;
+        const postId = req.body?.postId;
         const trustedAuthorId = String(req.user?.id ?? "");
 
-        if (!postId) {
+        if (!postId || typeof postId !== "string" || !postId.trim()) {
             return res.status(400).json({ status: "error", message: "Missing postId" });
         }
+        if (!trustedAuthorId) {
+            return res.status(401).json({ status: "error", message: "Unauthorized" });
+        }
 
-        const post = await dao.getPostID(String(postId));
-        if (!post) {
+        const id = String(postId).trim();
+
+        // البحث عن السجل في المسارات الثلاثة: ردود/بوستات، مقالات، روايات
+        // (الردود تُحفظ كسجلات posts — نفس دالة البحث تغطيهما)
+        let record = null;
+        let contentType = "posts";
+
+        record = await dao.getPostID(id);
+        if (!record) {
+            record = await dao.getArticleID(id);
+            if (record) contentType = "articles";
+        }
+        if (!record) {
+            record = await dao.getnovelsID(id);
+            if (record) contentType = "novels";
+        }
+
+        if (!record) {
+            console.warn(`POST /deletePost: record ${id} not found (userId=${trustedAuthorId})`);
             return res.status(404).json({ status: "error", message: "Post not found" });
         }
 
-        if (String(post.autherID) !== trustedAuthorId) {
+        const recordAuthorId = String(record.autherID ?? "");
+        if (!recordAuthorId || recordAuthorId !== trustedAuthorId) {
+            console.warn(
+                `POST /deletePost: forbidden — record=${id} author=${recordAuthorId} requester=${trustedAuthorId}`
+            );
             return res.status(403).json({ status: "error", message: "Not authorized to delete this post" });
         }
 
         // وسائط هذا السجل فقط — ردود البوست سجلات مستقلة بملفاتها
         const ownMedia = [
-            ...(Array.isArray(post.media) ? post.media : []),
-            ...(Array.isArray(post.img) ? post.img : []),
+            ...(Array.isArray(record.media) ? record.media : []),
+            ...(Array.isArray(record.img) ? record.img : []),
         ];
 
-        await dao.deletePost(String(postId));
+        // حذف السجل من المسار الصحيح
+        if (contentType === "articles") {
+            await dao.deleteArticle(id);
+        } else if (contentType === "novels") {
+            await dao.deletenovels(id);
+        } else {
+            await dao.deletePost(id);
+        }
+
+        // إزالة الـ ID من قائمة محتوى المالك (لن يظهر في بروفايله بعد الحذف)
+        let profileCleanup = "skipped";
+        try {
+            await sign.deletePostsFrom_User(trustedAuthorId, id);
+            profileCleanup = "done";
+        } catch (profileErr) {
+            console.error("POST /deletePost: profile cleanup failed:", profileErr.message);
+        }
+
+        await invalidateFeedCache(contentType);
 
         // حذف ملفات Cloudinary بعد نجاح حذف السجل، مع فحص إعادة الاستخدام
-        const cleanup = await deleteCloudinaryAssetsIfUnused({
-            media: ownMedia,
-            excludePostId: String(postId),
-        });
+        // فشلها لا يفشل الحذف نفسه — يُسجل لإعادة المحاولة
+        let cleanup = null;
+        try {
+            cleanup = await deleteCloudinaryAssetsIfUnused({
+                media: ownMedia,
+                excludePostId: id,
+            });
+        } catch (cleanupErr) {
+            console.error("POST /deletePost: cloudinary cleanup failed:", cleanupErr.message);
+            cleanup = { deleted: [], failed: [], skipped: 0, error: "cleanup-failed" };
+        }
+
+        console.log(
+            `POST /deletePost: deleted ${contentType}/${id} by user=${trustedAuthorId}` +
+            ` cleanup.deleted=${(cleanup?.deleted || []).length}`
+        );
 
         // حذف ردود البوست؟ — لا: الردود منشورات مستقلة (first-class)، تبقى كما هي.
 
         return res.status(200).json({
             status: "ok",
             message: "Post deleted",
+            contentType,
+            profileCleanup,
             cleanup,
         });
     } catch (err) {
