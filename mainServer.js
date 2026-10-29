@@ -13,6 +13,13 @@ const sign = require("./datastore/signin_signupDao_firebase.js");
 const dao = require("./datastore/Dao.js");
 const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
 const { saveContent_Article_Novels, saveContent_Posts, saveContent_Comment } = require("./service/saveContent.js");
+const {
+    MEDIA_LIMITS,
+    isConfigured,
+    buildSignedUpload,
+    validateMediaManifest,
+    deleteCloudinaryAssetsIfUnused,
+} = require("./service/cloudinary.service.js");
 
 require("dotenv").config();
 
@@ -759,6 +766,7 @@ app.post("/editProfile", async(req, res) => {
     });
 });
 
+
 // ✅ حفظ مقال أو رواية
 app.post("/saveArticle_novels", async(req, res) => {
     await saveContent_Article_Novels(req.body);
@@ -769,6 +777,8 @@ app.post("/saveArticle_novels", async(req, res) => {
   res.status(200).json({ status: 'ok', message: 'Your content saved successfully' });
 
 });
+
+
 
 // ✅ حفظ بوست — routes a comment payload to saveContent_Comment,
 // normal posts to the existing normal-post path.
@@ -786,6 +796,13 @@ app.post("/saveposts", verifyToken, async (req, res) => {
       }
 
       const payload = { ...req.body, autherID: trustedAuthorId };
+
+      // تحقق الخادم من حدود الوسائط قبل الحفظ
+      const mediaCheck = validateMediaManifest(payload.media || []);
+      if (!mediaCheck.ok) {
+        return res.status(400).json({ status: "error", message: mediaCheck.message });
+      }
+
       const result = await saveContent_Comment(payload);
 
       if (!result.success) {
@@ -931,6 +948,141 @@ app.post("/getPostById", verifyToken, async (req, res) => {
       message: "Failed to fetch post",
     });
   }
+});
+
+// 🔐 توقيع رفع Cloudinary — التوقيع يُنشأ على الخادم فقط بعد التحقق من الهوية.
+// العميل يختار النوع (image/video) فقط؛ لا يمكنه التلاعب بباراميترات التوقيع.
+app.post("/media/upload-signature", verifyToken, async (req, res) => {
+    try {
+        const { kind } = req.body;
+
+        if (!isConfigured()) {
+            return res.status(500).json({ status: "error", message: "Cloudinary not configured" });
+        }
+
+        if (!["image", "video"].includes(kind)) {
+            return res.status(400).json({ status: "error", message: "Invalid media kind" });
+        }
+
+        const result = buildSignedUpload({ kind });
+        if (!result.ok) {
+            return res.status(500).json({ status: "error", message: result.message });
+        }
+
+        // حدود الوسائط تُرسل للواجهة للتحقق المسبق فقط — الخادم هو المرجع النهائي.
+        return res.status(200).json({ status: "ok", ...result, limits: MEDIA_LIMITS });
+    } catch (err) {
+        console.error("POST /media/upload-signature error:", err);
+        return res.status(500).json({ status: "error", message: "Failed to build upload signature" });
+    }
+});
+
+// ✏️ تعديل بوست — المالك فقط (الهوية من التوكن، ليس من الواجهة)
+app.post("/editPost", verifyToken, async (req, res) => {
+    try {
+        const { postId, content, media, removedMedia } = req.body;
+        const trustedAuthorId = String(req.user?.id ?? "");
+
+        if (!postId || (!content && !media)) {
+            return res.status(400).json({ status: "error", message: "Missing postId or content" });
+        }
+
+        const post = await dao.getPostID(String(postId));
+        if (!post) {
+            return res.status(404).json({ status: "error", message: "Post not found" });
+        }
+
+        if (String(post.autherID) !== trustedAuthorId) {
+            return res.status(403).json({ status: "error", message: "Not authorized to edit this post" });
+        }
+
+        // تحقق الخادم من حدود الوسائط الجديدة
+        if (Array.isArray(media) && media.length) {
+            const check = validateMediaManifest(media);
+            if (!check.ok) {
+                return res.status(400).json({ status: "error", message: check.message });
+            }
+        }
+
+        const updates = {};
+        if (typeof content === "string" && content.trim()) updates.content = content.trim();
+        if (Array.isArray(media)) {
+            // حفظ الوسائط الجديدة + الإبقاء على أي وسائط قديمة لم تُحذف
+            updates.media = media;
+            // حافظ على توافق الحقل القديم img
+            updates.img = media.map((m) => (typeof m === "string" ? m : m.url)).filter(Boolean);
+        }
+
+        await dao.updateContent("posts", String(postId), updates);
+
+        // حذف ملفات Cloudinary المحذوفة من الوسائط القديمة — فقط لو غير مستخدمة في سجل آخر
+        let cleanup = null;
+        if (Array.isArray(removedMedia) && removedMedia.length) {
+            cleanup = await deleteCloudinaryAssetsIfUnused({
+                media: removedMedia,
+                excludePostId: String(postId),
+            });
+        }
+
+        const updated = await dao.getPostID(String(postId));
+        io.emit("LIKE_UPDATED", { contentType: "posts", post: updated });
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Post updated",
+            post: updated,
+            cleanup,
+        });
+    } catch (err) {
+        console.error("POST /editPost error:", err);
+        return res.status(500).json({ status: "error", message: "Failed to edit post" });
+    }
+});
+
+// 🗑️ حذف بوست — المالك فقط
+app.post("/deletePost", verifyToken, async (req, res) => {
+    try {
+        const { postId } = req.body;
+        const trustedAuthorId = String(req.user?.id ?? "");
+
+        if (!postId) {
+            return res.status(400).json({ status: "error", message: "Missing postId" });
+        }
+
+        const post = await dao.getPostID(String(postId));
+        if (!post) {
+            return res.status(404).json({ status: "error", message: "Post not found" });
+        }
+
+        if (String(post.autherID) !== trustedAuthorId) {
+            return res.status(403).json({ status: "error", message: "Not authorized to delete this post" });
+        }
+
+        // وسائط هذا السجل فقط — ردود البوست سجلات مستقلة بملفاتها
+        const ownMedia = [
+            ...(Array.isArray(post.media) ? post.media : []),
+            ...(Array.isArray(post.img) ? post.img : []),
+        ];
+
+        await dao.deletePost(String(postId));
+
+        // حذف ملفات Cloudinary بعد نجاح حذف السجل، مع فحص إعادة الاستخدام
+        const cleanup = await deleteCloudinaryAssetsIfUnused({
+            media: ownMedia,
+            excludePostId: String(postId),
+        });
+
+        // حذف ردود البوست؟ — لا: الردود منشورات مستقلة (first-class)، تبقى كما هي.
+
+        return res.status(200).json({
+            status: "ok",
+            message: "Post deleted",
+            cleanup,
+        });
+    } catch (err) {
+        console.error("POST /deletePost error:", err);
+        return res.status(500).json({ status: "error", message: "Failed to delete post" });
+    }
 });
 
 app.post("/edit_profile_photo", async(req, res) => {

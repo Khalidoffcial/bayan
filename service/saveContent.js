@@ -223,6 +223,9 @@ async function saveContent_Article_Novels({
 // id, likes, replies, and author — plus a parent reference (`comment_on` +
 // `parentType`) linking it back to the conversation. Posts/articles/novels
 // remain untouched; nested replies reference the reply's own id as parent.
+// `parentUserData` — the DIRECT parent's author (a reply's author when the
+// parent is itself a reply, otherwise the root post's author) — is resolved
+// here so the frontend can render "ردًا على @username" without extra lookups.
 async function saveContent_Comment({
     autherID,
     id,
@@ -230,7 +233,8 @@ async function saveContent_Comment({
     img,
     content,
     type,
-    userData
+    userData,
+    media
 }) {
     if (!autherID || !id || !comment_on || !content)
         return { success: false, message: "Missing required fields" };
@@ -240,6 +244,24 @@ async function saveContent_Comment({
 
     const allowedTypes = ["posts", "articles", "novels"];
     const parentType = allowedTypes.includes(type) ? type : "posts";
+
+    // Resolve the DIRECT parent's author.
+    // Parent may be a reply (in posts with its own comment_on) or a root post.
+    let parentUserData = undefined;
+    try {
+        const parentRecord = await dao.getPostID(String(comment_on));
+        if (parentRecord) {
+            const source = parentRecord.userData || parentRecord;
+            parentUserData = {
+                Id_user: String(source.Id_user ?? parentRecord.autherID ?? ""),
+                F_user: source.F_user || "",
+                S_user: source.S_user || "",
+                imgProfile: source.imgProfile || "",
+            };
+        }
+    } catch (err) {
+        console.warn("parentUserData resolution failed:", err.message);
+    }
 
     const classify = classifyMultipleCategories(
         await translateToEnglish(content)
@@ -255,6 +277,8 @@ async function saveContent_Comment({
         content,
         type: parentType, // keeps the reply in its parent's channel for reads
         img: Array.isArray(img) ? img : [],
+        // Cloudinary media records — kept beside the legacy img field.
+        media: Array.isArray(media) ? media : undefined,
         time: getCurrentTime(),
         date: getTodayDate(),
         timestamp: Date.now(),
@@ -269,6 +293,7 @@ async function saveContent_Comment({
             }
             : undefined,
         replyCount: 0,
+        parentUserData,
     };
 
     try {
@@ -287,7 +312,8 @@ async function saveContent_Posts({
     id,
     img,
     content,
-    type
+    type,
+    media
 }) {
 try {
         if (!autherID || !id || !content)
@@ -309,6 +335,7 @@ try {
             content,
             type,
             img,
+            media: Array.isArray(media) ? media : undefined,
             time: getCurrentTime(),
             date: getTodayDate(),
             timestamp: Date.now(),

@@ -1,4 +1,4 @@
-const { db, ref, set, get, update, query, equalTo, orderByChild, limitToLast, limitToFirst,runTransaction } = require('./firebaseArticle.js');
+const { db, ref, set, get, update, remove, query, equalTo, orderByChild, limitToLast, limitToFirst,runTransaction } = require('./firebaseArticle.js');
 
 // حفظ بوست جديد
 // async function savePost(post) {
@@ -220,9 +220,12 @@ async function deletePost(id) {
     const articleRef = ref(db, `posts/posts${id}`);
     try {
         await remove(articleRef);
+        // نظّف مؤشر الردود لو كان الأب
+        try { await remove(ref(db, `replyIndex/${id}`)); } catch (_) {}
         console.log('Post deleted successfully');
     } catch (error) {
         console.error('Error deleting post:', error);
+        throw error;
     }
 }
 // حذف قصه

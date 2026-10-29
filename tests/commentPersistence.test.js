@@ -8,6 +8,14 @@
 
 process.env.ACCESS_TOKEN_SECRET = "test-secret";
 
+/* Mock cloudinary BEFORE the saveContent chain requires it. */
+const Module = require("module");
+const origResolve = Module._resolveFilename;
+Module._resolveFilename = function (request, ...args) {
+    if (request === "cloudinary") return require.resolve("./mockCloudinary.js");
+    return origResolve.call(this, request, ...args);
+};
+
 const assert = require("assert");
 
 /* ---------- Mock firebase layer ---------- */
@@ -24,17 +32,16 @@ const daoModulePath = "../datastore/Dao.js";
 const firebaseModule = require.cache[require.resolve(daoModulePath)];
 
 // Inject mocks before requiring Dao
-const Module = require("module");
-const origResolve = Module._resolveFilename;
+const daoResolveFn = Module._resolveFilename;
 Module._resolveFilename = function (request, ...args) {
     if (request === "./firebaseArticle.js") {
         return require.resolve("./mockFirebase.js");
     }
-    return origResolve.call(this, request, ...args);
+    return daoResolveFn.call(this, request, ...args);
 };
 
 const dao = require(daoModulePath);
-Module._resolveFilename = origResolve;
+Module._resolveFilename = daoResolveFn;
 
 /* ---------- Mock saveContent helpers ---------- */
 const getCurrentTime = () => "12:00:00";
