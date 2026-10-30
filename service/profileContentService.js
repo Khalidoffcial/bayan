@@ -100,9 +100,10 @@ function normalize(record, collection, profileUser) {
         comment_on: record.comment_on || null,
         parentType: record.parentType || null,
         parentUserData: record.parentUserData || null,
-        // article/novel fields
+        // article/novel fields — cover image for both
         title: record.title || "",
         descrip: record.descrip || record.description || "",
+        series: record.series || null,
         // media (posts keep `media`, legacy uses `img`)
         media: Array.isArray(record.media) ? record.media : undefined,
         img: Array.isArray(record.img) ? record.img : [],
@@ -131,10 +132,18 @@ async function getProfileContent({ idUser, type = "all", cursor = 0, limit = 10 
     const want = String(type || "all").toLowerCase();
 
     // Which collections to read for this tab.
+    // "replies" reads the posts collection (replies live there, flagged by
+    // comment_on) and keeps ONLY records where the real author is the profile
+    // owner — replies by OTHERS on the owner's posts are excluded.
+    const wantReplies = want === "replies" || want === "reply";
     const collections = [];
-    if (want === "all" || want.includes("post")) collections.push("posts");
-    if (want === "all" || want.includes("article")) collections.push("articles");
-    if (want === "all" || want.includes("novel")) collections.push("novels");
+    if (!wantReplies) {
+        if (want === "all" || want.includes("post")) collections.push("posts");
+        if (want === "all" || want.includes("article")) collections.push("articles");
+        if (want === "all" || want.includes("novel")) collections.push("novels");
+    } else {
+        collections.push("posts");
+    }
 
     // Per-user id lists (targeted reads by user id — never a full DB scan).
     // Replies are NOT excluded just because they carry `comment_on`: they live
@@ -165,6 +174,19 @@ async function getProfileContent({ idUser, type = "all", cursor = 0, limit = 10 
     const byKey = new Map();
     for (const { collection, record } of fetched) {
         if (!record) continue;
+
+        const authorId = resolveAuthorId(record);
+
+        if (wantReplies) {
+            // Replies tab: the reply must be authored BY the profile owner.
+            // A record without comment_on is an original post, not a reply.
+            if (!record.comment_on) continue;
+            if (authorId !== String(idUser)) continue;
+        } else if (want === "posts" || want === "post") {
+            // Posts tab: ORIGINAL posts only — never mix replies in.
+            if (record.comment_on) continue;
+        }
+
         const normalized = normalize(record, collection, profileUser);
         const key = resolveKey(record, collection);
         if (!byKey.has(key)) byKey.set(key, normalized);

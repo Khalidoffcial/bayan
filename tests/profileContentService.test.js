@@ -139,9 +139,20 @@ DaoForDbUser.findbyID = async (idUser) =>
     });
 
     /* ---------- Test 4: tab filters ---------- */
-    run("posts tab includes only posts and replies (author's posts list)", async () => {
+    run("posts tab returns ORIGINAL posts only (no replies mixed in)", async () => {
         const posts = await getProfileContent({ idUser: "u1", type: "posts" });
-        assert.ok(posts.items.every((i) => i.kind === "post" || i.kind === "reply"));
+        assert.ok(posts.items.length > 0);
+        assert.ok(posts.items.every((i) => i.kind === "post"));
+    });
+
+    run("replies tab returns ONLY the profile owner's replies (incl. nested)", async () => {
+        const replies = await getProfileContent({ idUser: "u1", type: "replies" });
+        assert.ok(replies.items.length > 0);
+        assert.ok(replies.items.every((i) => i.kind === "reply"));
+        // nested reply on a reply (id 13 → parent 12) is included
+        assert.ok(replies.items.some((i) => i.id === "13"));
+        // replies by OTHERS on the owner's posts are NOT here
+        assert.ok(!replies.items.some((i) => i.autherID !== "u1"));
     });
 
     run("articles tab returns articles only", async () => {
