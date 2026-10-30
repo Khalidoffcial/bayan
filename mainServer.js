@@ -383,7 +383,9 @@ async function recommendFeed(user, type) {
                 : [String(type).toLowerCase()];
 
         let allContent = [];
-        const collectionTypeById = new Map(); // id → المصدر الحقيقي للسجل
+        // المصدر الحقيقي لكل سجل: id → المجموعة التي جاء منها فعلاً
+        // (يتجاهل الكشف التقريبي بالشكل — السجلات القديمة بلا type تُعرّف من هنا)
+        const collectionTypeById = new Map();
 
         for (const t of types) {
             // استخراج الاهتمامات حسب نوع المحتوى
@@ -391,6 +393,10 @@ async function recommendFeed(user, type) {
                 t === "novels"
                     ? (user?.interesting?.novels || [])
                     : (user?.interesting?.articles || []);
+
+            // محتوى هذا النوع وحده — الرجوع (fallback) لكل نوع مستقل
+            // حتى لا يمتلئ الـ feed من posts ويُقصى novels/articles
+            let typeContent = [];
 
             // =====================================
             // Personalized Feed
@@ -410,28 +416,25 @@ async function recommendFeed(user, type) {
                     }
 
                     if (Array.isArray(results) && results.length > 0) {
-                        allContent.push(...results);
+                        typeContent.push(...results);
                     }
                 }
             }
 
             // =====================================
-            // إذا لم توجد اهتمامات أو لم ينتج عنها محتوى
+            // إذا لم توجد اهتمامات أو لم ينتج عنها محتوى — لكل نوع على حدة
             // =====================================
-            if (allContent.length === 0) {
+            if (typeContent.length === 0) {
                 console.log("No personalized feed found. Loading random content...", t);
-                const fallback = await dao.getAllContent(t, 20);
-                allContent.push(...fallback);
+                typeContent = await dao.getAllContent(t, 20);
             }
-        }
 
-        // سجّل من أي مجموعة جاء كل id (للسجلات القديمة بلا حقل type)
-        for (const t of types) {
-            for (const item of allContent) {
-                if (item && item.id != null && !collectionTypeById.has(String(item.id))) {
-                    // تمييز تقريبي: المقالات/الروايات تحمل title + descrip، والبوستات لا
-                    if (t !== "posts" && item.title != null) collectionTypeById.set(String(item.id), t);
-                }
+            // وسم كل سجل بمجموعته قبل الدمج — هذا هو التطبيع الموحد للعرض
+            for (const item of typeContent) {
+                if (!item || item.id == null) continue;
+                const key = String(item.id);
+                collectionTypeById.set(key, t);
+                allContent.push(item);
             }
         }
 
@@ -451,12 +454,11 @@ async function recommendFeed(user, type) {
 
         console.log("After filter:", allContent.length);
 
-        // كل نوع يحمل نوعه الصريح — العميل يختار البطاقة المناسبة (PostCard vs ArticleCard).
-        // `sourceCollection` يحدد المسار الحقيقي الذي جاء منه السجل لأن records
-        // قد تفتقد حقل type (سجلات قديمة).
+        // كل نوع يحمل نوعه من المجموعة التي جاء منها فعلاً (المصدر الموثوق) —
+        // حقل type على السجل قد يكون ملوثًا (الردود تحمل parentType) أو غائبًا (سجلات قديمة).
         allContent = allContent.map((item) => ({
             ...item,
-            type: item.type || collectionTypeById.get(String(item.id)) || "posts",
+            type: collectionTypeById.get(String(item.id)) || item.type || "posts",
         }));
 
         // =====================================
