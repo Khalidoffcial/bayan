@@ -21,6 +21,7 @@ const dao = require("./datastore/Dao.js");
 const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
 const { saveContent_Article_Novels, saveContent_Posts, saveContent_Comment } = require("./service/saveContent.js");
 const { getProfileContent } = require("./service/profileContentService.js");
+const { translateContent, getProviderInfo } = require("./service/translation.service.js");
 const {
     MEDIA_LIMITS,
     isConfigured,
@@ -1017,6 +1018,93 @@ app.post("/getPostById", verifyToken, async (req, res) => {
   }
 });
 
+// 🌐 ترجمة المحتوى المنشور — عند طلب المستخدم فقط.
+// المحتوى الأصلي لا يُغيّر ولا يُستبدل؛ الترجمة تُرجع فقط في الاستجابة،
+// ولا تُخزن في قاعدة المحتوى إلا في كاش مؤقت مرتبط بـ contentVersion.
+app.post("/translate", verifyToken, async (req, res) => {
+  try {
+    const { contentId, contentType, targetLang, text } = req.body || {};
+
+    if (!contentId || !text || !targetLang) {
+      return res.status(400).json({
+        status: "error",
+        message: "Missing contentId, text or targetLang",
+      });
+    }
+
+    // جلب المحتوى الأصلي من قاعدة البيانات — المحتوى هو المرجع، لا الواجهة.
+    // هذا يضمن أن contentVersion هو الإصدار الفعلي (إذا نُشر المحتوى عُدّل،
+    // يُرفض الكاش القديم تلقائيًا لأن الإصدار تغيّر).
+    let originalContent = null;
+    switch (contentType) {
+      case "posts":
+        originalContent = await dao.getPostID(String(contentId));
+        break;
+      case "articles":
+        originalContent = await dao.getArticleID(String(contentId));
+        break;
+      case "novels":
+        originalContent = await dao.getnovelsID(String(contentId));
+        break;
+      default:
+        originalContent = null;
+    }
+
+    if (!originalContent) {
+      return res.status(404).json({
+        status: "error",
+        message: "Content not found",
+      });
+    }
+
+    // إصدار المحتوى: تاريخ التعديل أو hash. إذا تغيّر، تُهمل الترجمة القديمة.
+    const contentVersion =
+      originalContent.updatedAt ||
+      originalContent.editedAt ||
+      originalContent.createdAt ||
+      "";
+
+    const result = await translateContent({
+      contentId: String(contentId),
+      content: String(text || ""),
+      contentVersion: String(contentVersion),
+      targetLang: String(targetLang),
+      userId: String(req.user?.id ?? "anonymous"),
+      isLong: contentType === "articles" || contentType === "novels",
+    });
+
+    if (!result.ok) {
+      return res.status(result.error === "RATE_LIMITED" ? 429 : 400).json({
+        status: "error",
+        error: result.error,
+        message: result.message,
+        retryAfterMs: result.retryAfterMs,
+      });
+    }
+
+    return res.status(200).json({
+      status: "ok",
+      translatedText: result.translatedText,
+      sourceLang: result.sourceLang,
+      cached: result.cached,
+    });
+  } catch (err) {
+    console.error("POST /translate error:", err);
+    return res.status(500).json({
+      status: "error",
+      message: "Translation failed",
+    });
+  }
+});
+
+// ℹ️ حالة مزود الترجمة — للتشخيص فقط (لا تكشف أي مفاتيح)
+app.get("/translate/provider", verifyToken, async (req, res) => {
+  return res.status(200).json({
+    status: "ok",
+    provider: getProviderInfo(),
+  });
+});
+
 // 🔐 توقيع رفع Cloudinary — التوقيع يُنشأ على الخادم فقط بعد التحقق من الهوية.
 // العميل يختار النوع (image/video) فقط؛ لا يمكنه التلاعب بباراميترات التوقيع.
 app.post("/media/upload-signature", verifyToken, async (req, res) => {
@@ -1395,8 +1483,9 @@ function sanitizeSettings(body) {
             if (clean.appearance.theme && !["light", "dark", "system"].includes(clean.appearance.theme)) {
                 delete clean.appearance.theme;
             }
-            // لغة مسموح فقط: en | ar
-            if (clean.appearance.language && !["en", "ar"].includes(clean.appearance.language)) {
+            // لغة مسموح فقط من القائمة الرسمية — متزامنة مع LANGUAGES في الواجهة
+            const SUPPORTED_LANGUAGES = ["en", "ar", "fr", "es", "de", "pt", "tr", "zh", "ja", "ru"];
+            if (clean.appearance.language && !SUPPORTED_LANGUAGES.includes(clean.appearance.language)) {
                 delete clean.appearance.language;
             }
             // لون أساسي بصيغة hex سليمة فقط
