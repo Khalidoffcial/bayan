@@ -985,6 +985,7 @@ app.post("/getPostById", verifyToken, async (req, res) => {
       });
     }
 
+    console.log("Fetching post by ID:", postId);
     const post = await dao.getPostID(String(postId));
 
     if (!post) {
