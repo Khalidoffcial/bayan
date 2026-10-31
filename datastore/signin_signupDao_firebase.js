@@ -100,6 +100,7 @@ const defaultSettings = {
     fontFamily: "Inter",
     language: "en",
     direction: "ltr",
+    primaryColor: "#4A7DFF",
   },
 
   profile: {

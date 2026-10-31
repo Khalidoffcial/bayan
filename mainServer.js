@@ -1362,13 +1362,14 @@ app.get(
 
             const settings =
                 await sign.getUserSettings(
-                    req.id
+                    req.user.id
                 );
 
             res.json(settings);
 
         } catch (err) {
 
+            console.error("GET /settings error:", err.message);
             res.status(500).json({
                 error: err.message
             });
@@ -1377,23 +1378,69 @@ app.get(
     }
 );
 
+// Whitelist للحقول المسموح حفظها — لا يُقبل أي حقل مجهول من الواجهة
+const SETTINGS_FIELDS = ["appearance", "notifications", "reading", "creator", "profile"];
+const ALLOWED_APPEARANCE = ["theme", "fontSize", "fontFamily", "language", "direction", "primaryColor", "customColor"];
+
+function sanitizeSettings(body) {
+    const clean = {};
+    for (const field of SETTINGS_FIELDS) {
+        if (!body[field] || typeof body[field] !== "object") continue;
+        if (field === "appearance") {
+            clean.appearance = {};
+            for (const key of ALLOWED_APPEARANCE) {
+                if (body.appearance[key] !== undefined) clean.appearance[key] = body.appearance[key];
+            }
+            // ثيم مسموح فقط: light | dark | system
+            if (clean.appearance.theme && !["light", "dark", "system"].includes(clean.appearance.theme)) {
+                delete clean.appearance.theme;
+            }
+            // لغة مسموح فقط: en | ar
+            if (clean.appearance.language && !["en", "ar"].includes(clean.appearance.language)) {
+                delete clean.appearance.language;
+            }
+            // لون أساسي بصيغة hex سليمة فقط
+            for (const colorKey of ["primaryColor", "customColor"]) {
+                if (clean.appearance[colorKey] && !/^#[0-9a-fA-F]{6}$/.test(clean.appearance[colorKey])) {
+                    delete clean.appearance[colorKey];
+                }
+            }
+        } else {
+            // حقول boolean فقط لبقية الأقسام
+            clean[field] = {};
+            for (const [k, v] of Object.entries(body[field])) {
+                if (typeof v === "boolean") clean[field][k] = v;
+            }
+            if (field === "reading" && body.reading.readingGoal != null) {
+                const goal = Number(body.reading.readingGoal);
+                if (Number.isFinite(goal) && goal >= 5 && goal <= 180) clean.reading.readingGoal = goal;
+            }
+        }
+    }
+    return clean;
+}
+
 app.put(
     "/settings",
     verifyToken,
     async(req, res) => {
         try {
-            console.log(req.user.id,
-                req.body)
+            const clean = sanitizeSettings(req.body || {});
+            if (Object.keys(clean).length === 0) {
+                return res.status(400).json({ error: "No valid settings fields" });
+            }
+
             const result =
                 await sign.updateUserSettings(
-                    req.id,
-                    req.body
+                    req.user.id,
+                    clean
                 );
 
             res.json(result);
 
         } catch (err) {
 
+            console.error("PUT /settings error:", err.message);
             res.status(500).json({
                 error: err.message
             });
