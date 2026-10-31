@@ -326,7 +326,7 @@ async function addReply(replyObj) {
 
         // Canonical posts path — replies are posts.
         await set(ref(db, `posts/posts${replyId}`), replyObj);
-
+        console.log(`Reply ${replyId} added under parent ${parentId}`);
         // Register the reply in its AUTHOR's posts id list so the unified
         // profile feed (MYCONTENT) can discover it. Without this, replies
         // never appeared in the author's Replies tab (the list is read via
