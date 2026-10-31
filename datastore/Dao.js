@@ -327,6 +327,17 @@ async function addReply(replyObj) {
         // Canonical posts path — replies are posts.
         await set(ref(db, `posts/posts${replyId}`), replyObj);
 
+        // Register the reply in its AUTHOR's posts id list so the unified
+        // profile feed (MYCONTENT) can discover it. Without this, replies
+        // never appeared in the author's Replies tab (the list is read via
+        // user_data/Profile/{idUser}/posts).
+        const sign = require("./../datastore/signin_signupDao_firebase.js");
+        try {
+            await sign.addContentId_User("posts", String(replyObj.autherID ?? replyObj.userData?.Id_user ?? ""), replyId);
+        } catch (err) {
+            console.warn("addReply: profile list registration failed:", err.message);
+        }
+
         // Cheap per-parent lookup index.
         await set(ref(db, `replyIndex/${parentId}/${replyId}`), true);
 
