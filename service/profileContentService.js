@@ -152,7 +152,13 @@ async function getProfileContent({ idUser, type = "all", cursor = 0, limit = 10 
         collections.map(async (collection) => {
             try {
                 const ids = await DaoForDbUser.find_ContentUser_byID(collection, idUser);
+                // 🔍 TEMP DIAGNOSTIC LOG (remove after verification):
+                console.log(`[MYCONTENT] user=${idUser} tab=${want} collection=${collection} idsRaw=${JSON.stringify(ids)?.slice(0, 300)}`);
                 if (Array.isArray(ids)) return { collection, ids };
+                // Firebase RTDB stores a ONE-element array as a plain STRING
+                // (e.g. "7777" instead of ["7777"]) — without this branch a
+                // user with exactly one post/reply/article/novel gets EMPTY tabs.
+                if (typeof ids === "string" && ids.trim()) return { collection, ids: [ids] };
                 if (ids && typeof ids === "object") return { collection, ids: Object.values(ids) };
                 return { collection, ids: [] };
             } catch (err) {
@@ -194,6 +200,9 @@ async function getProfileContent({ idUser, type = "all", cursor = 0, limit = 10 
 
     // Single chronological merge — newest first, by ORIGINAL creation time.
     const merged = [...byKey.values()].sort((a, b) => b.timestamp - a.timestamp);
+
+    // 🔍 TEMP DIAGNOSTIC LOG (remove after verification):
+    console.log(`[MYCONTENT] user=${idUser} tab=${want} foundRecords=${fetched.filter(f => f.record).length} normalized=${byKey.size} final=${merged.length}`);
 
     // Per-tab counts (computed once from the full merged list).
     const counts = { all: merged.length };

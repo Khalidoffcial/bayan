@@ -452,33 +452,35 @@ async function DecreaseFollower(idUser, idFollowedUser) {
 
 async function addContentId_User(type,idUser, content_id) {
     try {
-        findbyID(idUser).then((updatedUser) => {
+        // Previously fire-and-forget (.then without await): the write could
+        // silently fail (e.g. findbyID returning undefined for a missing
+        // profile row) and MYCONTENT would never see the content id.
+        const updatedUser = await findbyID(idUser);
+        if (!updatedUser) {
+            console.warn(`addContentId_User: profile row missing for ${idUser}`);
+            return "user-not-found";
+        }
 
-            if(type == "posts"){
+        if(type == "posts"){
 
-                let posts = updatedUser.posts || [];
-                posts.push(content_id); // للإضافة
-                update(ref(db, `user_data/Profile/${idUser}`), { posts });
-            } else if(type =="articles"){
-                let articles = updatedUser.articles || [];
-                articles.push(content_id); // للإضافة    
-                update(ref(db, `user_data/Profile/${idUser}`), { articles });
-            }
-            else if(type =="novels"){
-                let novels = updatedUser.novels || [];
-                novels.push(content_id); // للإضافة
+            let posts = updatedUser.posts || [];
+            posts.push(content_id); // للإضافة
+            await update(ref(db, `user_data/Profile/${idUser}`), { posts });
+        } else if(type =="articles"){
+            let articles = updatedUser.articles || [];
+            articles.push(content_id); // للإضافة    
+            await update(ref(db, `user_data/Profile/${idUser}`), { articles });
+        }
+        else if(type =="novels"){
+            let novels = updatedUser.novels || [];
+            novels.push(content_id); // للإضافة
 
-                update(ref(db, `user_data/Profile/${idUser}`), { novels });
-            }
+            await update(ref(db, `user_data/Profile/${idUser}`), { novels });
+        }
 
-
-
-            return "suc";
-        }).catch((err) => {
-            return err;
-        });
-
+        return "suc";
     } catch (error) {
+        console.error("addContentId_User failed:", error?.message || error);
         throw error;
     }
 }
