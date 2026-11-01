@@ -1,1 +1,0 @@
-﻿const { translate } = require('@vitalets/google-translate-api'); (async () => { try { const r = await translate('Hello world', { to: 'ar' }); console.log('OK:', r.text); } catch (e) { console.log('FAIL:', e.name, e.message); } })();

@@ -3,23 +3,28 @@ const dao = require("../datastore/Dao.js");
 const sign = require("../datastore/signin_signupDao_firebase.js");
 const categories = require("../categories.json");
 const novel_categories = require("../novel_categories.json");
+const { translateContent } = require("./translation.service.js");
 
-const { translate } = require('@vitalets/google-translate-api');
-
-// 🔸 دالة الترجمة إلى الإنجليزية
+// 🔸 دالة الترجمة إلى الإنجليزية — عبر Translation Service (LibreTranslate)
 async function translateToEnglish(text) {
     try {
-        // 1. ترجمة النص للإنجليزية (أو اللغة اللي الموديل بتفهمها)
-        const translated = await translate(text, { to: 'en' });
-        const englishText = translated.text;
-
-        console.log('🔹 النص الأصلي:', text);
-        console.log('🔹 النص المترجم:', englishText);
-
-        // 2. تمرير النص المترجم للتصنيف
-        return englishText;
+        const result = await translateContent({
+            contentId: `classify-${Date.now()}`,
+            content: text,
+            contentVersion: "1",
+            targetLang: "en",
+            userId: "internal-classifier",
+            isLong: false,
+        });
+        if (result.ok) {
+            console.log('🔹 النص المترجم:', result.translatedText);
+            return result.translatedText;
+        }
+        console.error('🔹 فشل الترجمة:', result.error);
+        return text; // fallback للنص الأصلي
     } catch (err) {
         console.error(err);
+        return text;
     }
 }
 

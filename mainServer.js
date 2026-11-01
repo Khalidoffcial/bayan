@@ -6,7 +6,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const fetch = require("node-fetch");
-const { translate } = require("@vitalets/google-translate-api");
 require("dotenv").config();
 
 const { v2: cloudinary } = require("cloudinary");
@@ -15,6 +14,27 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+/**
+ * تصنيف تلقائي — يستخدم الترجمة إلى الإنجليزية عبر Translation Service
+ * بدل مكتبة Google المباشرة (تم استبدالها بـ LibreTranslate).
+ */
+async function translateToEnglish(text) {
+    try {
+        const result = await require("./service/translation.service.js").translateContent({
+            contentId: `classify-${Date.now()}`,
+            content: text,
+            contentVersion: "1",
+            targetLang: "en",
+            userId: "internal-classifier",
+            isLong: false,
+        });
+        return result.ok ? result.translatedText : text;
+    } catch (err) {
+        console.error("Classification translate failed:", err.message);
+        return text; // fallback للنص الأصلي — التصنيف يستمر
+    }
+}
 
 const sign = require("./datastore/signin_signupDao_firebase.js");
 const dao = require("./datastore/Dao.js");
@@ -524,16 +544,7 @@ async function enrichContent(contentArray) {
 // CLASSIFICATION HELPERS
 // ======================================================
 
-async function translateToEnglish(text) {
-    try {
-        const translated = await translate(text, { to: "en" });
-        console.log("🔹 Original:", text);
-        console.log("🔹 Translated:", translated.text);
-        return translated.text;
-    } catch (err) {
-        console.error(err);
-    }
-}
+// translateToEnglish معرّف أعلى الملف — يستخدم Translation Service (LibreTranslate)
 
 function classifyMultipleCategories(text, threshold = 0.05) {
     if (!text || typeof text !== "string") return [];
@@ -1084,9 +1095,9 @@ app.post("/translate", verifyToken, async (req, res) => {
         RATE_LIMITED: 429,
         PROVIDER_UNAVAILABLE: 503,
         PROVIDER_FAILED: 502,
-        TIMEOUT: 504,
-        DETECT_FAILED: 422,
+        PROVIDER_TIMEOUT: 504,
         INVALID_RESPONSE: 502,
+        UNSUPPORTED_LANGUAGE: 422,
         SAME_LANGUAGE: 422,
         EMPTY: 422,
       };

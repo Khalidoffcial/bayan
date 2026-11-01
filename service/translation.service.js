@@ -9,14 +9,13 @@
  *    المزودين يحدث في PROVIDERS دون تعديل الأكواد المستدعية.
  *  - حدود حجم ونِسَب استخدام صارمة لمنع الإساءة.
  *
- * المزود الحالي: google-translate-api (unofficial) — مجاني، لكنه:
- *  - غير رسمي (لا SLA، قد يُحجب، يعمل عبر endpoints غير موثقة).
- *  - لا يحتاج مفتاح API ولا تكلفة صريحة.
- * للاستخدام الإنتاجي الطويل الأمد يُنصح بـ: DeepL / Google Cloud Translation
- * (بمفتاح API في backend .env فقط، لا في الواجهة).
+ * المزود الحالي: LibreTranslate — مفتوح المصدر، يُستضاف ذاتيًا أو عبر خدمة موثوقة.
+ *  - العنوان والمفتاح من متغيرات البيئة (LIBRETRANSLATE_URL / LIBRETRANSLATE_API_KEY).
+ *  - بدون LIBRETRANSLATE_URL: المزود معطّل والسيرفر يعمل (ترجمة غير متاحة بوضوح).
+ *  - source:"auto" يلغي الاعتماد على اكتشاف اللغة كشرط للترجمة.
  */
 
-const { translate } = require("@vitalets/google-translate-api");
+const fetch = require("node-fetch");
 
 // ======================================================
 // إعدادات الحماية والحدود
@@ -31,13 +30,87 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // مدة بقاء الترجمة في
 const CACHE_MAX_ENTRIES = 1000;        // أقصى عدد مدخلات في الكاش
 const PROVIDER_TIMEOUT_MS = 15000;     // مهلة كل استدعاء للمزود
 
+// LibreTranslate — من متغيرات البيئة فقط. لا عنوان ثابت في الكود.
+// تُقرأ ديناميكيًا (وليس const) ليدعم الاختبار والتحديث الحي.
+const libreConfigured = () => Boolean((process.env.LIBRETRANSLATE_URL || "").trim());
+const libreUrl = () => (process.env.LIBRETRANSLATE_URL || "").trim().replace(/\/+$/, "");
+const libreApiKey = () => process.env.LIBRETRANSLATE_API_KEY || "";
+
 const SUPPORTED_LANGUAGES = ["en", "ar", "fr", "es", "de", "pt", "tr", "zh", "ja", "ru"];
 
 // خريطة من لغات Bayan إلى رموز المزود
 const PROVIDER_LANG_MAP = {
   en: "en", ar: "ar", fr: "fr", es: "es", de: "de",
-  pt: "pt", tr: "tr", zh: "zh-CN", ja: "ja", ru: "ru",
+  pt: "pt", tr: "tr", zh: "zh", ja: "ja", ru: "ru",
 };
+
+/** توحيد رموز اللغات قبل المقارنة — zh-CN / zh-Hans → zh، وهكذا */
+const normalizeLangCode = (code) => {
+  if (!code || typeof code !== "string") return null;
+  const base = code.toLowerCase().split("-")[0];
+  return base || null;
+};
+
+/** استدعاء LibreTranslate مع timeout ومعالجة أخطاء واضحة */
+async function libreCall(endpoint, body) {
+  if (!libreConfigured()) {
+    throw Object.assign(new Error("LibreTranslate URL is not configured"), { code: "PROVIDER_UNAVAILABLE" });
+  }
+  const payload = { ...body };
+  const apiKey = libreApiKey();
+  if (apiKey) payload.api_key = apiKey;
+
+  let res;
+  try {
+    res = await withTimeout(
+      fetch(`${libreUrl()}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
+      PROVIDER_TIMEOUT_MS
+    );
+  } catch (err) {
+    if (err?.code === "TIMEOUT") throw err;
+    throw Object.assign(new Error("LibreTranslate connection failed"), { code: "PROVIDER_UNAVAILABLE" });
+  }
+
+  if (res.status === 429) {
+    throw Object.assign(new Error("LibreTranslate rate limited"), { code: "RATE_LIMITED" });
+  }
+  if (res.status === 403) {
+    throw Object.assign(new Error("LibreTranslate API key invalid"), { code: "PROVIDER_FAILED" });
+  }
+  if (!res.ok) {
+    throw Object.assign(new Error(`LibreTranslate HTTP ${res.status}`), { code: "PROVIDER_FAILED" });
+  }
+
+  let data;
+  try {
+    data = await res.json();
+  } catch (e) {
+    throw Object.assign(new Error("Invalid JSON from LibreTranslate"), { code: "INVALID_RESPONSE" });
+  }
+  return data;
+}
+
+/** جلب اللغات المدعومة فعليًا من النسخة المستخدمة — يُخزن عند الإقلاع */
+let providerLanguages = null; // null = لم يُجلب بعد
+async function refreshProviderLanguages() {
+  try {
+    const data = await libreCall("/languages", {});
+    if (Array.isArray(data)) {
+      providerLanguages = data.map((l) => normalizeLangCode(l.code)).filter(Boolean);
+      console.log("🌐 LibreTranslate languages:", providerLanguages.join(", "));
+    }
+  } catch (err) {
+    console.error("🌐 LibreTranslate /languages failed:", err.message);
+  }
+  return providerLanguages;
+}
+
+const isLanguageSupportedByProvider = (lang) =>
+  providerLanguages === null || providerLanguages.includes(normalizeLangCode(lang));
 
 // ======================================================
 // طبقة المزود (Provider abstraction)
@@ -61,32 +134,54 @@ function withTimeout(promise, ms, label = "provider") {
 }
 
 const PROVIDERS = {
-  google: {
-    name: "google-translate-api (unofficial, free, no API key)",
+  libretranslate: {
+    name: "LibreTranslate (self-hosted or trusted instance)",
+    /**
+     * ترجمة دفعة مقاطع — استدعاء لكل مقطع بـ source:"auto".
+     * لا نفترض حفظ HTML المعقد — كل مقطع نصي فقط، وإعادة التجميع تحفظ الوسوم.
+     */
     async translateBatch(texts, targetLang) {
+      const target = PROVIDER_LANG_MAP[targetLang] || targetLang;
       const out = [];
       for (const text of texts) {
-        const result = await withTimeout(
-          translate(text, { to: PROVIDER_LANG_MAP[targetLang] || "en" }),
-          PROVIDER_TIMEOUT_MS
-        );
-        if (!result || typeof result.text !== "string") {
-          throw Object.assign(new Error("Invalid provider response"), { code: "INVALID_RESPONSE" });
+        const data = await libreCall("/translate", {
+          q: text,
+          source: "auto",
+          target,
+          format: "text",
+        });
+        const translated = data?.translatedText;
+        if (typeof translated !== "string") {
+          throw Object.assign(new Error("Missing translatedText in response"), { code: "INVALID_RESPONSE" });
         }
-        out.push(result.text);
+        // اختياري: اللغة المكتشفة من الاستجابة — غير مضمونة في كل النسخ
+        if (data.detectedLanguage?.language && out.length === 0) {
+          lastDetectedLang = normalizeLangCode(data.detectedLanguage.language);
+        }
+        out.push(translated);
       }
       return out;
     },
+    /** اكتشاف اللغة — endpoint /detect أو يُرجع null عند التعذر */
     async detectLanguage(text) {
-      const result = await withTimeout(translate(text, { to: "en" }), PROVIDER_TIMEOUT_MS);
-      return result?.from?.language?.iso || null;
+      try {
+        const data = await libreCall("/detect", { q: text });
+        const first = Array.isArray(data) ? data[0] : data;
+        const code = first?.language || first?.code;
+        return normalizeLangCode(code);
+      } catch (err) {
+        // الاكتشاف اختياري — لا نمنع الترجمة بسبب فشله
+        return null;
+      }
     },
   },
 };
 
-// المزود النشط — يُتغيّر في مكان واحد فقط
-let activeProvider = PROVIDERS.google;
-let providerAvailable = true; // يُحدد من فحص التهيئة
+let lastDetectedLang = null;
+
+// المزود النشط — LibreTranslate
+let activeProvider = PROVIDERS.libretranslate;
+let providerAvailable = libreConfigured(); // false إذا لم يُضبط LIBRETRANSLATE_URL
 
 function setProvider(name) {
   if (!PROVIDERS[name]) throw new Error(`Unknown provider: ${name}`);
@@ -97,21 +192,30 @@ function getProviderInfo() {
   return {
     name: activeProvider.name,
     available: providerAvailable,
+    configured: libreConfigured(),
+    providerLanguages, // null إذا لم تُجلب بعد
     maxTextLength: MAX_TEXT_LENGTH,
     maxTextLengthArticle: MAX_TEXT_LENGTH_ARTICLE,
     supportedLanguages: SUPPORTED_LANGUAGES,
   };
 }
 
-// فحص عند الإقلاع — لا نُثبت أن الخدمة تعمل حتى نجرّبها فعليًا
+// فحص عند الإقلاع — اختياري: لا يمنع الخدمة من العمل عند أول طلب حقيقي
+// (providerAvailable يُحدّث عند كل فشل/نجاح فعلي، وليس قرادة إقلاع واحدة فقط)
 (async () => {
+  if (!libreConfigured()) {
+    providerAvailable = false;
+    console.error("🌐 LIBRETRANSLATE_URL not set — translation provider disabled (server keeps running)");
+    return;
+  }
   try {
+    await refreshProviderLanguages();
     await activeProvider.translateBatch(["ok"], "en");
     providerAvailable = true;
     console.log("🌐 Translation provider ready:", activeProvider.name);
   } catch (err) {
-    providerAvailable = false;
-    console.error("🌐 Translation provider NOT available:", err.message);
+    // لا نقفل الخدمة نهائيًا — قد تكون اللحظة الأولى بطيئة فقط
+    console.warn("🌐 LibreTranslate initial check failed (will retry per request):", err.message);
   }
 })();
 
@@ -254,13 +358,29 @@ async function translateContent({
   if (!contentId || !content || !targetLang || !SUPPORTED_LANGUAGES.includes(targetLang)) {
     return { ok: false, error: "MISSING_PARAMS", message: "Missing or invalid translation parameters" };
   }
-  if (!providerAvailable) {
-    return { ok: false, error: "PROVIDER_UNAVAILABLE", message: "Translation provider is not available" };
+  // قراءة ديناميكية — تسمح باختبار عدم الضبط دون إعادة تحميل الوحدة
+  if (!libreConfigured()) {
+    return { ok: false, error: "PROVIDER_UNAVAILABLE", message: "Translation provider is not configured" };
   }
 
   const maxLength = isLong ? MAX_TEXT_LENGTH_ARTICLE : MAX_TEXT_LENGTH;
   if (content.length > maxLength) {
     return { ok: false, error: "TOO_LONG", message: `Content exceeds the maximum of ${maxLength} characters` };
+  }
+
+  if (!isLanguageSupportedByProvider(targetLang)) {
+    return { ok: false, error: "UNSUPPORTED_LANGUAGE", message: `Target language '${targetLang}' is not supported by the translation provider` };
+  }
+
+  // بصمة النص الأصلي — تمنع إعادة نتيجة قديمة لنفس contentId إذا تغير النص
+  const crypto = require("crypto");
+  const contentHash = crypto.createHash("sha256").update(content).digest("hex").slice(0, 16);
+
+  // الكاش — قبل Rate Limit واستدعاء المزود (النتيجة الصالحة لا تستهلك الحصة)
+  const preKey = cacheKey(contentId, "pre", targetLang, contentHash);
+  const preCached = cacheGet(preKey);
+  if (preCached) {
+    return { ok: true, translatedText: preCached.translatedText, sourceLang: preCached.sourceLang, cached: true };
   }
 
   // Rate limit
@@ -276,46 +396,57 @@ async function translateContent({
     return { ok: false, error: "TOO_LONG", message: "Too many segments to translate" };
   }
 
-  // اكتشاف اللغة المصدر — نجرب حتى 3 مقاطع (المقطع الأول قد يكون رقمًا أو رابطًا أو قصيرًا جدًا)
+  // اكتشاف اللغة المصدر — اختياري: إن فشل، نكمل بـ source:"auto"
+  // ولا نمنع الترجمة لمجرد تعذر الاكتشاف.
   let sourceLang = null;
   let detectErr = null;
   const probeSegments = segments.slice(0, 3);
   for (const seg of probeSegments) {
     try {
       const detected = await activeProvider.detectLanguage(seg);
-      if (detected) { sourceLang = detected; break; }
+      if (detected) { sourceLang = normalizeLangCode(detected); break; }
     } catch (err) {
       detectErr = err;
+      if (err?.code === "TIMEOUT") break;
     }
-  }
-  if (!sourceLang) {
-    if (detectErr?.code === "TIMEOUT") {
-      return { ok: false, error: "TIMEOUT", message: "Translation provider timed out" };
-    }
-    return { ok: false, error: "DETECT_FAILED", message: "Could not detect the content language" };
-  }
-  if (sourceLang === targetLang) {
-    return { ok: false, error: "SAME_LANGUAGE", message: "Content is already in the target language" };
   }
 
-  // الكاش — قبل استدعاء المزود
-  const key = cacheKey(contentId, sourceLang, targetLang, contentVersion);
+  if (sourceLang) {
+    if (sourceLang === targetLang) {
+      return { ok: false, error: "SAME_LANGUAGE", message: "Content is already in the target language" };
+    }
+    if (!SUPPORTED_LANGUAGES.includes(sourceLang)) {
+      // لغة مكتشفة خارج القائمة — نتجاهل الاكتشاف ونكمل بـ auto
+      sourceLang = null;
+    }
+  }
+
+  // الكاش الرئيسي — مرتبط بـ contentId + بصمة النص + اللغات
+  const key = cacheKey(contentId, sourceLang || "unknown", targetLang, contentHash);
   const cached = cacheGet(key);
   if (cached) {
-    return { ok: true, translatedText: cached.translatedText, sourceLang, cached: true };
+    return { ok: true, translatedText: cached.translatedText, sourceLang: cached.sourceLang, cached: true };
   }
 
   // استدعاء المزود — على المقطع كله
   try {
     const translatedSegments = await activeProvider.translateBatch(segments, targetLang);
     const translatedText = reassemble(translatedSegments);
-    cacheSet(key, { translatedText, sourceLang });
-    return { ok: true, translatedText, sourceLang, cached: false };
+    // sourceLang قد يكون null إذا فشل الاكتشاف — نُرجع "unknown" للواجهة
+    const finalSourceLang = sourceLang || lastDetectedLang || "unknown";
+    cacheSet(key, { translatedText, sourceLang: finalSourceLang });
+    return { ok: true, translatedText, sourceLang: finalSourceLang, cached: false };
   } catch (err) {
     if (err?.code === "TIMEOUT") {
-      return { ok: false, error: "TIMEOUT", message: "Translation provider timed out" };
+      return { ok: false, error: "PROVIDER_TIMEOUT", message: "Translation provider timed out" };
     }
-    return { ok: false, error: "PROVIDER_FAILED", message: "Translation provider failed" + (err?.message ? ": " + err.message : "") };
+    if (err?.code === "PROVIDER_UNAVAILABLE") {
+      return { ok: false, error: "PROVIDER_UNAVAILABLE", message: "Translation provider is not reachable" };
+    }
+    if (err?.code === "INVALID_RESPONSE") {
+      return { ok: false, error: "INVALID_RESPONSE", message: "Translation provider returned an invalid response" };
+    }
+    return { ok: false, error: "PROVIDER_FAILED", message: "Translation provider failed" };
   }
 }
 

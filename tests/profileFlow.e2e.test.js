@@ -17,7 +17,9 @@ const Module = require("module");
 const origResolve = Module._resolveFilename;
 Module._resolveFilename = function (request, ...args) {
     if (request === "./firebaseArticle.js") return require.resolve("./mockFirebase.js");
-    if (request === "@vitalets/google-translate-api") return require.resolve("./translateHelper.js");
+    // مزود الترجمة أصبح LibreTranslate — لا نوجّه المكتبة القديمة
+    // (translation.service.js يقرأ LIBRETRANSLATE_URL من env؛ في الاختبار يكون فارغًا
+    // فيُرجع PROVIDER_UNAVAILABLE بأمان دون اتصال خارجي — التصنيف يعتمد fallback للنص الأصلي)
     return origResolve.call(this, request, ...args);
 };
 
