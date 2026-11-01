@@ -1491,7 +1491,7 @@ app.get(
                 await sign.getUserSettings(
                     req.user.id
                 );
-
+console.log("Fetched settings for user", req.user.id, ":", settings);
             res.json(settings);
 
         } catch (err) {
