@@ -1074,12 +1074,26 @@ app.post("/translate", verifyToken, async (req, res) => {
       isLong: contentType === "articles" || contentType === "novels",
     });
 
+    // دقة الحالات: كل خطأ له HTTP status مناسب — لا 400 مضلل
     if (!result.ok) {
-      return res.status(result.error === "RATE_LIMITED" ? 429 : 400).json({
+      const statusMap = {
+        MISSING_PARAMS: 400,
+        TOO_LONG: 413,
+        RATE_LIMITED: 429,
+        PROVIDER_UNAVAILABLE: 503,
+        PROVIDER_FAILED: 502,
+        TIMEOUT: 504,
+        DETECT_FAILED: 422,
+        INVALID_RESPONSE: 502,
+        SAME_LANGUAGE: 422,
+        EMPTY: 422,
+      };
+      const status = statusMap[result.error] || 500;
+      return res.status(status).json({
         status: "error",
         error: result.error,
         message: result.message,
-        retryAfterMs: result.retryAfterMs,
+        ...(result.retryAfterMs ? { retryAfterMs: result.retryAfterMs } : {}),
       });
     }
 

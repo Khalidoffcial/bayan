@@ -29,6 +29,7 @@ const MAX_REQUESTS_PER_USER = 60;      // أقصى طلبات ترجمة لكل 
 const RATE_WINDOW_MS = 10 * 60 * 1000; // نافذة الـ rate limit (10 دقائق)
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // مدة بقاء الترجمة في الكاش (24 ساعة)
 const CACHE_MAX_ENTRIES = 1000;        // أقصى عدد مدخلات في الكاش
+const PROVIDER_TIMEOUT_MS = 15000;     // مهلة كل استدعاء للمزود
 
 const SUPPORTED_LANGUAGES = ["en", "ar", "fr", "es", "de", "pt", "tr", "zh", "ja", "ru"];
 
@@ -46,22 +47,39 @@ const PROVIDER_LANG_MAP = {
  * TranslationProvider — العقد الذي يُطبقه أي مزود.
  *   translateBatch(texts, targetLang) → { texts: [...], sourceLang }
  */
+/**
+ * Timeout wrapper — يمنع تعليق الطلب إذا لم يرد المزود.
+ * الخطأ يميّز بوضوح: TIMEOUT ≠ فشل المزود.
+ */
+function withTimeout(promise, ms, label = "provider") {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(Object.assign(new Error(`${label} timed out after ${ms}ms`), { code: "TIMEOUT" })), ms)
+    ),
+  ]);
+}
+
 const PROVIDERS = {
   google: {
     name: "google-translate-api (unofficial, free, no API key)",
     async translateBatch(texts, targetLang) {
       const out = [];
       for (const text of texts) {
-        // المزود يعيد من و إلى في النتيجة — نستخدمه للاكتشاف
-        const result = await translate(text, { to: PROVIDER_LANG_MAP[targetLang] || "en" });
+        const result = await withTimeout(
+          translate(text, { to: PROVIDER_LANG_MAP[targetLang] || "en" }),
+          PROVIDER_TIMEOUT_MS
+        );
+        if (!result || typeof result.text !== "string") {
+          throw Object.assign(new Error("Invalid provider response"), { code: "INVALID_RESPONSE" });
+        }
         out.push(result.text);
       }
       return out;
     },
-    // مزود يعيد اللغة المصدر لكل مقطع — يُستخدم للاكتشاف
     async detectLanguage(text) {
-      const result = await translate(text, { to: "en" });
-      return result.from?.language?.iso || null;
+      const result = await withTimeout(translate(text, { to: "en" }), PROVIDER_TIMEOUT_MS);
+      return result?.from?.language?.iso || null;
     },
   },
 };
@@ -258,14 +276,22 @@ async function translateContent({
     return { ok: false, error: "TOO_LONG", message: "Too many segments to translate" };
   }
 
-  // اكتشاف اللغة المصدر — من أول مقطع
-  let sourceLang;
-  try {
-    sourceLang = await activeProvider.detectLanguage(segments[0]);
-  } catch (err) {
-    return { ok: false, error: "DETECT_FAILED", message: "Could not detect the content language" };
+  // اكتشاف اللغة المصدر — نجرب حتى 3 مقاطع (المقطع الأول قد يكون رقمًا أو رابطًا أو قصيرًا جدًا)
+  let sourceLang = null;
+  let detectErr = null;
+  const probeSegments = segments.slice(0, 3);
+  for (const seg of probeSegments) {
+    try {
+      const detected = await activeProvider.detectLanguage(seg);
+      if (detected) { sourceLang = detected; break; }
+    } catch (err) {
+      detectErr = err;
+    }
   }
   if (!sourceLang) {
+    if (detectErr?.code === "TIMEOUT") {
+      return { ok: false, error: "TIMEOUT", message: "Translation provider timed out" };
+    }
     return { ok: false, error: "DETECT_FAILED", message: "Could not detect the content language" };
   }
   if (sourceLang === targetLang) {
@@ -286,7 +312,10 @@ async function translateContent({
     cacheSet(key, { translatedText, sourceLang });
     return { ok: true, translatedText, sourceLang, cached: false };
   } catch (err) {
-    return { ok: false, error: "PROVIDER_FAILED", message: err.message || "Translation failed" };
+    if (err?.code === "TIMEOUT") {
+      return { ok: false, error: "TIMEOUT", message: "Translation provider timed out" };
+    }
+    return { ok: false, error: "PROVIDER_FAILED", message: "Translation provider failed" + (err?.message ? ": " + err.message : "") };
   }
 }
 
