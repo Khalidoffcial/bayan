@@ -23,6 +23,7 @@ const { saveContent_Article_Novels, saveContent_Posts, saveContent_Comment } = r
 const { getProfileContent } = require("./service/profileContentService.js");
 const { translateContent, getProviderInfo } = require("./service/translation.service.js");
 const { robotsTxt, sitemapXml } = require("./service/seo.service.js");
+const { registerView, resolveViewerId, checkRate } = require("./service/viewCounter.service.js");
 const {
     MEDIA_LIMITS,
     isConfigured,
@@ -1121,6 +1122,52 @@ app.get("/translate/provider", verifyToken, async (req, res) => {
   });
 });
 
+// 👁️ تسجيل مشاهدة محتوى — زيادة ذرية في Backend فقط.
+// الهوية تُستخرج من الجلسة الموثقة للمسجلين، أو IP hashed للزوار.
+// الواجهة لا تختار العدد ولا تعيده الزيادة إلا من استجابة الخادم.
+app.post("/view", async (req, res) => {
+  try {
+    const { contentId, contentType } = req.body || {};
+
+    if (!contentId || !contentType) {
+      return res.status(400).json({ status: "error", message: "Missing contentId or contentType" });
+    }
+
+    // اختياري: التوكن — لو موجود نتحقق منه ونستخرج الهوية منه
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      try {
+        const token = authHeader.split(" ")[1];
+        req.user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      } catch (e) {
+        // توكن غير صالح → نتعامل كزائر (لا نفشل الطلب)
+        req.user = null;
+      }
+    }
+
+    const viewerId = resolveViewerId(req);
+    if (!checkRate(viewerId)) {
+      return res.status(429).json({ status: "error", message: "Too many view registrations" });
+    }
+
+    const result = await registerView({ contentId: String(contentId), contentType: String(contentType), viewerId });
+
+    if (!result.ok) {
+      const status = result.error === "CONTENT_NOT_FOUND" ? 404 : 500;
+      return res.status(status).json({ status: "error", error: result.error });
+    }
+
+    return res.status(200).json({
+      status: "ok",
+      views: result.views,
+      counted: result.counted, // false = مشاهدة مكررة داخل النافذة
+    });
+  } catch (err) {
+    console.error("POST /view error:", err.message);
+    return res.status(500).json({ status: "error", message: "Failed to register view" });
+  }
+});
+
 // 🔍 SEO — robots.txt (عام، بدون auth)
 app.get("/robots.txt", (req, res) => {
   res.type("text/plain");
@@ -1534,12 +1581,19 @@ function sanitizeSettings(body) {
                 }
             }
         } else {
-            // حقول boolean فقط لبقية الأقسام
-            clean[field] = {};
-            for (const [k, v] of Object.entries(body[field])) {
-                if (typeof v === "boolean") clean[field][k] = v;
+            // حقول boolean فقط لبقية الأقسام عدا profile (strings)
+            if (field === "profile") {
+                clean.profile = {};
+                for (const [k, v] of Object.entries(body.profile)) {
+                    if (typeof v === "string" || v === null) clean.profile[k] = v;
+                }
+            } else {
+                clean[field] = {};
+                for (const [k, v] of Object.entries(body[field])) {
+                    if (typeof v === "boolean") clean[field][k] = v;
+                }
             }
-            if (field === "reading" && body.reading.readingGoal != null) {
+            if (field === "reading" && body.reading?.readingGoal != null) {
                 const goal = Number(body.reading.readingGoal);
                 if (Number.isFinite(goal) && goal >= 5 && goal <= 180) clean.reading.readingGoal = goal;
             }

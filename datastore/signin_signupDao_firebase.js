@@ -536,13 +536,20 @@ async function getUserSettings(userId) {
 
 async function updateUserSettings(userId, settingsData) {
     try {
+        // دمج الإعدادات الجديدة فوق الموجودة — لا استبدال كامل يفقد حقولًا
+        // غير مُرسلة (مثل profile الذي يُدار من صفحة البروفايل)
+        const existing = await getUserSettings(userId);
+        const merged = {
+            ...(existing || defaultSettings),
+            ...settingsData,
+            // دمج القسم الفرعي مستوى عميق واحد — الأقسام المرسلة تستبدل محتواها فقط
+            updatedAt: new Date().toISOString(),
+        };
+
         await update(
             ref(db, `user_data/Profile/${userId}`),
             {
-                settings: {
-                    ...settingsData,
-                    updatedAt: new Date().toISOString(),
-                },
+                settings: merged,
             }
         );
 

@@ -527,6 +527,20 @@ async function incrementFieldTransaction(path, field, amount = 1) {
 }
 
 
+async function incrementViewsTransaction(path) {
+    try {
+        const targetRef = ref(db, path);
+        const result = await runTransaction(targetRef, (current) => {
+            if (current === null) return null; // المحتوى محذوف — لا زيادة
+            return { ...current, views: (current.views || 0) + 1 };
+        });
+        return result.snapshot.val()?.views ?? null;
+    } catch (error) {
+        console.error("incrementViewsTransaction error:", error.message);
+        return null;
+    }
+}
+
 async function likeContent(type,postId, userId) {
     const postRef = ref(db, `${type}/${type}${postId}`);
 
@@ -686,6 +700,7 @@ module.exports = {
     unlikeContent,
     hasUserLiked,
     getAllContent,
+    incrementViewsTransaction,
     addComment,
     getComments,
     addReply,
