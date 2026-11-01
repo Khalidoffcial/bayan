@@ -22,6 +22,7 @@ const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
 const { saveContent_Article_Novels, saveContent_Posts, saveContent_Comment } = require("./service/saveContent.js");
 const { getProfileContent } = require("./service/profileContentService.js");
 const { translateContent, getProviderInfo } = require("./service/translation.service.js");
+const { robotsTxt, sitemapXml } = require("./service/seo.service.js");
 const {
     MEDIA_LIMITS,
     isConfigured,
@@ -1118,6 +1119,29 @@ app.get("/translate/provider", verifyToken, async (req, res) => {
     status: "ok",
     provider: getProviderInfo(),
   });
+});
+
+// 🔍 SEO — robots.txt (عام، بدون auth)
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.send(robotsTxt());
+});
+
+// 🔍 SEO — sitemap.xml ديناميكي من المحتوى المنشور الفعلي
+app.get("/sitemap.xml", async (req, res) => {
+  try {
+    const [articles, novels] = await Promise.all([
+      dao.getLatestArticles(500),
+      dao.getLatestNovels(500),
+    ]);
+    res.type("application/xml");
+    res.send(sitemapXml({ articles: articles || [], novels: novels || [] }));
+  } catch (err) {
+    console.error("GET /sitemap.xml error:", err.message);
+    // لا نفشل الفهرسة بالكامل — نرجع sitemap بالصفحات الأساسية فقط
+    res.type("application/xml");
+    res.send(sitemapXml({}));
+  }
 });
 
 // 🔐 توقيع رفع Cloudinary — التوقيع يُنشأ على الخادم فقط بعد التحقق من الهوية.
