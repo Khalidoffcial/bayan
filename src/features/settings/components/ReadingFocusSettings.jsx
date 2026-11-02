@@ -1,79 +1,62 @@
 import React from "react";
 import { useSettings } from "../../../contexts/SettingsContext";
+import { useTranslation } from "../../../i18n/useTranslation";
 import Toggle from "../../../components/ui/Toggle";
-import { READING_TOGGLES, READING_GOALS } from "../../../constants/settingsConfig";
+import { READING_KEYS, READING_GOALS } from "../../../constants/settingsConfig";
 
 export const ReadingFocusSettings = () => {
   const { reading, setReading, triggerSave } = useSettings();
+  const { t } = useTranslation();
 
-  const toggle = (key) => setReading((r) => ({ ...r, [key]: !r[key] }));
-  const setGoal = (val) => setReading((r) => ({ ...r, readingGoal: val }));
+  const toggle = (key) => {
+    setReading((r) => ({ ...r, [key]: !r[key] }));
+    triggerSave();
+  };
+  const setGoal = (val) => {
+    setReading((r) => ({ ...r, readingGoal: val }));
+    triggerSave();
+  };
 
   return (
     <div>
       <div className="section-header">
-        <h1 className="section-title">Reading & Focus</h1>
-        <p className="section-subtitle">
-          Tune your reading environment for deep, distraction-free work
-        </p>
+        <h1 className="section-title">{t("settings.reading")}</h1>
+        <p className="section-subtitle">{t("settings.reading.subtitle")}</p>
       </div>
 
       <div className="settings-card">
-        <div className="card-title">
-          <span className="card-title-icon">◈</span> Focus Preferences
-        </div>
-        {READING_TOGGLES.map((item) => (
-          <div className="toggle-row" key={item.key}>
+        {READING_KEYS.map((key) => (
+          <div className="toggle-row" key={key}>
             <div className="toggle-info">
-              <div className="toggle-label">{item.label}</div>
-              <div className="toggle-desc">{item.desc}</div>
+              <div className="toggle-label">{t(`settings.reading.${key}`)}</div>
+              <div className="toggle-desc">{t(`settings.reading.${key}.desc`)}</div>
             </div>
             <Toggle
-              checked={Boolean(reading[item.key])}
-              onChange={() => toggle(item.key)}
-              id={`reading-toggle-${item.key}`}
+              checked={Boolean(reading[key])}
+              onChange={() => toggle(key)}
+              id={`reading-${key}`}
             />
           </div>
         ))}
       </div>
 
       <div className="settings-card">
-        <div className="card-title">
-          <span className="card-title-icon">◈</span> Daily Reading Goal
-        </div>
-        <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 14 }}>
-          Set a daily reading target to build a consistent habit.
-        </p>
-        <div className="goal-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <div className="card-title">{t("settings.reading.goal")}</div>
+        <div className="goal-cards">
           {READING_GOALS.map((g) => (
             <div
-              key={g.value}
-              className={`goal-card ${reading.readingGoal === g.value ? "active" : ""
-                }`}
-              onClick={() => setGoal(g.value)}
-              style={{
-                padding: 16,
-                border: reading.readingGoal === g.value ? "1px solid var(--teal)" : "1px solid var(--border)",
-                borderRadius: "var(--radius-sm)",
-                textAlign: "center",
-                cursor: "pointer",
-                background: reading.readingGoal === g.value ? "var(--teal-dim)" : "transparent",
-              }}
+              key={g}
+              className={`goal-card ${reading.readingGoal === g ? "active" : ""}`}
+              onClick={() => setGoal(g)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && setGoal(g)}
             >
-              <div className="goal-value" style={{ fontSize: 24, fontWeight: 700 }}>{g.value}</div>
-              <div className="goal-unit" style={{ fontSize: 12, color: "var(--text3)" }}>min / day</div>
-              <div className="goal-unit" style={{ fontSize: 12, marginTop: 4 }}>
-                {g.label}
-              </div>
+              <div className="goal-number">{g}</div>
+              <div className="goal-unit">{t("settings.reading.minDay")}</div>
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="actions-row">
-        <button className="btn btn-primary" onClick={triggerSave}>
-          Save preferences
-        </button>
       </div>
     </div>
   );

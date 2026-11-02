@@ -18,10 +18,26 @@ const Top = () => {
 
   return (
     <header className="top top-header">
+      {/* عنصر موازٍ لزر الحساب — يحفظ اللوجو في منتصف الهيدر بغض النظر عن الاتجاه */}
+
+      {/* اللوجو في منتصف الـ Topbar — ملف الشعار الأصلي (يتبدل مع الثيم عبر CSS) */}
+      <div
+        className="logo-center top-header__logo-container"
+        onClick={() => navigate('/')}
+        role="button"
+        tabIndex={0}
+        aria-label="Bayan Space — Home"
+      >
+      <div className="top-header__spacer" aria-hidden="true" />
+
+        <div className="img top-header__logo-img" />
+      </div>
+
+      {/* أيقونة الحساب — الطرف المقابل لموضع الـ Sidebar (تتبع RTL/LTR تلقائيًا) */}
       <button
         onClick={handleProfileClick}
         className="login-button top-header__profile-btn"
-        aria-label="User profile"
+        aria-label={user?.name || "User profile"}
       >
         <img
           className="top-profile-pic top-header__profile-pic"
@@ -29,16 +45,6 @@ const Top = () => {
           alt={user?.name || "Profile"}
         />
       </button>
-
-      <div className="logo-center top-header__logo-container">
-        <div
-          className="img top-header__logo-img"
-          onClick={() => navigate('/')}
-          role="button"
-          tabIndex={0}
-          aria-label="Home"
-        />
-      </div>
     </header>
   );
 };

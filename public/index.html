@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/cropped_image.ico" />
+    <link rel="icon" href="%PUBLIC_URL%/bayan_Icon_Web.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff" />
 
@@ -18,7 +18,7 @@
     <!-- 🟢 بيانات Open Graph (لتحسين المشاركة على فيسبوك وغيرها) -->
     <meta property="og:title" content="bayan | منصة المقالات والروايات والتعليم العربي" />
     <meta property="og:description" content="مقالات عربية تعليمية وثقافية وروايات مشوقة تناسب جميع المستويات. اكتشف أفضل محتوى عربي الآن!" />
-    <meta property="og:image" content="./cropped_image.ico" />
+    <meta property="og:image" content="./bayan_Icon_Web.ico" />
     <meta property="og:url" content="https://bypen.vercel.app/" />
     <meta property="og:type" content="website" />
 
@@ -42,11 +42,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Zain:wght@200;300;400;700;800;900&display=swap" rel="stylesheet" />
-    <!-- 🟢 موقع الإعلانات monetag وغيره -->
-
-    <meta name="monetag" content="c097fc113e41d73a9a6b6ac2bd69acd2" />
-    <script src="https://shoukigaigoors.net/act/files/tag.min.js?z=9491660" data-cfasync="false" async></script>
-
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
@@ -54,19 +49,23 @@
 
     <title>bayan | مقالات، روايات وبوستات</title>
   </head>
-<body dir="rtl">
+<body>
+  <!-- اتجاه الواجهة يُشتق من اللغة المحفوظة قبل رسم أي شيء — يمنع وميض RTL
+       في الواجهات غير العربية. مصدر الحقيقة النهائي هو SettingsContext
+       بعد تحميل الإعدادات من الخادم. -->
+  <script>
+    (function () {
+      try {
+        var lang = localStorage.getItem("language") || "en";
+        var dir = lang === "ar" ? "rtl" : "ltr";
+        document.documentElement.setAttribute("lang", lang);
+        document.documentElement.setAttribute("dir", dir);
+        document.body.setAttribute("dir", dir);
+      } catch (e) {}
+    })();
+  </script>
   <noscript>يجب تفعيل JavaScript لتشغيل هذا التطبيق.</noscript>
   <div id="root"></div>
-
-  <!-- 🔵 إعلان PropellerAds - Zone 9492138 -->
-  <script data-cfasync="false">
-    (function(d,z,s){
-      s.src='https://'+d+'/401/'+z;
-      try {
-        (document.body || document.documentElement).appendChild(s);
-      } catch(e){}
-    })('groleegni.net', 9492138, document.createElement('script'));
-  </script>
 </body>
 
 </html>

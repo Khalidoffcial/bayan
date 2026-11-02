@@ -6,9 +6,11 @@ import WriterEditor from "./WriterEditor";
 import WriterImages from "./WriterImages";
 import WriterActions from "./WriterActions";
 import useWriter from "../hooks/useWriter";
+import { useTranslation } from "../../../i18n/useTranslation";
 import "../styles/writer.css";
 
 export const Writer = () => {
+  const { t } = useTranslation();
   const {
     active,
     setActive,
@@ -177,9 +179,9 @@ export const Writer = () => {
 
             {confirmingDiscard && (
               <div className="composer-discard-confirm" role="alertdialog" aria-label="Discard draft">
-                <span>تجاهل المسودة؟ / Discard your draft?</span>
-                <button className="discard-yes" onClick={handleCancelClick}>نعم / Yes</button>
-                <button className="discard-no" onClick={() => setConfirmingDiscard(false)}>لا / No</button>
+                <span>{t("composer.discard")}</span>
+                <button className="discard-yes" onClick={handleCancelClick}>{t("composer.yes")}</button>
+                <button className="discard-no" onClick={() => setConfirmingDiscard(false)}>{t("composer.no")}</button>
               </div>
             )}
 

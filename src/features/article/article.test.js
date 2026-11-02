@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { SettingsProvider } from '../../contexts/SettingsContext';
 import { ArticleHeader, ArticleBody, ArticleActions, ArticleReading } from './index';
 
 describe('Article Feature Components', () => {
@@ -22,11 +23,15 @@ describe('Article Feature Components', () => {
 
   test('renders ArticleBody with HTML content and image', () => {
     render(
-      <ArticleBody
-        content="<p>Main article text</p>"
-        imageUrl="https://example.com/banner.jpg"
-        contentDir="ltr"
-      />
+      <SettingsProvider>
+        <ArticleBody
+          content="<p>Main article text</p>"
+          imageUrl="https://example.com/banner.jpg"
+          contentDir="ltr"
+          contentId="a1"
+          contentType="articles"
+        />
+      </SettingsProvider>
     );
 
     expect(screen.getByText('Main article text')).toBeInTheDocument();

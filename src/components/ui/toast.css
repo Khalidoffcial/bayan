@@ -1,0 +1,84 @@
+/* Toast — Bayan Space identity (RTL + dark-mode aware) */
+
+.toast-stack {
+  position: fixed;
+  bottom: 20px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 3000;
+  pointer-events: none;
+  max-width: min(92vw, 420px);
+}
+
+[dir="rtl"] .toast-stack {
+  transform: translateX(50%);
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md, 12px);
+  background: var(--bg-primary, #ffffff);
+  color: var(--text, #1a1b22);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.08));
+  font-family: var(--font-primary, "Inter", sans-serif);
+  font-size: 0.9rem;
+  animation: toast-in 0.18s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.toast--success .toast-icon {
+  color: var(--blue, #0f8ee2);
+}
+
+.toast--error .toast-icon,
+.toast--warning .toast-icon {
+  color: var(--danger, #c53030);
+}
+
+.toast--info .toast-icon {
+  color: var(--text2, #5c5f70);
+}
+
+.toast-message {
+  flex: 1;
+  line-height: 1.45;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--text3, #9499aa);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  transition: color var(--transition-fast, 0.2s);
+}
+
+.toast-close:hover {
+  color: var(--text, #1a1b22);
+}

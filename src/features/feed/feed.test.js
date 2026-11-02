@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, renderHook, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { SettingsProvider } from '../../contexts/SettingsContext';
 import {
   Feed,
   FeedList,
@@ -14,6 +15,7 @@ import {
 } from './index';
 
 import useSocket from '../../hooks/useSocket';
+import feedStore from './services/feedStore';
 
 // Mock useSocket hook
 const mockSocketEmit = jest.fn();
@@ -24,6 +26,7 @@ const mockSocket = {
   emit: mockSocketEmit,
   on: mockSocketOn,
   off: mockSocketOff,
+  once: jest.fn((event, cb) => mockSocketOn(event, cb)),
   connected: false,
 };
 
@@ -34,12 +37,12 @@ describe('Feed Feature Configuration & Services', () => {
     jest.clearAllMocks();
   });
 
-  test('FEED_BATCH_SIZE is set to 100 and prefetch threshold is defined', () => {
-    expect(FEED_BATCH_SIZE).toBe(100);
+  test('FEED_BATCH_SIZE matches the configured page size and prefetch threshold is defined', () => {
+    expect(FEED_BATCH_SIZE).toBe(20);
     expect(FEED_PREFETCH_THRESHOLD_PX).toBeGreaterThan(0);
   });
 
-  test('requestFeed emits GET_FEED with default batch size 100', () => {
+  test('requestFeed emits GET_FEED with the configured page size', () => {
     const fakeSocket = { emit: jest.fn() };
     requestFeed(fakeSocket, { userId: 'u1', type: 'posts', cursor: 0 });
 
@@ -47,7 +50,7 @@ describe('Feed Feature Configuration & Services', () => {
       userId: 'u1',
       type: 'posts',
       cursor: 0,
-      limit: 100,
+      limit: 20,
     });
   });
 
@@ -64,7 +67,7 @@ describe('Feed Feature Configuration & Services', () => {
   });
 });
 
-describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () => {
+describe('useFeed Hook — Cache-First Feed, SWR Refresh & Deduplication', () => {
   let socketCallbacks = {};
 
   beforeEach(() => {
@@ -74,70 +77,69 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
     mockSocketOn.mockImplementation((event, callback) => {
       socketCallbacks[event] = callback;
     });
-    mockSocket.connected = false;
+    mockSocket.connected = true; // production sockets are connected when fetching
+    feedStore.clearAll();
   });
 
-  test('initializes with empty feed, cursor 0, and hasMore true', () => {
+  test('initializes with empty feed and hasMore true on a cold cache', () => {
     const { result } = renderHook(() => useFeed('posts', 'user1'));
 
     expect(result.current.feed).toEqual([]);
-    expect(result.current.loading).toBe(false);
-    expect(result.current.hasMore).toBe(true);
     expect(result.current.cursor).toBe(0);
+    expect(result.current.hasMore).toBe(true);
   });
 
-  test('requests 100 items on fetchFeed and caches received 100 items without duplicate requests', () => {
+  test('fetchFeed requests one server page and merges it into the persistent store', () => {
     const { result } = renderHook(() => useFeed('posts', 'user1'));
 
-    // Trigger initial fetch
     act(() => {
       result.current.fetchFeed(true);
     });
 
-    expect(result.current.loading).toBe(true);
-    expect(mockSocketEmit).toHaveBeenCalledWith('GET_FEED', {
+    expect(mockSocketEmit).toHaveBeenCalledWith('GET_FEED', expect.objectContaining({
       userId: 'user1',
       type: 'posts',
       cursor: 0,
-      limit: 100,
-    });
+      limit: FEED_BATCH_SIZE,
+    }));
 
-    // Mock 100 items returned by backend in FEED_RESULT
-    const mock100Items = Array.from({ length: 100 }, (_, i) => ({
+    const page1 = Array.from({ length: FEED_BATCH_SIZE }, (_, i) => ({
       id: `item-${i + 1}`,
-      title: `Post ${i + 1}`,
       type: 'posts',
     }));
 
     act(() => {
-      socketCallbacks['FEED_RESULT']({
-        items: mock100Items,
-        nextCursor: 100,
-        hasMore: true,
-      });
+      socketCallbacks['FEED_RESULT']({ items: page1, nextCursor: FEED_BATCH_SIZE });
     });
 
-    // Cache should hold 100 items in memory
-    expect(result.current.feed.length).toBe(100);
-    expect(result.current.cursor).toBe(100);
-    expect(result.current.loading).toBe(false);
+    expect(result.current.feed.length).toBe(FEED_BATCH_SIZE);
+    expect(result.current.cursor).toBe(FEED_BATCH_SIZE);
     expect(result.current.hasMore).toBe(true);
 
-    // Calling fetchFeed again while already fetching is locked
+    // Second page continues from the stored cursor — no re-fetch of page 1
     mockSocketEmit.mockClear();
     act(() => {
       result.current.fetchFeed();
     });
 
-    expect(mockSocketEmit).toHaveBeenCalledWith('GET_FEED', {
-      userId: 'user1',
-      type: 'posts',
-      cursor: 100,
-      limit: 100,
-    });
+    expect(mockSocketEmit).toHaveBeenCalledWith('GET_FEED', expect.objectContaining({
+      cursor: FEED_BATCH_SIZE,
+    }));
   });
 
-  test('correctly extracts and stores multiple posts when backend sends { posts: [...] } payload', () => {
+  test('cache-first remount: warm fresh cache hydrates WITHOUT any network request', () => {
+    // Warm the store as if the user already visited the feed
+    feedStore.mergePage('posts', [{ id: 'warm-1' }, { id: 'warm-2' }], { nextCursor: 2 });
+    mockSocketEmit.mockClear();
+
+    const { result } = renderHook(() => useFeed('posts', 'user1'));
+
+    expect(result.current.feed.length).toBe(2);            // instant cache render
+    expect(mockSocketEmit).not.toHaveBeenCalled();          // zero refetch
+    expect(result.current.loading).toBe(false);
+  });
+
+  test('correctly extracts and stores posts from a { posts: [...] } payload', () => {
     const { result } = renderHook(() => useFeed('posts', 'user1'));
 
     act(() => {
@@ -152,11 +154,7 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
     ];
 
     act(() => {
-      socketCallbacks['FEED_RESULT']({
-        posts: mockPosts,
-        nextCursor: 4,
-        hasMore: true,
-      });
+      socketCallbacks['FEED_RESULT']({ posts: mockPosts, nextCursor: 4 });
     });
 
     expect(result.current.feed.length).toBe(4);
@@ -164,7 +162,7 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
     expect(result.current.feed[3].id).toBe('post-d');
   });
 
-  test('correctly extracts and stores multiple posts when backend sends { content: [...] } or direct array payload', () => {
+  test('extracts items from { content: [...] } and direct array payloads', () => {
     const { result } = renderHook(() => useFeed('posts', 'user1'));
 
     act(() => {
@@ -178,24 +176,20 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
     ];
 
     act(() => {
-      socketCallbacks['FEED_RESULT']({
-        content: mockContent,
-        cursor: 3,
-      });
+      socketCallbacks['FEED_RESULT']({ content: mockContent, cursor: 3 });
     });
 
     expect(result.current.feed.length).toBe(3);
     expect(result.current.feed[1].id).toBe('c-2');
   });
 
-  test('prevents duplicate items from appearing in feed state', () => {
+  test('prevents duplicate items when the same page arrives twice', () => {
     const { result } = renderHook(() => useFeed('posts', 'user1'));
 
     act(() => {
       result.current.fetchFeed(true);
     });
 
-    // Receive first batch
     act(() => {
       socketCallbacks['FEED_RESULT']({
         items: [
@@ -208,7 +202,6 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
 
     expect(result.current.feed.length).toBe(2);
 
-    // Receive second batch with an overlapping item (post-2) and new item (post-3)
     act(() => {
       socketCallbacks['FEED_RESULT']({
         items: [
@@ -219,12 +212,11 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
       });
     });
 
-    // Should contain 3 unique items, not 4
     expect(result.current.feed.length).toBe(3);
     expect(result.current.feed.map((p) => p.id)).toEqual(['post-1', 'post-2', 'post-3']);
   });
 
-  test('prepends NEW_POST to active feed without clearing cached items', () => {
+  test('prepends NEW_POST without clearing cached items', () => {
     const { result } = renderHook(() => useFeed('posts', 'user1'));
 
     act(() => {
@@ -241,7 +233,6 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
       });
     });
 
-    // Broadcast NEW_POST event
     act(() => {
       socketCallbacks['NEW_POST']({
         id: 'live-post-new',
@@ -254,7 +245,7 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
     expect(result.current.feed[1].id).toBe('post-1');
   });
 
-  test('resetFeed clears feed cache, resets cursor, and resets deduplication state', () => {
+  test('LIKE_UPDATED patches the affected item in place — cache stays consistent', () => {
     const { result } = renderHook(() => useFeed('posts', 'user1'));
 
     act(() => {
@@ -263,23 +254,23 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
 
     act(() => {
       socketCallbacks['FEED_RESULT']({
-        items: [{ id: 'post-1', title: 'First' }],
+        items: [{ id: 'post-1', title: 'First', likesCount: 1 }],
         nextCursor: 1,
       });
     });
 
-    expect(result.current.feed.length).toBe(1);
-
     act(() => {
-      result.current.resetFeed();
+      socketCallbacks['LIKE_UPDATED']({
+        contentType: 'posts',
+        post: { id: 'post-1', title: 'First (edited)', likesCount: 9 },
+      });
     });
 
-    expect(result.current.feed).toEqual([]);
-    expect(result.current.cursor).toBe(0);
-    expect(result.current.hasMore).toBe(true);
+    expect(result.current.feed.length).toBe(1); // no duplication, no reset
+    expect(result.current.feed[0].likesCount).toBe(9);
   });
 
-  test('preserves existing cached items on socket error', () => {
+  test('preserves cached items on socket error and reports the error', () => {
     const { result } = renderHook(() => useFeed('posts', 'user1'));
 
     act(() => {
@@ -291,21 +282,36 @@ describe('useFeed Hook — 100-Item Batching, Client Cache & Deduplication', () 
         items: [{ id: 'post-1', title: 'First' }],
         nextCursor: 1,
       });
-    });
-
-    // Error occurs during subsequent fetch
-    act(() => {
-      result.current.fetchFeed();
     });
 
     act(() => {
       socketCallbacks['connect_error']({ message: 'Network timeout' });
     });
 
-    // Existing cached post remains intact
-    expect(result.current.feed.length).toBe(1);
+    expect(result.current.feed.length).toBe(1); // cache untouched by errors
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBe('Network timeout');
+  });
+
+  test('removePost removes exactly one item from the persistent cache', () => {
+    const { result } = renderHook(() => useFeed('posts', 'user1'));
+
+    act(() => {
+      result.current.fetchFeed(true);
+    });
+
+    act(() => {
+      socketCallbacks['FEED_RESULT']({
+        items: [{ id: 'post-1' }, { id: 'post-2' }],
+        nextCursor: 2,
+      });
+    });
+
+    act(() => {
+      result.current.removePost('post-1');
+    });
+
+    expect(result.current.feed.map((p) => p.id)).toEqual(['post-2']);
   });
 });
 
@@ -357,9 +363,11 @@ describe('Feed Feature UI Components', () => {
     };
 
     render(
-      <BrowserRouter>
-        <ArticleCard item={mockArticle} />
-      </BrowserRouter>
+      <SettingsProvider>
+        <BrowserRouter>
+          <ArticleCard item={mockArticle} />
+        </BrowserRouter>
+      </SettingsProvider>
     );
 
     expect(screen.getByText('Deep Learning Insights')).toBeInTheDocument();
@@ -375,17 +383,19 @@ describe('Feed Feature UI Components', () => {
     }));
 
     render(
-      <BrowserRouter>
-        <FeedList
-          feed={items}
-          likedPosts={{}}
-          likesCount={{}}
-          onLike={jest.fn()}
-          onComment={jest.fn()}
-          onShare={jest.fn()}
-          getDirection={jest.fn(() => 'ltr')}
-        />
-      </BrowserRouter>
+      <SettingsProvider>
+        <BrowserRouter>
+          <FeedList
+            feed={items}
+            likedPosts={{}}
+            likesCount={{}}
+            onLike={jest.fn()}
+            onComment={jest.fn()}
+            onShare={jest.fn()}
+            getDirection={jest.fn(() => 'ltr')}
+          />
+        </BrowserRouter>
+      </SettingsProvider>
     );
 
     // Items from memory cache are rendered

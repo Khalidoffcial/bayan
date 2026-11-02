@@ -2,11 +2,13 @@
   width: 100%;
   min-height: 100vh;
   padding-top: 70px;
+  /* مساحة المحتوى بعد السايدبار الثابت — تتبع الاتجاه تلقائيًا */
+  padding-inline-start: var(--sidebar-w, 260px);
+  box-sizing: border-box;
 }
 
 .article-reading-content {
-  width: min(820px, 95%);
-  margin: 0 auto 40px;
+  margin-inline: auto;
   padding: 0 16px;
 }
 

@@ -2,11 +2,14 @@
   width: 100%;
   min-height: 100vh;
   padding-top: 70px;
+  /* مساحة المحتوى بعد السايدبار الثابت — تتبع الاتجاه تلقائيًا */
+  padding-inline-start: var(--sidebar-w, 260px);
+  box-sizing: border-box;
 }
 
 .post-reading-content {
   width: min(760px, 95%);
-  margin: 0 auto 40px;
+  margin-inline: auto;
   padding: 0 16px;
 }
 
@@ -69,4 +72,12 @@
   margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid #efefef;
+}
+/* ---------- Owner actions (edit / delete) ---------- */
+
+.post-owner-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-bottom: 8px;
 }

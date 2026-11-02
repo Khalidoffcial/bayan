@@ -5,8 +5,8 @@
    ================================================================ */
 
 .inline-comments {
-  border-top: 1px solid #efefef;
-  background: #f6f5f2;
+  border-top: 1px solid var(--border, #efefef);
+  background: var(--bg, #f6f5f2);
   padding: 14px 18px 18px;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@
 .inline-comments-title {
   font-size: 14px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary, #111827);
 }
 
 .inline-comments-count {
@@ -239,4 +239,57 @@
     font-size: 16px;
     /* prevents iOS zoom-on-focus */
   }
+}
+/* ---------- Reply metadata (Twitter/X-style context) ---------- */
+
+.inline-comments-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.inline-comments-username {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.inline-comments-context {
+  display: block;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+.inline-comments-context-link {
+  color: #0f8ee2;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.inline-comments-context-link:hover {
+  text-decoration: underline;
+}
+
+.inline-comments-stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.inline-comments-stat {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.inline-comments-reply {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.inline-comments-reply:hover {
+  background: #eef4fb;
+  border-radius: 10px;
 }

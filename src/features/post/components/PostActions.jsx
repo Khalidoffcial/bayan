@@ -1,7 +1,7 @@
 import React from "react";
 import { FaHeart, FaComment, FaShareAlt } from "react-icons/fa";
 
-export const PostActions = ({ liked, likesCount, onLike, onComment, onShare }) => {
+export const PostActions = ({ liked, likesCount, onLike, onComment, onShare, extraStats }) => {
   return (
     <div className="post-actions">
       <button
@@ -27,6 +27,9 @@ export const PostActions = ({ liked, likesCount, onLike, onComment, onShare }) =
       >
         <FaShareAlt />
       </button>
+
+      {/* عداد المشاهدات — عنصر عرض فقط، غير قابل للنقر */}
+      {extraStats && <div className="post-actions__extra">{extraStats}</div>}
     </div>
   );
 };

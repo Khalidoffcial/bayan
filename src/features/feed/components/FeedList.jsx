@@ -10,7 +10,8 @@ export const FeedList = ({
   onComment,
   onShare,
   getDirection,
-  userId
+  userId,
+  onPostDeleted
 }) => {
   if (!feed || feed.length === 0) return null;
   
@@ -45,6 +46,7 @@ console.log("----: ",item?.likesBy?.[userId] || false)
     onComment={onComment}
     onShare={onShare}
     getDirection={getDirection}
+    onDeleted={onPostDeleted}
   />
 );
       })}

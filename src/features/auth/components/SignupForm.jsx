@@ -2,11 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import useAuthForm from "../hooks/useAuthForm";
 import GoogleAuthButton from "./GoogleAuthButton";
-import nextIcon from "../../../assets/icons/next.png";
-import earth from "../../../assets/images/image0.svg";
-import "../styles/signup.css";
+import AuthShell from "./AuthShell";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const SignupForm = () => {
+  const { t } = useTranslation();
   const {
     fullName,
     setFullName,
@@ -27,90 +27,92 @@ export const SignupForm = () => {
   } = useAuthForm("signup");
 
   return (
-    <div className="log-page">
-      <img className="background" src={earth} alt="bg" />
+    <AuthShell titleKey="auth.signup.title" subtitleKey="auth.signup.subtitle">
+      <GoogleAuthButton onClick={handleGoogleAuth} disabled={loading} />
 
-      <div className="signup-box">
-        <h2>Bayan</h2>
-        <h6>Sign up</h6>
+      <div className="auth-divider">{t("auth.or")}</div>
 
-        <div className="user-box">
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          {showPasswordError && (
-            <p className="error">
-              Password must contain at least 1 uppercase letter
-            </p>
-          )}
-
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-
-          {showConfirmError && (
-            <p className="error">Passwords do not match</p>
-          )}
-
-          <GoogleAuthButton onClick={handleGoogleAuth} disabled={loading} />
-
-          {errorMsg && (
-            <p className="error" style={{ textAlign: "center", margin: "10px 0" }}>
-              {errorMsg}
-            </p>
-          )}
-
-          <div className="checkbox">
-            <input
-              type="checkbox"
-              id="remember-me-signup"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="checkboxInput"
-            />
-            <label htmlFor="remember-me-signup" className="checkboxLabel">
-              Remember Me
-            </label>
-          </div>
-        </div>
-
-        <div className="sign">
-          <Link to="/signin" className="signin">
-            Sign in
-          </Link>
-
-          <button
-            className="signup"
-            onClick={handleSignup}
-            disabled={loading}
-          >
-            <h1>{loading ? "Signing up..." : "Sign up"}</h1>
-            <img src={nextIcon} alt="next" />
-          </button>
-        </div>
+      <div className="auth-field">
+        <label htmlFor="signup-name">{t("auth.fullName")}</label>
+        <input
+          id="signup-name"
+          type="text"
+          placeholder={t("auth.fullNamePlaceholder")}
+          autoComplete="name"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+        />
       </div>
-    </div>
+
+      <div className="auth-field">
+        <label htmlFor="signup-username">{t("auth.username")}</label>
+        <input
+          id="signup-username"
+          type="text"
+          placeholder={t("auth.usernamePlaceholder")}
+          autoComplete="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
+
+      <div className={`auth-field ${showPasswordError ? "auth-field--error" : ""}`}>
+        <label htmlFor="signup-password">{t("auth.password")}</label>
+        <input
+          id="signup-password"
+          type="password"
+          placeholder={t("auth.passwordPlaceholder")}
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {showPasswordError && (
+          <span className="auth-field__error">{t("auth.passwordRule")}</span>
+        )}
+      </div>
+
+      <div className={`auth-field ${showConfirmError ? "auth-field--error" : ""}`}>
+        <label htmlFor="signup-confirm">{t("auth.confirmPassword")}</label>
+        <input
+          id="signup-confirm"
+          type="password"
+          placeholder={t("auth.confirmPlaceholder")}
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+        {showConfirmError && (
+          <span className="auth-field__error">{t("auth.passwordsNoMatch")}</span>
+        )}
+      </div>
+
+      {errorMsg && (
+        <div className="auth-alert" role="alert">
+          <span aria-hidden="true">⚠</span>
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
+      <div className="auth-remember">
+        <input
+          type="checkbox"
+          id="remember-me-signup"
+          checked={rememberMe}
+          onChange={(e) => setRememberMe(e.target.checked)}
+        />
+        <label htmlFor="remember-me-signup">{t("auth.rememberMe")}</label>
+      </div>
+
+      <button type="button" className="auth-submit" onClick={handleSignup} disabled={loading}>
+        {loading && <span className="auth-submit__spinner" aria-hidden="true" />}
+        <span>{loading ? t("auth.signingUp") : t("auth.signupCta")}</span>
+      </button>
+
+      <p className="auth-switch">
+        {t("auth.haveAccount")}{" "}
+        <Link to="/signin">{t("auth.loginLink")}</Link>
+      </p>
+    </AuthShell>
   );
 };
 

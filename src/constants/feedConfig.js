@@ -2,7 +2,10 @@
  * Centralized Feed Configuration
  */
 export const FEED_CONFIG = {
-  BATCH_SIZE: 100,
+  // Server-ranked page size — one Firebase-backed aggregation per page.
+  // 100 filled several screens at once and made every "load more" heavy;
+  // 20 matches the backend default and keeps prefetch cheap.
+  BATCH_SIZE: 20,
   PREFETCH_THRESHOLD_PX: 600,
 };
 

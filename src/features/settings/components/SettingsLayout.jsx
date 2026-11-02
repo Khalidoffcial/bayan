@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useSettings } from "../../../contexts/SettingsContext";
+import { useTranslation } from "../../../i18n/useTranslation";
 import Top from "../../../components/layout/Top";
 
 import AppearanceSettings from "./AppearanceSettings";
@@ -14,9 +15,14 @@ import StatisticsSettings from "./StatisticsSettings";
 import "../styles/settings.css";
 
 const NAV = [
-  { id: "appearance", icon: "◈", label: "Appearance" },
-  { id: "notifications", icon: "◎", label: "Notifications" },
-  { id: "language", icon: "◐", label: "Language" },
+  { id: "account", labelKey: "settings.account" },
+  { id: "appearance", labelKey: "settings.appearance" },
+  { id: "language", labelKey: "settings.language" },
+  { id: "notifications", labelKey: "settings.notifications" },
+  { id: "reading", labelKey: "settings.reading" },
+  { id: "creator", labelKey: "settings.creator" },
+  { id: "premium", labelKey: "settings.premium" },
+  { id: "statistics", labelKey: "settings.statistics" },
 ];
 
 const PANELS = {
@@ -33,6 +39,7 @@ const PANELS = {
 export const SettingsLayout = () => {
   const [active, setActive] = useState("appearance");
   const { saveStatus, profile } = useSettings();
+  const { t } = useTranslation();
   const Panel = PANELS[active] || AppearanceSettings;
 
   return (
@@ -40,7 +47,7 @@ export const SettingsLayout = () => {
       <Top />
       <div className="settings-layout">
         <aside className="settings-sidebar">
-          <div className="sidebar-section-label">Preferences</div>
+          <div className="sidebar-section-label">{t("settings.preferences")}</div>
           <nav className="sidebar-nav">
             {NAV.map((item) => (
               <div
@@ -49,22 +56,18 @@ export const SettingsLayout = () => {
                 onClick={() => setActive(item.id)}
                 role="button"
                 tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && setActive(item.id)}
               >
-                <span className="sidebar-icon">{item.icon}</span>
-                {item.label}
-                {item.badge && (
-                  <span className="sidebar-badge">{item.badge}</span>
-                )}
+                {t(item.labelKey)}
               </div>
             ))}
           </nav>
 
           <div className="sidebar-footer">
             <div className="sidebar-item" style={{ fontSize: 12 }}>
-              <span className="sidebar-icon">⬡</span>
               <div>
                 <div style={{ fontWeight: 500, color: "var(--text)" }}>
-                  {profile.name || "User"}
+                  {profile.name || t("common.loading")}
                 </div>
                 <div style={{ color: "var(--text3)", fontSize: 11 }}>
                   @{profile.username || "user"}
@@ -79,25 +82,26 @@ export const SettingsLayout = () => {
         </main>
 
         {saveStatus && (
-          <div className="save-bar">
-            {saveStatus === "saving" ? (
+          <div className={`save-bar ${saveStatus === "failed" ? "save-bar--error" : ""}`} role="status">
+            {saveStatus === "saving" && (
               <>
-                <div
-                  style={{
-                    width: 14,
-                    height: 14,
-                    border: "2px solid var(--gold)",
-                    borderTopColor: "transparent",
-                    borderRadius: "50%",
-                    animation: "spin 0.6s linear infinite",
-                  }}
-                />
-                <span className="save-bar-msg">Saving changes...</span>
+                <div className="save-bar-spinner" aria-hidden="true" />
+                <span className="save-bar-msg">{t("settings.saving")}</span>
               </>
-            ) : (
+            )}
+            {saveStatus === "saved" && (
               <>
-                <span style={{ color: "var(--teal)", fontSize: 16 }}>✓</span>
-                <span className="save-bar-msg">Changes saved</span>
+                <span className="save-bar-check" aria-hidden="true">✓</span>
+                <span className="save-bar-msg">{t("settings.saved")}</span>
+              </>
+            )}
+            {saveStatus === "failed" && (
+              <>
+                <span className="save-bar-cross" aria-hidden="true">✕</span>
+                <span className="save-bar-msg">{t("settings.saveFailed")}</span>
+                <button type="button" className="save-bar-retry" onClick={() => window.dispatchEvent(new CustomEvent("BAYAN_RETRY_SAVE"))}>
+                  {t("common.retry")}
+                </button>
               </>
             )}
           </div>

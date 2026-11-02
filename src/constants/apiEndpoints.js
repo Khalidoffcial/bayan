@@ -15,4 +15,13 @@ export const API_ENDPOINTS = {
   EDIT_PROFILE_PHOTO: `${API_BASE_URL}/edit_profile_photo`,
   EDIT_BIO: `${API_BASE_URL}/edit_bio`,
   SETTINGS: `${API_BASE_URL}/settings`,
+  GET_COMMENTS: `${API_BASE_URL}/getComments`,
+  GET_REPLIES: `${API_BASE_URL}/getReplies`,
+  GET_POST_BY_ID: `${API_BASE_URL}/getPostById`,
+  MEDIA_UPLOAD_SIGNATURE: `${API_BASE_URL}/media/upload-signature`,
+  MEDIA_DISCARD: `${API_BASE_URL}/media/discard`,
+  EDIT_POST: `${API_BASE_URL}/editPost`,
+  DELETE_POST: `${API_BASE_URL}/deletePost`,
+  TRANSLATE: `${API_BASE_URL}/translate`,
+  VIEW: `${API_BASE_URL}/view`,
 };

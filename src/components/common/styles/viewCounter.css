@@ -1,0 +1,26 @@
+/* ViewCounter — أيقونة Eye + رقم، متناسق مع الثيمين وRTL/LTR */
+
+.view-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--text2, #6b7280);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.view-counter__icon {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.view-counter__num {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* حالة فشل الاتصال — القيمة القديمة تظهر بشفافية أقل، لا رقم وهمي */
+.view-counter--stale {
+  opacity: 0.6;
+}

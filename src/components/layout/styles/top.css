@@ -7,8 +7,8 @@ header.top {
   left: 0;
   width: 100%;
   height: var(--header-height, 50px);
-  background-color: #ffffff;
-  border-bottom: 2px solid #202020;
+  background-color: var(--glass, #ffffff);
+  border-bottom: 2px solid var(--border-md, #202020);
   border-radius: 10px;
   display: flex;
   justify-content: space-between;
@@ -17,8 +17,8 @@ header.top {
   padding: 0 20px;
 }
 
-.top-header__profile-btn,
-.login-button {
+.top-header__profile-btn
+{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,8 +30,8 @@ header.top {
   transition: background-color 0.3s ease;
 }
 
-.top-header__profile-btn:hover,
-.login-button:hover {
+.top-header__profile-btn:hover
+ {
   background-color: #2e2e2e;
 }
 
@@ -57,9 +57,21 @@ header.top {
   width: 200px;
   height: 48px;
   margin-left: 4px;
-  background-image: url('../../../assets/icons/logo.jpeg');
+  background-image: url('../../../assets/icons/logo.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   cursor: pointer;
 }
+
+/* موبايل: الهيدر يعود لعرض كامل لأن السايدبار يصبح overlay */
+@media (max-width: 900px) {
+  .top-header,
+  header.top {
+    width: 100%;
+    inset-inline-start: 0;
+  }
+}
+
+/* اللوجو انتقل إلى أعلى الـ Sidebar — لا نسخة في الهيدر.
+   القاعدة محفوظة فارغة لتجنب كسر أي مراجع قديمة في DOM خارج هذا المشروع. */

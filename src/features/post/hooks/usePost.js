@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { sharePost } from "../services/post.service";
+import { sharePost, fetchPostById } from "../services/post.service";
 import useAuth from "../../../hooks/useAuth";
 import useSocket from "../../../hooks/useSocket";
 
@@ -18,15 +18,37 @@ export const usePost = () => {
   const [commented, setCommented] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     if (location.state) {
       setDataPost(location.state);
       if (location.state?.img?.length > 0) {
         setImageUrl(location.state.img[0]);
       }
       setLoading(false);
-    } else {
+    } else if (!postId) {
+      // No route param and no navigation state — nothing to load.
       setLoading(false);
+    } else {
+      // Deep link / page refresh: fetch the post (or reply) from the server.
+      setLoading(true);
+      fetchPostById(postId).then(({ post, error }) => {
+        if (cancelled) return;
+        setLoading(false);
+        if (error || !post) {
+          setDataPost(null);
+          return;
+        }
+        setDataPost(post);
+        if (post?.img?.length > 0) {
+          setImageUrl(post.img[0]);
+        }
+      });
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [postId, location.state]);
 
     // مزامنة حالة اللايك والعداد مع بيانات البوست والمستخدم
@@ -82,6 +104,7 @@ export const usePost = () => {
   return {
     postId,
     dataPost,
+    setDataPost,
     imageUrl,
     loading,
     liked,

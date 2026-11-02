@@ -60,6 +60,9 @@ export const ArticleReading = () => {
           descrip={dataArticle.descrip}
           imageUrl={imageUrl}
           titleDir={getDirection(dataArticle.title)}
+          authorName={dataArticle.userData?.F_user || dataArticle.userData?.S_user}
+          datePublished={dataArticle.createdAt}
+          dateModified={dataArticle.updatedAt}
         />
 
         <ArticleBody
@@ -67,6 +70,8 @@ export const ArticleReading = () => {
           imageUrl={imageUrl}
           contentDir={getDirection(dataArticle.content)}
           articleRef={articleRef}
+          contentId={dataArticle.id}
+          contentType="articles"
         />
 
         <ArticleActions

@@ -542,8 +542,10 @@
 
 .ck.ck-editor__editable {
   min-height: 200px !important;
-  color: #222222 !important;
-  background: #ffffff !important;
+  /* tokens — يستجيب للوضعين الفاتح والداكن (استثناء !important
+     هنا ضروري لأن CKEditor يفرض ألوانه بـ inline styles) */
+  color: var(--text-primary, #1a1b22) !important;
+  background: var(--bg-primary, #ffffff) !important;
 }
 
 /* Toast Notification */
@@ -564,7 +566,7 @@
   align-items: center;
   gap: 10px;
   font-family: "Inter", sans-serif;
-  direction: rtl;
+  /* الاتجاه يتبع لغة الواجهة — لا قيمة ثابتة */
 }
 
 /* ---------- Responsive ---------- */

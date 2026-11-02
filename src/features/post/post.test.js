@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { SettingsProvider } from '../../contexts/SettingsContext';
 import { PostHeader, PostBody, PostActions, PostReading } from './index';
 
 describe('Post Feature Components', () => {
@@ -25,11 +26,15 @@ describe('Post Feature Components', () => {
 
   test('renders PostBody with content', () => {
     render(
-      <PostBody
-        content="<p>Insightful post content</p>"
-        imageUrl="https://example.com/preview.jpg"
-        contentDir="ltr"
-      />
+      <SettingsProvider>
+        <PostBody
+          content="<p>Insightful post content</p>"
+          imageUrl="https://example.com/preview.jpg"
+          contentDir="ltr"
+          contentId="p1"
+          contentType="posts"
+        />
+      </SettingsProvider>
     );
 
     expect(screen.getByText('Insightful post content')).toBeInTheDocument();
@@ -61,11 +66,13 @@ describe('Post Feature Components', () => {
 
   test('renders PostReading fallback when no post state is present', () => {
     render(
-      <BrowserRouter>
-        <HelmetProvider>
-          <PostReading />
-        </HelmetProvider>
-      </BrowserRouter>
+      <SettingsProvider>
+        <BrowserRouter>
+          <HelmetProvider>
+            <PostReading />
+          </HelmetProvider>
+        </BrowserRouter>
+      </SettingsProvider>
     );
 
     expect(screen.getByText(/post not found/i)).toBeInTheDocument();

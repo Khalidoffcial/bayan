@@ -24,6 +24,7 @@ export const useProfile = () => {
   const [editingName, setEditingName] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [savingField, setSavingField] = useState(null); // "name" | "bio" | "img" أثناء الحفظ
 
   // Crop State
   const [image, setImage] = useState(null);
@@ -32,12 +33,11 @@ export const useProfile = () => {
   const [cropMode, setCropMode] = useState(false);
   const [croppedArea, setCroppedArea] = useState(null);
 
-  // Stats & Feed State
-  const [activeTab, setActiveTab] = useState("Posts");
+  // Stats State (content tabs/feed moved to useProfileContent)
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [followMode, setFollowMode] = useState(true);
-  const [feed, setFeed] = useState([]);
+
   const [likesMap, setLikesMap] = useState({});
   const [commented, setCommented] = useState(false);
 
@@ -89,72 +89,24 @@ export const useProfile = () => {
     }
   }, [userDataMain, idOtherUser]);
 
-  // 3. Socket Setup & Real-time Content
+  // 3. Socket Setup (followers only).
+  // Content fetching/rendering moved to useProfileContent — the unified
+  // posts + replies + articles + novels profile feed lives there now.
   useEffect(() => {
     const socket = socketRef?.current;
     if (!socket) return;
 
     const handleNewFollower = () => setFollowersCount((prev) => prev + 1);
     const handleLostFollower = () => setFollowersCount((prev) => Math.max(0, prev - 1));
-    const handleContent = (data) => setFeed(Array.isArray(data) ? [...data].reverse() : []);
-
-    const handleNewPost = (post) => {
-      if (!post || typeof post !== "object") return;
-      const targetId = idOtherUser || userDataMain.id;
-      const postAuthorId =
-        post.autherID ||
-        post.authorId ||
-        post.userId ||
-        post.userData?.Id_user ||
-        post.userData?.id;
-
-      if (targetId && String(postAuthorId) === String(targetId)) {
-        const currentTab = String(activeTab || "Posts").toLowerCase();
-        const postType = String(post.type || "post").toLowerCase();
-
-        const matchesTab =
-          (currentTab.includes("post") && (postType.includes("post") || !post.type)) ||
-          (currentTab.includes("article") && postType.includes("article")) ||
-          (currentTab.includes("novel") && postType.includes("novel"));
-
-        if (matchesTab) {
-          setFeed((prev) => {
-            const exists = prev.some(
-              (p) => String(p.id ?? p._id ?? p.id_post ?? "") === String(post.id ?? post._id ?? "")
-            );
-            if (exists) return prev;
-            return [post, ...prev];
-          });
-        }
-      }
-    };
-
-    const handleLocalNewPost = (event) => {
-      if (event.detail) handleNewPost(event.detail);
-    };
 
     socket.on("newFollower", handleNewFollower);
     socket.on("lostFollower", handleLostFollower);
-    socket.on("CONTENT_RESULT", handleContent);
-    socket.on("NEW_POST", handleNewPost);
-    window.addEventListener("BAYAN_NEW_POST", handleLocalNewPost);
 
     return () => {
       socket.off("newFollower", handleNewFollower);
       socket.off("lostFollower", handleLostFollower);
-      socket.off("CONTENT_RESULT", handleContent);
-      socket.off("NEW_POST", handleNewPost);
-      window.removeEventListener("BAYAN_NEW_POST", handleLocalNewPost);
     };
-  }, [socketRef, activeTab, idOtherUser, userDataMain.id]);
-
-  // 4. Fetch Content for Profile Tab
-  useEffect(() => {
-    const targetId = idOtherUser || userDataMain.id;
-    if (targetId) {
-      socketRef.current?.emit("MYCONTENT", { idUser: targetId, type: activeTab });
-    }
-  }, [activeTab, idOtherUser, userDataMain.id]);
+  }, [socketRef]);
 
   const handleFollow = useCallback(async () => {
     socketRef.current?.emit("followUser", { idUser: userDataMain.id, idFollowedUser: idOtherUser });
@@ -185,25 +137,42 @@ export const useProfile = () => {
   }, [userDataMain.id, idOtherUser]);
 
   const saveProfileUpdate = useCallback(async (value, field) => {
+    setSavingField(field);
     try {
-      const data = await updateUserProfileField(value, field);
+      // تطبيع اسم الحقل: الخادم يقارن بأحرف صغيرة ("bio"/"name"/"img")
+      const data = await updateUserProfileField(value, String(field).toLowerCase());
       if (data?.userData) {
         setUserDataMain(data.userData);
         localStorage.setItem("me", JSON.stringify(data.userData));
+        // مزامنة الحقول المعروضة فورًا من استجابة الخادم (مصدر الحقيقة)
+        if (data.userData.Bio !== undefined) setBio(data.userData.Bio || "");
+        if (data.userData.name !== undefined) setName(data.userData.name);
+        if (data.userData.imgProfile !== undefined) setImageUrl(data.userData.imgProfile || "");
       }
+      return { ok: true };
     } catch (err) {
       console.error("Profile update error:", err);
+      return { ok: false, error: err?.response?.data?.message || err?.message || "Failed to update profile" };
+    } finally {
+      setSavingField(null);
     }
   }, []);
 
-  const handleSaveName = () => {
-    setEditingName(false);
-    saveProfileUpdate(name, "name");
+  const handleSaveName = async () => {
+    if (savingField) return;
+    const trimmed = name.trim();
+    if (!trimmed) return; // الاسم لا يكون فارغًا
+    setName(trimmed);
+    const res = await saveProfileUpdate(trimmed, "name");
+    if (res.ok) setEditingName(false);
   };
 
-  const handleSaveBio = () => {
-    setEditingBio(false);
-    saveProfileUpdate(bio, "Bio");
+  const handleSaveBio = async () => {
+    if (savingField) return;
+    const trimmed = (bio ?? "").trim(); // البايو الفارغ مسموح، المسافات تُنسّف
+    setBio(trimmed);
+    const res = await saveProfileUpdate(trimmed, "bio");
+    if (res.ok) setEditingBio(false);
   };
 
   const handleImageChange = (e) => {
@@ -283,6 +252,7 @@ export const useProfile = () => {
     setEditingName,
     editingBio,
     setEditingBio,
+    savingField,
     dropdownOpen,
     setDropdownOpen,
     image,
@@ -293,12 +263,9 @@ export const useProfile = () => {
     cropMode,
     setCropMode,
     setCroppedArea,
-    activeTab,
-    setActiveTab,
     followersCount,
     followingCount,
     followMode,
-    feed,
     likesMap,
     commented,
     setCommented,

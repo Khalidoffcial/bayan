@@ -1,0 +1,150 @@
+/* ================================================================
+   MediaGallery — post/reply media, Twitter/X-style layouts.
+   Principle: images keep their ORIGINAL aspect ratio (`object-fit:
+   contain`) — never blanket-cropped by `cover`. Oversized originals
+   are capped by a max-height so they stay usable in the feed; the
+   full uncapped image opens in the image viewer on click.
+   Layouts: 1 image = natural frame, 2 = side-by-side,
+   3 = one large + two stacked, 4 = 2x2 grid. Videos unchanged.
+   ================================================================ */
+
+.media-gallery {
+  display: flex;
+  gap: 8px;
+  border-radius: 14px;
+  scrollbar-width: none;
+  overflow: hidden;
+}
+
+.media-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.media-gallery-item {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f0f0ee;
+  cursor: zoom-in;
+  min-width: 0;
+}
+
+.media-gallery-item img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  background: #f0f0ee;
+}
+
+.media-gallery-video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  max-height: 520px;
+  border-radius: 14px;
+  background: #000;
+}
+
+/* ---------- Layout: 1 image ---------- */
+.media-gallery--count-1 {
+  display: block;
+}
+
+.media-gallery--count-1 .media-gallery-item img {
+  /* Cap towering portrait screenshots; contain keeps them uncropped. */
+  max-height: 520px;
+  margin-inline: auto;
+}
+
+/* ---------- Layout: 2 images ---------- */
+.media-gallery--count-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.media-gallery--count-2 .media-gallery-item img {
+  height: 100%;
+  max-height: 340px;
+  object-fit: contain;
+}
+
+/* ---------- Layout: 3 images ---------- */
+.media-gallery--count-3 {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  max-height: 420px;
+}
+
+.media-gallery--count-3 .media-gallery-item:first-child {
+  grid-row: span 2;
+}
+
+.media-gallery--count-3 .media-gallery-item img {
+  height: 100%;
+  max-height: 210px;
+  object-fit: contain;
+}
+
+/* ---------- Layout: 4 images ---------- */
+.media-gallery--count-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  max-height: 420px;
+}
+
+.media-gallery--count-4 .media-gallery-item img {
+  height: 100%;
+  max-height: 210px;
+  object-fit: contain;
+}
+
+/* Desktop drag-scroll retained for >4 legacy items (rare, defensive). */
+.media-gallery--strip {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+}
+
+.media-gallery--strip.media-gallery--dragging {
+  cursor: grabbing;
+}
+
+.media-gallery--strip .media-gallery-item {
+  flex: 0 0 auto;
+}
+
+.media-gallery--strip .media-gallery-item img {
+  height: 220px;
+  width: auto;
+  max-width: 85vw;
+}
+
+@media (max-width: 640px) {
+  .media-gallery--count-2 .media-gallery-item img {
+    max-height: 220px;
+  }
+
+  .media-gallery--count-3,
+  .media-gallery--count-4 {
+    max-height: 300px;
+  }
+
+  .media-gallery--count-3 .media-gallery-item img,
+  .media-gallery--count-4 .media-gallery-item img {
+    max-height: 150px;
+  }
+
+  .media-gallery--count-1 .media-gallery-item img {
+    max-height: 420px;
+  }
+
+  .media-gallery-video {
+    max-height: 380px;
+  }
+}

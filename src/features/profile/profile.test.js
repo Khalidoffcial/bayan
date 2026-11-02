@@ -53,15 +53,26 @@ describe('Profile Feature Components', () => {
     expect(screen.getByText('Following')).toBeInTheDocument();
   });
 
-  test('renders ProfileTabs and handles tab clicks', () => {
+  test('renders ProfileTabs with unified content tabs and handles clicks', () => {
     const handleTabChange = jest.fn();
-    render(<ProfileTabs activeTab="Posts" onTabChange={handleTabChange} />);
+    const counts = { all: 4, posts: 2, replies: 1, articles: 1, novels: 0 };
 
+    render(
+      <ProfileTabs activeTab="all" onTabChange={handleTabChange} counts={counts} />
+    );
+
+    // "All" is the default tab and appears first.
+    expect(screen.getByText('All')).toBeInTheDocument();
     expect(screen.getByText('Posts')).toBeInTheDocument();
+    expect(screen.getByText('Replies')).toBeInTheDocument();
     expect(screen.getByText('Articles')).toBeInTheDocument();
     expect(screen.getByText('Novels')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Articles'));
-    expect(handleTabChange).toHaveBeenCalledWith('Articles');
+    // Counts render when the server provides them.
+    expect(screen.getByText('4')).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Replies'));
+    expect(handleTabChange).toHaveBeenCalledWith('replies');
   });
 });

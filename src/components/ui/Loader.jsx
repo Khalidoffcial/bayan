@@ -1,63 +1,40 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import logoLight from "../../assets/icons/logo.png";
+import "./Loader.css";
 
-export const Loader = () => {
+/**
+ * Loader — Apple-simple, مصقول:
+ * شعار Bayan في المنتصف + خط تحميل رفيع أزرق (#0f8ee2) يتحرك تحته.
+ * حركة واحدة ناعمة، خروج fade عند الإزالة، بلا Glow/3D/جسيمات.
+ * فاتح/داكن عبر data-theme، ويحترم prefers-reduced-motion.
+ */
+const Loader = () => {
+  const [leaving, setLeaving] = useState(false);
+
+  // خروج fade ناعم قبل إزالة العنصر من الـ DOM
+  useEffect(() => {
+    const onLeave = () => setLeaving(true);
+    window.addEventListener("app:loader-hide", onLeave);
+    return () => window.removeEventListener("app:loader-hide", onLeave);
+  }, []);
+
   return (
-    <div className="loader-container">
-      <motion.div
-        className="loader-ring"
-        animate={{
-          rotate: 360,
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 1.2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="loader-dot"
-        animate={{
-          scale: [1, 1.5, 1],
-          opacity: [1, 0.5, 1],
-        }}
-        transition={{
-          duration: 1,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <style>{`
-        .loader-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 150px;
-          position: relative;
-        }
-
-        .loader-ring {
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          border: 5px solid rgba(255, 255, 255, 0.2);
-          border-top-color: #ff0055;
-          border-right-color: #00ccff;
-          position: absolute;
-          box-shadow: 0 0 15px rgba(255, 0, 136, 0.5);
-        }
-
-        .loader-dot {
-          width: 14px;
-          height: 14px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #ff0055, #00ccff);
-          box-shadow: 0 0 15px rgba(0, 204, 255, 0.8);
-        }
-      `}</style>
+    <div
+      className={`bayan-loader ${leaving ? "bayan-loader--leave" : ""}`}
+      role="status"
+      aria-label="Loading"
+    >
+      <div className="bayan-loader__mark">
+        <img src={logoLight} alt="" className="bayan-loader__logo" draggable="false" />
+        <span className="bayan-loader__bar" aria-hidden="true" />
+      </div>
     </div>
   );
+};
+
+/** يُطلق حدث الخروج — يُستخدم من التطبيق عند اكتمال التحميل */
+export const hideLoader = () => {
+  window.dispatchEvent(new Event("app:loader-hide"));
 };
 
 export default Loader;

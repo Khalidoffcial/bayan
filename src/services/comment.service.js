@@ -1,4 +1,4 @@
-import api from "./api.service";
+import {api} from "./api.service";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
 /**
@@ -32,9 +32,6 @@ export const COMMENT_CONTENT_TYPES = {
 
 const normalizeId = (value) => (value === undefined || value === null ? "" : String(value));
 
-const isCommentFor = (item, contentId) =>
-  Boolean(item) && typeof item === "object" && normalizeId(item.comment_on) === normalizeId(contentId);
-
 /**
  * Normalizes a raw backend comment record into a predictable shape.
  * Kept defensive because feed records vary in ID/author field naming.
@@ -48,11 +45,17 @@ export const normalizeComment = (raw, index = 0) => {
   return {
     id,
     commentOn: normalizeId(raw.comment_on ?? raw.commentOn ?? raw.commentOnId),
+    parentType: raw.parentType || raw.type || COMMENT_CONTENT_TYPES.POST,
     text: typeof raw.content === "string" ? raw.content : "",
     images: Array.isArray(raw.img) ? raw.img : [],
+    media: Array.isArray(raw.media) ? raw.media : [],
     type: raw.type || COMMENT_CONTENT_TYPES.POST,
     date: raw.date || null,
+    time: raw.time || null,
     createdAt: raw.createdAt || raw.timestamp || null,
+    likesCount: Number(raw.likesCount ?? raw.likes ?? 0),
+    replyCount: Number(raw.replyCount ?? 0),
+    likesBy: raw.likesBy || null,
     author: {
       id: normalizeId(raw.autherID ?? raw.authorId ?? raw.userId ?? raw.userData?.Id_user),
       name: raw.userData?.F_user || raw.F_user || "",
@@ -65,66 +68,50 @@ export const normalizeComment = (raw, index = 0) => {
 };
 
 /**
- * Fetches existing comments for a content item.
+ * Fetches existing replies/comments for a content item.
  *
- * Uses the existing socket connection and emits GET_FEED; the resolver
- * filters FEED_RESULT records whose `comment_on` matches the target content.
- * Resolves with an array of normalized comments (never rejects).
+ * Primary path: REST POST /getReplies — targeted per-parent read maintained
+ * by the backend's replyIndex; falls back gracefully when unavailable.
  *
- * @param {import("socket.io-client").Socket|null} socket
- * @param {{ contentId: string, contentType?: string, timeoutMs?: number }} params
+ * @param {{ contentId: string, contentType?: string }} params
  * @returns {Promise<{ comments: Array, error: string|null }>}
  */
-export const fetchComments = (socket, { contentId, timeoutMs = 8000 } = {}) =>
-  new Promise((resolve) => {
-    if (!socket || !contentId) {
-      resolve({ comments: [], error: null });
-      return;
+export const fetchComments = async ({ contentId } = {}) => {
+  if (!contentId) return { comments: [], error: null };
+
+  try {
+    const response = await api.post(API_ENDPOINTS.GET_REPLIES, {
+      parentId: String(contentId),
+    });
+
+    const body = response?.data;
+    if (body?.status !== "ok") {
+      return { comments: [], error: body?.message || "Failed to load replies" };
     }
 
-    let settled = false;
-    const comments = [];
+    const rawItems = Array.isArray(body.replies) ? body.replies : [];
     const seen = new Set();
+    const comments = [];
 
-    const finish = (error = null) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      socket.off(COMMENT_EVENTS.FEED_RESULT, handleResult);
-      resolve({ comments, error });
+    rawItems.forEach((item, index) => {
+      const comment = normalizeComment(item, index);
+      if (comment && !seen.has(comment.id)) {
+        seen.add(comment.id);
+        comments.push(comment);
+      }
+    });
+
+    return { comments, error: null };
+  } catch (err) {
+    return {
+      comments: [],
+      error:
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to load replies",
     };
-
-    const handleResult = (res) => {
-      const rawItems = Array.isArray(res)
-        ? res
-        : res?.items || res?.posts || res?.content || res?.data || res?.result || res?.feed || [];
-
-      rawItems
-        .filter((item) => isCommentFor(item, contentId))
-        .forEach((item, index) => {
-          const comment = normalizeComment(item, index);
-          if (comment && !seen.has(comment.id)) {
-            seen.add(comment.id);
-            comments.push(comment);
-          }
-        });
-    };
-
-    const timer = setTimeout(() => finish(), timeoutMs);
-
-    socket.on(COMMENT_EVENTS.FEED_RESULT, handleResult);
-
-    try {
-      socket.emit(COMMENT_EVENTS.GET_FEED, {
-        userId: "",
-        type: "all",
-        cursor: 0,
-        limit: 100,
-      });
-    } catch (err) {
-      finish(err?.message || "Failed to load comments");
-    }
-  });
+  }
+};
 
 /**
  * Submits a comment through the existing REST endpoint used by the writer.
@@ -134,7 +121,7 @@ export const fetchComments = (socket, { contentId, timeoutMs = 8000 } = {}) =>
  * @param {{ contentId: string, contentType?: string, userId?: string, text: string, images?: string[] }} params
  * @returns {Promise<{ ok: boolean, comment?: object, error?: string }>}
  */
-export const submitComment = async ({userData, contentId, contentType = COMMENT_CONTENT_TYPES.POST, userId, text, images = [] }) => {
+export const submitComment = async ({userData, contentId, contentType = COMMENT_CONTENT_TYPES.POST, userId, text, images = [], media = [] }) => {
   const trimmed = (text || "").trim();
 
   if (!contentId) return { ok: false, error: "Missing content reference" };
@@ -144,15 +131,16 @@ export const submitComment = async ({userData, contentId, contentType = COMMENT_
   }
  
   const id = String(Date.now()) + String(Math.floor(100 + Math.random() * 900));
-
+ 
   try {
-          const payload = {
+      const payload = {
         autherID: userId,
         id,
         comment_on: contentId,
         img: images,
-        content:trimmed,
-        type:contentType,
+        media,
+        content: trimmed,
+        type: contentType,
         userData: userData
           ? {
             Id_user: userData.id,
@@ -164,20 +152,51 @@ export const submitComment = async ({userData, contentId, contentType = COMMENT_
         date: new Date().toLocaleDateString("en-CA"),
       };
 
-    await api.post(API_ENDPOINTS.SAVE_POSTS, payload);
+    const response = await api.post(API_ENDPOINTS.SAVE_POSTS, payload);
+
+    // Only treat the comment as persisted when the backend actually
+    // acknowledged success (2xx with `status: "ok"`).
+    const body = response?.data;
+    const backendOk =
+      response.status >= 200 &&
+      response.status < 300 &&
+      (body?.status === undefined || body.status === "ok");
+
+    if (!backendOk) {
+      return {
+        ok: false,
+        error:
+          body?.message ||
+          "The comment could not be saved. Please try again.",
+      };
+    }
 
     return {
       ok: true,
       comment: normalizeComment(payload),
     };
   } catch (err) {
-    const status = err?.response?.status;
-    const error =
-      status === 401
-        ? "Your session has expired. Please sign in again."
-        : err?.response?.data?.message || err?.message || "Failed to post comment. Please try again.";
-    return { ok: false, error };
-  }
+  console.error("submitComment failed:", {
+    message: err.message,
+    url: err.config?.baseURL
+      ? `${err.config.baseURL}${err.config.url}`
+      : err.config?.url,
+    status: err.response?.status,
+    response: err.response?.data,
+
+  });
+
+  const status = err.response?.status;
+
+  const error =
+    status === 401
+      ? "Your session has expired. Please sign in again."
+      : err.response?.data?.message ||
+        err.message ||
+        "Failed to post comment. Please try again.";
+
+  return { ok: false, error };
+}
 };
 
 export default { fetchComments, submitComment, normalizeComment, COMMENT_MAX_LENGTH };

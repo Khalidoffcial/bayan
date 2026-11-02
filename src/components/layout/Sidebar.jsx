@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./styles/sidebar.css";
+import { useTranslation } from "../../i18n/useTranslation";
 
 // Assets
 import menu from "../../assets/icons/menu.png";
@@ -20,12 +21,14 @@ import allOutline from "../../assets/icons/allOutline.png";
 const Sidebar = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { t } = useTranslation();
 
   const channels = [
-    { name: "Posts", activeIcon: PostIcon, inactiveIcon: PostIconOutline },
-    { name: "Articles", activeIcon: articleIcon, inactiveIcon: articleOutline },
-    { name: "Novels", activeIcon: novelIcon, inactiveIcon: novelOutline },
-    { name: "Exams", activeIcon: examIcon, inactiveIcon: examOutline },
+    { key: "nav.all", path: "/", activeIcon: allIcon, inactiveIcon: allOutline, match: (p) => p === "/" || p === "/all" },
+    { key: "nav.posts", path: "/posts", activeIcon: PostIcon, inactiveIcon: PostIconOutline, match: (p) => p === "/posts" },
+    { key: "nav.articles", path: "/articles", activeIcon: articleIcon, inactiveIcon: articleOutline, match: (p) => p === "/articles" },
+    { key: "nav.novels", path: "/novels", activeIcon: novelIcon, inactiveIcon: novelOutline, match: (p) => p === "/novels" },
+    { key: "nav.exams", path: "/exams", activeIcon: examIcon, inactiveIcon: examOutline, match: (p) => p === "/exams" },
   ];
 
   return (
@@ -39,36 +42,24 @@ const Sidebar = () => {
       )}
 
       <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+        {/* اللوجو في الـ Topbar (تعليمات الجولة الحالية) — لا نسخة هنا */}
         <ul className="sidebar-list">
-          <Link
-            to="/"
-            className={`sidebar-item ${location.pathname === "/" ? "active" : ""}`}
-            onClick={() => setSidebarOpen(false)}
-          >
-            <span>All</span>
-            <img
-              src={location.pathname === "/" ? allIcon : allOutline}
-              alt="All"
-              className="settings-icon"
-            />
-          </Link>
-
           {channels.map((channel) => {
-            const path = `/${channel.name.toLowerCase()}`;
-            const isActive = location.pathname === path;
+            const path = channel.path;
+            const isActive = channel.match(location.pathname);
             return (
               <Link
-                key={channel.name}
+                key={channel.key}
                 to={path}
                 className={`sidebar-item ${isActive ? "active" : ""}`}
                 onClick={() => setSidebarOpen(false)}
               >
-                <span>{channel.name}</span>
                 <img
                   src={isActive ? channel.activeIcon : channel.inactiveIcon}
-                  alt={channel.name}
+                  alt=""
                   className="settings-icon"
                 />
+                <span>{t(channel.key)}</span>
               </Link>
             );
           })}
@@ -79,12 +70,12 @@ const Sidebar = () => {
           className={`sidebar-item settings-link ${location.pathname === "/settings" ? "active" : ""}`}
           onClick={() => setSidebarOpen(false)}
           >
-          <span>Settings</span>
           <img
             src={location.pathname === "/settings" ? setting : settingOutline}
-            alt="Settings"
+            alt=""
             className="settings-icon"
           />
+          <span>{t("nav.settings")}</span>
         </Link>
       </div>
     </>

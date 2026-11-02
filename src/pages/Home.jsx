@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import Sidebar from '../components/layout/Sidebar';
+import { useNavigate, useLocation } from "react-router-dom";
 import Content from '../components/layout/Content';
 import cookie from "../utils/cookies";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
@@ -9,12 +8,14 @@ import '../App.css';
 
 export const HomePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Auth check when loading the page
   useEffect(() => {
     const token = cookie("get");
     if (!token) {
-      navigate("/signin");
+      // الزائر غير المسجل → صفحة تعريفية (بما يحافظ على deep link عبر state)
+      navigate("/welcome", { replace: true, state: { from: location.pathname } });
       return;
     }
 
@@ -34,16 +35,17 @@ export const HomePage = () => {
         }
       })
       .catch(() => {
-        navigate("/signin");
+        navigate("/welcome", { replace: true, state: { from: location.pathname } });
       });
   }, [navigate]);
 
   return (
     <div>
+      {/* الـ Sidebar يُعرض مرة واحدة فقط داخل Content → Feed
+          — أي Sidebar ثانٍ هنا كان يسبب padding-inline-start مكرر
+          ويلتصق به الـ Feed في RTL وينحرف في LTR */}
       <div className="homepage">
         <Content />
-        <Sidebar />
-        
       </div>
     </div>
   );

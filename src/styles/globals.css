@@ -17,17 +17,16 @@ body {
   overflow-x: hidden;
 }
 
-/* RTL / LTR Helpers */
+/* RTL / LTR Helpers — لا direction/text-align هنا: سمات dir على html/body هي مصدر الحقيقة الوحيد.
+   --dir-factor: يُستخدم فقط في الحركات (transform) التي تحتاج قلبًا فيزيائيًا */
 html[dir="rtl"],
 body[dir="rtl"] {
-  direction: rtl;
-  text-align: right;
+  --dir-factor: -1;
 }
 
 html[dir="ltr"],
 body[dir="ltr"] {
-  direction: ltr;
-  text-align: left;
+  --dir-factor: 1;
 }
 
 /* Button Reset */

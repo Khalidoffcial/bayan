@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useLocation } from "react-router-dom";
 
 // Writer (inline composer)
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import useFeed from "../hooks/useFeed";
 import { getDirection } from "../../../utils/helpers";
 import { FEED_PREFETCH_THRESHOLD_PX } from "../../../constants/feedConfig";
+import { feedStore } from "../services/feedStore";
 
 // Shared Layout & UI Components
 import Top from "../../../components/layout/Top";
@@ -27,6 +28,13 @@ export const Feed = () => {
   const { user } = useAuth();
     const navigate = useNavigate();
   
+  // المسار → نوع الخلاصة المطلوب من الخادم:
+  //   /            → "all" (Posts + Articles + Novels) — المسار الرئيسي الوحيد للـ All
+  //   /posts       → "posts"
+  //   /articles    → "articles"
+  //   /novels      → "novels"
+  //   (/all يعاد توجيهه إلى / في AppRoutes — لا نسخة ثانية من الـ Feed)
+  const feedType = typeArticle ? String(typeArticle).toLowerCase() : "all";
 
   const {
     feed,
@@ -34,10 +42,10 @@ export const Feed = () => {
     hasMore,
     error,
     fetchFeed,
-    resetFeed,
-    sendEngagement
+    sendEngagement,
+    removePost
 
-  } = useFeed(typeArticle || "posts", user?.id);
+  } = useFeed(feedType, user?.id);
 
   // Local UI State
   const [likedPosts, setLikedPosts] = useState({});
@@ -45,11 +53,43 @@ export const Feed = () => {
   // Inline comments: single expanded section at a time (null = all collapsed).
   const [activeCommentId, setActiveCommentId] = useState(null);
 
-  // Initial Load & Reset on route/filter changes
+  // Scroll restoration: save while mounted, restore after items render.
+  // Only ONE restore per mount (prevents visual jumping on later loads),
+  // and only when the layout has enough content to scroll to.
+  const didRestoreScroll = useRef(false);
+
   useEffect(() => {
-    resetFeed();
-    fetchFeed(true);
-  }, [location.pathname, typeArticle, user?.id, fetchFeed, resetFeed]);
+    didRestoreScroll.current = false;
+
+    const save = () => {
+      feedStore.setScroll(feedType, window.scrollY);
+    };
+    window.addEventListener("scroll", save, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", save);
+    };
+  }, [feedType]);
+
+  useEffect(() => {
+    if (didRestoreScroll.current) return;
+    const savedY = feedStore.getScroll(feedType);
+    if (!savedY) return;
+
+    // Wait until the cached items are actually rendered before restoring —
+    // restoring earlier would clamp to a shorter document and lose position.
+    const raf = requestAnimationFrame(() => {
+      if (document.documentElement.scrollHeight > savedY + window.innerHeight) {
+        window.scrollTo({ top: savedY, behavior: "instant" });
+        didRestoreScroll.current = true;
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [feedType, feed]);
+
+  // NOTE: no resetFeed + refetch on pathname change — the store keeps the
+  // feed alive across navigate-to-content-and-back; useFeed hydrates from
+  // cache instantly and only refreshes after the staleness window.
 
   // Intelligent Infinite Scroll & Prefetch
   useEffect(() => {
@@ -157,6 +197,7 @@ const handleLike = useCallback(
           onShare={handleShare}
           getDirection={getDirection}
           userId={user?.id}
+          onPostDeleted={removePost}
         />
 
         {loading && <Loader />}

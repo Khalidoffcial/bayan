@@ -14,10 +14,13 @@ export const ProfileInfo = ({
   onSaveBio,
   setName,
   setBio,
+  savingField,
   followMode,
   onFollow,
   onUnfollow,
 }) => {
+  const savingBio = savingField === "bio";
+  const savingName = savingField === "name";
   return (
     <div className="profile-info">
       <div className="name-section">
@@ -29,8 +32,13 @@ export const ProfileInfo = ({
               className="edit-input"
               autoFocus
             />
-            <button onClick={onSaveName} className="save-btn" aria-label="Save name">
-              <FaCheck />
+            <button
+              onClick={onSaveName}
+              className="save-btn"
+              aria-label="Save name"
+              disabled={savingName}
+            >
+              {savingName ? "..." : <FaCheck />}
             </button>
           </div>
         ) : (
@@ -54,8 +62,13 @@ export const ProfileInfo = ({
               className="edit-textarea"
               autoFocus
             />
-            <button onClick={onSaveBio} className="save-btn" aria-label="Save bio">
-              <FaCheck />
+            <button
+              onClick={onSaveBio}
+              className="save-btn"
+              aria-label="Save bio"
+              disabled={savingBio}
+            >
+              {savingBio ? "..." : <FaCheck />}
             </button>
           </div>
         ) : (

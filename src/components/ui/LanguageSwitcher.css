@@ -1,0 +1,81 @@
+/* LanguageSwitcher — مبدّل اللغة (لاندينج + باقي الصفحات) */
+.lang-switcher {
+  position: relative;
+  display: inline-block;
+}
+
+.lang-switcher__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border, rgba(0, 0, 0, .12));
+  background: transparent;
+  color: var(--text-primary, #111);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.lang-switcher__btn:hover {
+  border-color: var(--blue, #4A7DFF);
+  background: var(--primary-dim, rgba(74, 125, 255, .06));
+}
+
+.lang-switcher__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline-end: 0;
+  min-width: 190px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--bg-primary, #fff);
+  border: 1px solid var(--border, rgba(0, 0, 0, .08));
+  border-radius: 14px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, .14);
+  z-index: 60;
+}
+
+.lang-switcher__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-primary, #111);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: start;
+}
+
+.lang-switcher__option:hover {
+  background: var(--primary-dim, rgba(74, 125, 255, .08));
+}
+
+.lang-switcher__option.is-active {
+  color: var(--blue, #4A7DFF);
+  font-weight: 700;
+}
+
+.lang-switcher__check {
+  font-size: 13px;
+}
+
+[data-theme="dark"] .lang-switcher__btn {
+  color: var(--text-primary, #eee);
+  border-color: rgba(255, 255, 255, .16);
+}
+
+[data-theme="dark"] .lang-switcher__menu {
+  background: var(--bg3, #16181d);
+  border-color: rgba(255, 255, 255, .1);
+}

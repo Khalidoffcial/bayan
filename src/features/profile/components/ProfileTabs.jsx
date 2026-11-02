@@ -1,19 +1,29 @@
 import React from "react";
+import { PROFILE_TABS } from "../services/profileContent.service";
 
-export const ProfileTabs = ({ activeTab, onTabChange }) => {
-  const tabs = ["Posts", "Articles", "Novels"];
-
+/**
+ * Unified profile content tabs. "الكل" is the default tab and shows every
+ * kind the profile owner authored. Tab labels carry live counts when the
+ * server provides them.
+ */
+export const ProfileTabs = ({ activeTab, onTabChange, counts = {} }) => {
   return (
     <div className="profile-tabs">
-      {tabs.map((tab) => (
-        <button
-          key={tab}
-          className={`tab-item ${activeTab === tab ? "active" : ""}`}
-          onClick={() => onTabChange(tab)}
-        >
-          {tab}
-        </button>
-      ))}
+      {PROFILE_TABS.map(({ key, label }) => {
+        const count = counts[key];
+        const hasCount = Number.isFinite(Number(count)) && Number(count) > 0;
+
+        return (
+          <button
+            key={key}
+            className={`tab-item ${activeTab === key ? "active" : ""}`}
+            onClick={() => onTabChange(key)}
+          >
+            {label}
+            {hasCount && <span className="tab-count">{counts[key]}</span>}
+          </button>
+        );
+      })}
     </div>
   );
 };

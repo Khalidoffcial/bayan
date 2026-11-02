@@ -1,0 +1,126 @@
+/* ================================================================
+   MediaLightbox — full-size post image viewer.
+   ================================================================ */
+
+.mlb-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(10, 12, 16, 0.88);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.mlb-stage {
+  position: relative;
+  max-width: min(1200px, 96vw);
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mlb-image {
+  display: block;
+  max-width: min(1200px, 96vw);
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  /* full image — never cropped or distorted */
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  background: #111;
+}
+
+.mlb-close {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: none;
+  background: #fff;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.mlb-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mlb-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.mlb-nav--prev {
+  left: -56px;
+}
+
+.mlb-nav--next {
+  right: -56px;
+}
+
+.mlb-counter {
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 3px 12px;
+  border-radius: 999px;
+}
+
+@media (max-width: 640px) {
+  .mlb-backdrop {
+    padding: 10px;
+  }
+
+  .mlb-stage,
+  .mlb-image {
+    max-width: 100vw;
+    max-height: 78vh;
+  }
+
+  .mlb-nav--prev {
+    left: 8px;
+  }
+
+  .mlb-nav--next {
+    right: 8px;
+  }
+
+  .mlb-close {
+    top: 8px;
+    right: 8px;
+  }
+
+  .mlb-counter {
+    bottom: 8px;
+  }
+}

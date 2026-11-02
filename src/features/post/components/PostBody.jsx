@@ -1,6 +1,7 @@
 import React from "react";
+import ContentTranslation from "../../../components/common/ContentTranslation";
 
-export const PostBody = ({ content, imageUrl, contentDir }) => {
+export const PostBody = ({ content, imageUrl, contentDir, contentId, contentType }) => {
   return (
     <div className="post-body" dir={contentDir}>
       <div
@@ -12,6 +13,8 @@ export const PostBody = ({ content, imageUrl, contentDir }) => {
           <img src={imageUrl} alt="Post Content" />
         </div>
       )}
+      {/* خيار الترجمة يظهر أسفل الأصل فقط عند طلب المستخدم — لا ترجمة تلقائية */}
+      <ContentTranslation contentId={contentId} contentType={contentType} content={content} />
     </div>
   );
 };

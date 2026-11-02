@@ -2,11 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import useAuthForm from "../hooks/useAuthForm";
 import GoogleAuthButton from "./GoogleAuthButton";
-import nextIcon from "../../../assets/icons/next.png";
-import earth from "../../../assets/images/image0.svg";
-import "../styles/signup.css";
+import AuthShell from "./AuthShell";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const LoginForm = () => {
+  const { t } = useTranslation();
   const {
     username,
     setUsername,
@@ -21,69 +21,62 @@ export const LoginForm = () => {
   } = useAuthForm("login");
 
   return (
-    <div className="log-page">
-      <img className="background" src={earth} alt="background" />
+    <AuthShell titleKey="auth.login.title" subtitleKey="auth.login.subtitle">
+      <GoogleAuthButton onClick={handleGoogleAuth} disabled={loading} />
 
-      <div className="signup-box">
-        <h2>Bayan</h2>
-        <h6>Login</h6>
+      <div className="auth-divider">{t("auth.or")}</div>
 
-        <div className="user-box">
-          <input
-            type="text"
-            placeholder="Username"
-            autoComplete="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-
-        <div className="user-box">
-          <input
-            type="password"
-            placeholder="Enter password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-
-        <GoogleAuthButton onClick={handleGoogleAuth} disabled={loading} />
-
-        {errorMsg && (
-          <p className="error" style={{ textAlign: "center", margin: "10px 0" }}>
-            {errorMsg}
-          </p>
-        )}
-
-        <div className="checkbox">
-          <input
-            type="checkbox"
-            id="remember-me-login"
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
-          />
-          <label htmlFor="remember-me-login" className="checkboxLabel">
-            Remember Me
-          </label>
-        </div>
-
-        <div className="sign">
-          <Link to="/signup" className="signin">
-            I don’t have an account
-          </Link>
-
-          <button
-            className="signup"
-            onClick={handleLogin}
-            disabled={loading}
-          >
-            <h1>{loading ? "Signing in..." : "Sign in"}</h1>
-            <img src={nextIcon} alt="next" className="img_next" />
-          </button>
-        </div>
+      <div className="auth-field">
+        <label htmlFor="login-username">{t("auth.username")}</label>
+        <input
+          id="login-username"
+          type="text"
+          placeholder={t("auth.usernamePlaceholder")}
+          autoComplete="username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
       </div>
-    </div>
+
+      <div className="auth-field">
+        <label htmlFor="login-password">{t("auth.password")}</label>
+        <input
+          id="login-password"
+          type="password"
+          placeholder={t("auth.passwordPlaceholder")}
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      {errorMsg && (
+        <div className="auth-alert" role="alert">
+          <span aria-hidden="true">⚠</span>
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
+      <div className="auth-remember">
+        <input
+          type="checkbox"
+          id="remember-me-login"
+          checked={rememberMe}
+          onChange={(e) => setRememberMe(e.target.checked)}
+        />
+        <label htmlFor="remember-me-login">{t("auth.rememberMe")}</label>
+      </div>
+
+      <button type="button" className="auth-submit" onClick={handleLogin} disabled={loading}>
+        {loading && <span className="auth-submit__spinner" aria-hidden="true" />}
+        <span>{loading ? t("auth.signingIn") : t("auth.loginCta")}</span>
+      </button>
+
+      <p className="auth-switch">
+        {t("auth.noAccount")}{" "}
+        <Link to="/signup">{t("auth.signupLink")}</Link>
+      </p>
+    </AuthShell>
   );
 };
 

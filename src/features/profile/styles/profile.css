@@ -1,10 +1,14 @@
 .profile-container {
-  max-width: 80%;
+  width: 80%;
   padding: 20px;
   padding-top: 100px;
-  color: #222;
-  background: #f7f7f7;
+  color: var(--text-primary, #222);
   border-radius: 20px;
+  justify-self: right;
+}
+
+html[lang="ar"] .profile-container {
+  justify-self: left;
 }
 
 .profile-content {
@@ -26,7 +30,7 @@
   height: 110px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #1da1f2;
+  border: 3px solid var(--blue, #1da1f2);
   cursor: pointer;
   transition: transform 0.2s;
 }
@@ -38,8 +42,8 @@
 .edit-overlay {
   position: absolute;
   bottom: 0;
-  right: 0;
-  background: #1da1f2;
+  inset-inline-end: 0;
+  background: var(--blue, #1da1f2);
   color: white;
   width: 32px;
   height: 32px;
@@ -55,7 +59,8 @@
   top: 120px;
   left: 50%;
   transform: translateX(-50%);
-  background: white;
+  background: var(--bg-primary, white);
+  border: 1px solid var(--border, rgba(0,0,0,.08));
   border-radius: 10px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
   overflow: hidden;
@@ -75,7 +80,7 @@
 }
 
 .image-dropdown button:hover {
-  background: #f1f1f1;
+  background: var(--surface-hover, #f1f1f1);
 }
 
 /* Crop Modal */
@@ -95,7 +100,7 @@
   width: 90%;
   max-width: 500px;
   height: 400px;
-  background: #333;
+  background: var(--bg4, #333);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -116,7 +121,7 @@
 
 .save-btn {
   padding: 10px 20px;
-  background: #1da1f2;
+  background: var(--blue, #1da1f2);
   color: white;
   border-radius: 8px;
   cursor: pointer;
@@ -128,7 +133,7 @@
   gap: 6px;
   margin: 10px auto;
   padding: 10px 24px;
-  background: #1da1f2;
+  background: var(--blue, #1da1f2);
   color: white;
   border-radius: 8px;
   cursor: pointer;
@@ -140,9 +145,9 @@
   gap: 6px;
   margin: 10px auto;
   padding: 10px 24px;
-  background: #ffffff;
-  color: #1da1f2;
-  border: 1px solid #1da1f2;
+  background: var(--bg-primary, #ffffff);
+  color: var(--blue, #1da1f2);
+  border: 1px solid var(--blue, #1da1f2);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
@@ -166,7 +171,7 @@
 }
 
 .edit-btn {
-  color: #1da1f2;
+  color: var(--blue, #1da1f2);
   cursor: pointer;
   font-size: 16px;
 }
@@ -179,11 +184,12 @@
 
 .edit-input,
 .edit-textarea {
-  border: 1px solid #ddd;
+  border: 1px solid var(--input-border, #ddd);
   border-radius: 8px;
   padding: 6px 12px;
   font-size: 16px;
-  background: white;
+  background: var(--input-bg, white);
+  color: var(--text-primary, #222);
 }
 
 /* Stats */
@@ -203,12 +209,12 @@
 
 .stat-value {
   font-size: 20px;
-  color: #111;
+  color: var(--text-primary, #111);
 }
 
 .stat-label {
   font-size: 13px;
-  color: #777;
+  color: var(--text3, #777);
 }
 
 /* Tabs */
@@ -216,7 +222,7 @@
   display: flex;
   justify-content: space-around;
   margin: 20px 0;
-  border-bottom: 2px solid #ddd;
+  border-bottom: 2px solid var(--border, #ddd);
 }
 
 .tab-item {
@@ -230,9 +236,94 @@
 }
 
 .tab-item.active {
-  border-bottom: 3px solid #1da1f2;
-  color: #1da1f2;
+  border-bottom: 3px solid var(--blue, #1da1f2);
+  color: var(--blue, #1da1f2);
   font-weight: bold;
+}
+
+.tab-count {
+  margin-inline-start: 6px;
+  font-size: 12px;
+  background: var(--blue-dim, #eef6fd);
+  color: var(--blue, #1da1f2);
+  border-radius: 999px;
+  padding: 1px 7px;
+  vertical-align: middle;
+}
+
+/* Unified profile content states */
+.profile-content-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.profile-content-empty-text,
+.profile-content-error-text {
+  color: var(--text2, #777);
+  font-size: 15px;
+  margin: 0;
+}
+
+.profile-content-error-text {
+  color: var(--danger, #c0392b);
+}
+
+.profile-content-retry,
+.profile-content-load-more {
+  padding: 8px 22px;
+  background: var(--blue, #1da1f2);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.profile-content-retry:hover,
+.profile-content-load-more:hover {
+  opacity: 0.85;
+}
+
+.profile-content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-content-end {
+  text-align: center;
+  color: var(--text3, #aaa);
+  font-size: 13px;
+  padding: 14px 0;
+  margin: 0;
+}
+
+.profile-content-loading-more {
+  padding: 18px;
+}
+
+@media (max-width: 600px) {
+  .profile-tabs {
+    justify-content: flex-start;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .tab-item {
+    flex: none;
+    font-size: 14px;
+  }
+
+  .tab-count {
+    font-size: 10px;
+    padding: 1px 6px;
+  }
 }
 
 .profile-feed {

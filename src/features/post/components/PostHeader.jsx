@@ -1,6 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 import defaultImg from "../../../assets/icons/user_10374408.png";
+import { ViewableAvatar } from "../../../components/common/ProfileImageViewer";
 
 export const PostHeader = ({ userData, imageUrl }) => {
   return (
@@ -14,8 +15,9 @@ export const PostHeader = ({ userData, imageUrl }) => {
       </Helmet>
 
       <div className="post-user-info">
-        <img
-          src={userData?.imgProfile || defaultImg}
+        <ViewableAvatar
+          src={userData?.imgProfile || ""}
+          fallback={defaultImg}
           className="post-profile-pic"
           alt={userData?.F_user || "User"}
         />

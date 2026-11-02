@@ -1,11 +1,15 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { saveArticleOrNovel, saveIdeaPost, uploadWriterImages } from "../services/writer.service";
+import { on as onBus, off as offBus } from "../../../utils/eventBus";
+import { saveArticleOrNovel, saveIdeaPost } from "../services/writer.service";
+import { uploadMediaBatch, discardUploadedMedia } from "../../../services/media.service";
 import { generateID } from "../../../utils/helpers";
 import { SERIES_DEFAULT_LIST } from "../../../constants/categories";
 import useSocket from "../../../hooks/useSocket";
+import { useToast } from "../../../components/ui/Toast";
 
 export const useWriter = () => {
   const socketRef = useSocket();
+  const toast = useToast();
   const [active, setActive] = useState(false);
   const [type, setType] = useState("post");
   const [content, setContent] = useState("");
@@ -32,6 +36,17 @@ export const useWriter = () => {
         console.error("Parse user error:", err);
       }
     }
+  }, []);
+
+  // Open the composer from anywhere (e.g. Spotlight CTA buttons).
+  // detail: { type?: "post" | "article" | "novels" }
+  useEffect(() => {
+    const openComposer = (detail) => {
+      if (detail?.type) setType(detail.type);
+      setActive(true);
+    };
+    onBus("BAYAN_OPEN_COMPOSER", openComposer);
+    return () => offBus("BAYAN_OPEN_COMPOSER", openComposer);
   }, []);
 
   const handleImageChange = (e) => {
@@ -85,18 +100,13 @@ export const useWriter = () => {
     setIsSubmitting(false);
   }, []);
 
-  // Collapse the composer. Asks for confirmation before discarding a draft.
+  // Collapse the composer. Confirms discard through the shared ConfirmDialog
+  // (controlled by the Writer component) instead of window.confirm().
   const handleCancel = useCallback(() => {
     if (isSubmitting) return;
-    if (hasDraft) {
-      const confirmed = window.confirm(
-        "هل تريد تجاهل المسودة؟ لن يمكن استعادتها. / Discard your draft? This cannot be undone."
-      );
-      if (!confirmed) return;
-    }
     resetForm();
     setActive(false);
-  }, [hasDraft, isSubmitting, resetForm]);
+  }, [isSubmitting, resetForm]);
 
   const handleAddSeries = () => {
     if (customSeries) {
@@ -117,13 +127,15 @@ export const useWriter = () => {
 
     setErrorMessage("");
     setIsSubmitting(true);
+    let uploadedMedia = [];
     try {
-      const uploadedImages = await uploadWriterImages(images);
+      uploadedMedia = await uploadMediaBatch(images);
       const id = generateID();
       const payload = {
         autherID: userData?.id,
         id,
-        img: uploadedImages,
+        img: uploadedMedia.map((m) => m.url), // توافق الحقل القديم img
+        media: uploadedMedia, // سجل Cloudinary {kind,url,publicId,...}
         content,
         type,
         userData: userData
@@ -147,7 +159,13 @@ export const useWriter = () => {
           await saveIdeaPost(payload);
         }
       } catch (apiError) {
-        console.warn("Backend REST save notice:", apiError?.message || apiError);
+        // Post save failed AFTER media upload — clean up orphaned Cloudinary
+        // files so a retry does not leave duplicates behind, then keep the
+        // draft (images stay in the composer) for the user to retry.
+        console.error("Backend save failed after upload — discarding orphaned media:", apiError?.message || apiError);
+        discardUploadedMedia(uploadedMedia).catch(() => {});
+        uploadedMedia = [];
+        throw apiError;
       }
 
       // Broadcast new post via Socket.io to all clients
@@ -157,19 +175,19 @@ export const useWriter = () => {
       window.dispatchEvent(new CustomEvent("BAYAN_NEW_POST", { detail: payload }));
 
       // Set user feedback
-      setSuccessMessage("تم النشر بنجاح! / Published successfully!");
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 4000);
+      toast.success("تم النشر بنجاح");
 
       resetForm();
       setActive(false);
     } catch (error) {
       console.error("Publish error:", error);
       // Keep the draft intact so the user does not lose their work
-      setErrorMessage(
-        "تعذّر النشر، حاول مرة أخرى. / Publishing failed, please try again."
-      );
+      const msg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "تعذّر النشر، حاول مرة أخرى";
+      setErrorMessage(msg);
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }

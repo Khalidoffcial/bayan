@@ -10,7 +10,7 @@ describe('Settings Feature Panels', () => {
         <AppearanceSettings />
       </SettingsProvider>
     );
-    expect(screen.getByText(/personalize how bayan space looks/i)).toBeInTheDocument();
+    expect(screen.getByText(/personalize how bayan looks and feels/i)).toBeInTheDocument();
     expect(screen.getByText(/color theme/i)).toBeInTheDocument();
   });
 
@@ -20,7 +20,7 @@ describe('Settings Feature Panels', () => {
         <LanguageSettings />
       </SettingsProvider>
     );
-    expect(screen.getByText(/choose your preferred interface language/i)).toBeInTheDocument();
+    expect(screen.getByText(/choose the interface language/i)).toBeInTheDocument();
   });
 
   test('renders NotificationsSettings panel', () => {

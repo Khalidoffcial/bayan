@@ -3,16 +3,32 @@
 =========================== */
 
 .feed-container {
-  width: 80%;
+  width: 100%;
   min-height: 100vh;
   position: relative;
-  direction: rtl;
+  /* مساحة المحتوى بعد السايدبار الثابت — padding منطقي يتبع الاتجاه:
+     sidebar يسار (LTR) → padding يمين على العنصر، والعكس في RTL */
+  box-sizing: border-box;
+  /* الاتجاه يتبع لغة الواجهة عبر html[dir] — لا قيمة ثابتة */
+}
 
+@media (max-width: 900px) {
+  /* موبايل: السايدبار overlay — لا padding */
+  .feed-container,
+  .post-reading-container,
+  .article-reading-container,
+  .settings-layout,
+  .homepage {
+    padding-inline-start: 0;
+  }
 }
 
 .feed-main {
   width: min(820px, 95%);
-  margin: 70px auto 40px;
+  /* التمركز داخل المساحة المتبقية فعليًا — لا يتغير مع RTL/LTR */
+  margin-inline: auto;
+  padding-top: 70px;
+  padding-bottom: 40px;
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -31,8 +47,8 @@
 
 .box {
   width: 100%;
-  background: #ffffff;
-  border: 1px solid #ececec;
+  background: var(--bg-primary, #ffffff);
+  border: 1px solid var(--border, #ececec);
   border-radius: 22px;
   overflow: hidden;
   transition: 0.25s ease;
@@ -42,8 +58,8 @@
 }
 
 .box:hover {
-  border-color: #dadada;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05);
+  border-color: var(--border-md, #dadada);
+  box-shadow: var(--shadow-lg, 0 12px 35px rgba(0, 0, 0, 0.05));
 }
 
 .box h1 {
@@ -51,15 +67,64 @@
   padding: 16px 22px 8px;
   font-size: 24px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary, #111827);
   line-height: 1.4;
 }
 
 .box .descrip {
   padding: 0 22px 16px;
-  color: #374151;
+  color: var(--text2, #374151);
   font-size: 16px;
   line-height: 1.8;
+}
+
+/* Content-kind badge (article/novel) on unified feed cards */
+.article-kind-badge {
+  display: inline-block;
+  margin: 14px 22px 0;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.article-kind-badge--article {
+  background: var(--blue-dim, #eef6fd);
+  color: var(--blue, #1da1f2);
+}
+
+.article-kind-badge--novel {
+  background: var(--purple-dim, #f6effd);
+  color: var(--purple, #8b5cf6);
+}
+
+.article-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: contain;
+  margin-top: 10px;
+  background: var(--bg2, #f0f0ee);
+}
+
+.article-date {
+  padding: 0 22px;
+  font-size: 12px;
+  color: var(--text3, #9ca3af);
+  display: block;
+  margin-bottom: -8px;
+}
+
+/* صف الميتا: التاريخ + عداد المشاهدات — يمتد بالاتجاه تلقائيًا */
+.article-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  gap: 10px;
+  margin-bottom: -8px;
 }
 
 /* ===========================
@@ -71,8 +136,8 @@
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
-  background: #ffffff;
-  border: 1px solid #ececec;
+  background: var(--bg-primary, #ffffff);
+  border: 1px solid var(--border, #ececec);
   border-radius: 22px;
   overflow: hidden;
   transition: 0.25s ease;
@@ -80,8 +145,8 @@
 
 .container_post:hover,
 .post-card:hover {
-  border-color: #dcdcdc;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05);
+  border-color: var(--border-md, #dcdcdc);
+  box-shadow: var(--shadow-lg, 0 12px 35px rgba(0, 0, 0, 0.05));
 }
 
 /* ===========================
@@ -101,7 +166,7 @@
   height: 52px;
   object-fit: cover;
   border-radius: 50%;
-  border: 2px solid #f1f1f1;
+  border: 2px solid var(--border-md, #f1f1f1);
   flex-shrink: 0;
   transition: transform 0.25s ease;
 }
@@ -120,13 +185,13 @@
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary, #111827);
 }
 
 .usernameacc {
   margin: 0;
   font-size: 14px;
-  color: #7b7b7b;
+  color: var(--text3, #7b7b7b);
 }
 
 /* ===========================
@@ -136,7 +201,7 @@
 .img_article {
   width: 100%;
   overflow: hidden;
-  background: #f6f6f6;
+  background: var(--bg2, #f6f6f6);
 }
 
 .img_article img {
@@ -155,7 +220,7 @@
   padding: 22px;
   font-size: 17px;
   line-height: 1.9;
-  color: #222222;
+  color: var(--text-primary, #222222);
   word-break: break-word;
   cursor: pointer;
 }
@@ -167,7 +232,7 @@
 .his_Post {
   padding: 0 22px 16px;
   font-size: 13px;
-  color: #999999;
+  color: var(--text3, #999999);
 }
 
 /* ===========================
@@ -179,7 +244,7 @@
   justify-content: space-around;
   align-items: center;
   padding: 10px 18px;
-  border-top: 1px solid #efefef;
+  border-top: 1px solid var(--border, #efefef);
 }
 
 .actions button {
@@ -190,14 +255,14 @@
   gap: 8px;
   cursor: pointer;
   font-size: 16px;
-  color: #6b7280;
+  color: var(--text2, #6b7280);
   padding: 10px 18px;
   border-radius: 12px;
   transition: 0.25s ease;
 }
 
 .actions button:hover {
-  background: #f5f5f5;
+  background: var(--surface-hover, #f5f5f5);
 }
 
 .actions svg {
@@ -231,4 +296,43 @@
     padding: 16px;
     font-size: 16px;
   }
+}
+/* ===========================
+   REPLY CONTEXT (Twitter/X-style)
+=========================== */
+
+.post-card-reply-context {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2, #6b7280);
+  margin: -4px 0 6px 0;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.post-card-reply-context:hover {
+  color: var(--blue, #0f8ee2);
+}
+
+.post-card-reply-context-link {
+  color: var(--blue, #0f8ee2);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.post-card-reply-context-link:hover {
+  text-decoration: underline;
+}
+
+/* Card head: author + owner ⋯ menu on one row */
+.post-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.post-card-head .dropdown-menu-root {
+  flex-shrink: 0;
+  margin-top: 2px;
 }

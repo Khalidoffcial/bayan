@@ -1,0 +1,406 @@
+/* ============================================================
+   AuthShell — إطار المصادقة الموحد (Blue Premium Identity)
+   Desktop: تقسيم بصري/فورم — Mobile: عمود واحد
+   ============================================================ */
+
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--bg, #f6f5f2);
+}
+
+/* ---------- الجزء البصري ---------- */
+.auth-shell__visual {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(90% 70% at 30% 20%, rgba(15, 142, 226, .28) 0%, transparent 60%),
+    linear-gradient(160deg, #071b33 0%, #0a2b4d 60%, #0f8ee2 200%);
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(32px, 5vw, 72px);
+}
+
+.auth-shell__visual-glow {
+  position: absolute;
+  top: -15%;
+  inset-inline-end: -20%;
+  width: 60%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(15, 142, 226, .35), transparent 70%);
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+.auth-shell__visual-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .38;
+  mix-blend-mode: luminosity;
+}
+
+.auth-shell__visual-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 420px;
+}
+
+.auth-shell__tagline {
+  margin: 0;
+  color: #F1F5FB;
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 700;
+  line-height: 1.4;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, .4);
+}
+
+/* ---------- جانب الفورم ---------- */
+.auth-shell__formside {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 4vw, 48px) clamp(20px, 6vw, 88px);
+}
+
+.auth-shell__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: clamp(28px, 5vh, 64px);
+}
+
+.auth-shell__brand-logo {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  background: rgba(255, 255, 255, .94);
+  padding: 5px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--blue-border, rgba(15, 142, 226, .2));
+}
+
+[data-theme="dark"] .auth-shell__brand-logo {
+  background: rgba(255, 255, 255, .92);
+}
+
+.auth-shell__card {
+  width: 100%;
+  max-width: 440px;
+  margin-inline: auto;
+  background: var(--bg-primary, #fff);
+  border: 1px solid var(--blue-border, rgba(15, 142, 226, .14));
+  border-radius: 24px;
+  padding: clamp(28px, 4vw, 44px);
+  box-shadow: 0 24px 64px rgba(8, 102, 168, .12);
+}
+
+.auth-shell__title {
+  margin: 0 0 6px;
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text-primary);
+}
+
+.auth-shell__subtitle {
+  margin: 0 0 28px;
+  color: var(--text2);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.auth-shell__foot {
+  margin-top: auto;
+  padding-top: 28px;
+  text-align: center;
+}
+
+.auth-shell__back {
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color .2s ease;
+}
+
+.auth-shell__back:hover {
+  color: var(--blue);
+}
+
+/* ---------- حقول الإدخال الموحدة ---------- */
+.auth-field {
+  margin-bottom: 18px;
+}
+
+.auth-field label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.auth-field input {
+  width: 100%;
+  padding: 13px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg, #f6f5f2);
+  border: 1.5px solid var(--border, rgba(0, 0, 0, .1));
+  border-radius: 14px;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.auth-field input:focus {
+  border-color: var(--blue, #0f8ee2);
+  box-shadow: 0 0 0 4px var(--blue-dim, rgba(15, 142, 226, .14));
+  background: var(--bg-primary, #fff);
+}
+
+.auth-field input::placeholder {
+  color: var(--text3);
+}
+
+.auth-field--error input {
+  border-color: var(--danger, #E24B4A);
+}
+
+.auth-field__error {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--danger, #E24B4A);
+  line-height: 1.4;
+}
+
+/* رسالة الخطأ العامة */
+.auth-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 4px 0 18px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--danger-dim, rgba(226, 75, 74, .1));
+  border: 1px solid rgba(226, 75, 74, .25);
+  color: var(--danger, #E24B4A);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ---------- تذكرني ---------- */
+.auth-remember {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 4px 0 22px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.auth-remember input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue, #0f8ee2);
+  cursor: pointer;
+}
+
+.auth-remember label {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text2);
+  cursor: pointer;
+}
+
+/* ---------- زر أساسي (Sign in / Sign up) ---------- */
+.auth-submit {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border: none;
+  border-radius: 999px;
+  background: var(--blue, #0f8ee2);
+  color: #fff;
+  font: inherit;
+  font-size: 15.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease, box-shadow .25s ease;
+  box-shadow: 0 8px 24px rgba(15, 142, 226, .3);
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: var(--blue-hover, #0866a8);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(15, 142, 226, .38);
+}
+
+.auth-submit:disabled {
+  opacity: .7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* مؤشر تحميل رفيع داخل الزر */
+.auth-submit__spinner {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .35);
+  border-top-color: #fff;
+  animation: auth-spin .7s linear infinite;
+}
+
+@keyframes auth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- زر Google ---------- */
+.auth-google {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 13px 20px;
+  margin-bottom: 18px;
+  border: 1.5px solid var(--border, rgba(0, 0, 0, .12));
+  border-radius: 999px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, transform .15s ease;
+}
+
+.auth-google:hover:not(:disabled) {
+  border-color: var(--blue, #0f8ee2);
+  background: var(--blue-light, #eaf6ff);
+  transform: translateY(-1px);
+}
+
+.auth-google:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.auth-google__g {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ---------- فاصل أو ---------- */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0;
+  color: var(--text3);
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border, rgba(0, 0, 0, .1));
+}
+
+/* ---------- التبديل بين الدخول/التسجيل ---------- */
+.auth-switch {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 14.5px;
+  color: var(--text2);
+}
+
+.auth-switch a {
+  color: var(--blue, #0f8ee2);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-shell__visual {
+    display: none;
+  }
+
+  .auth-shell__formside {
+    padding: 20px 18px 40px;
+  }
+
+  .auth-shell__card {
+    box-shadow: 0 12px 36px rgba(8, 102, 168, .1);
+  }
+}
+
+/* ---------- Dark Mode ---------- */
+[data-theme="dark"] .auth-shell {
+  background: var(--bg, #0C0D10);
+}
+
+[data-theme="dark"] .auth-shell__card {
+  background: var(--bg3, #16181d);
+  border-color: rgba(15, 142, 226, .25);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .45);
+}
+
+[data-theme="dark"] .auth-field input {
+  background: var(--input-bg, #1B2433);
+  border-color: var(--input-border, #2D394B);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .auth-google {
+  background: var(--bg3, #16181d);
+  border-color: rgba(255, 255, 255, .14);
+}
+
+[data-theme="dark"] .auth-google:hover:not(:disabled) {
+  background: rgba(15, 142, 226, .1);
+}
+
+[data-theme="dark"] .auth-divider::before,
+[data-theme="dark"] .auth-divider::after {
+  background: rgba(255, 255, 255, .12);
+}
+
+/* ---------- Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+
+  .auth-shell__card,
+  .auth-submit,
+  .auth-google {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
+
+  .auth-submit__spinner {
+    animation-duration: 1.4s;
+  }
+}

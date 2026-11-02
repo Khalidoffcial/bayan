@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const WriterEditor = ({
   type,
@@ -50,8 +51,9 @@ export const WriterEditor = ({
     ],
     language: "ar",
     alignment: { options: ["left", "right", "center", "justify"] },
-    placeholder: "Write your topic here...",
   };
+
+  const { t } = useTranslation();
 
   if (type === "article" || type === "novels") {
     return (
@@ -60,15 +62,15 @@ export const WriterEditor = ({
           ref={textInputRef}
           type="text"
           className="sm_WriterInput"
-          placeholder="Address..."
+          placeholder={t("composer.titlePlaceholder")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          aria-label="Title"
+          aria-label={t("composer.titlePlaceholder")}
         />
 
         <textarea
           className="sm_WriterInput"
-          placeholder="Description..."
+          placeholder={t("composer.descPlaceholder")}
           value={descrip}
           onChange={(e) => setDescription(e.target.value)}
         />
@@ -78,13 +80,13 @@ export const WriterEditor = ({
             value={seriesList.includes(customSeries) ? customSeries : series}
             onChange={(e) => setSeries(e.target.value)}
           >
-            <option value="">Select series</option>
+            <option value="">{t("writer.selectSeries")}</option>
             {seriesList.map((s, i) => (
               <option key={i} value={s}>
                 {s}
               </option>
             ))}
-            <option value="new">New series</option>
+            <option value="new">{t("writer.newSeries")}</option>
           </select>
 
           {series === "new" && (
@@ -92,7 +94,7 @@ export const WriterEditor = ({
               <input
                 type="text"
                 className="sm_WriterInput"
-                placeholder="Enter new series title"
+                placeholder={t("writer.newSeriesPlaceholder")}
                 value={customSeries}
                 onChange={(e) => setCustomSeries(e.target.value)}
               />
@@ -103,7 +105,7 @@ export const WriterEditor = ({
 
         <CKEditor
           editor={ClassicEditor}
-          config={editorConfiguration}
+          config={{ ...editorConfiguration, placeholder: t("composer.contentPlaceholder") }}
           data={content}
           onChange={(_, editor) => setContent(editor.getData())}
         />
@@ -115,10 +117,10 @@ export const WriterEditor = ({
     <textarea
       ref={textInputRef}
       className="WriterInput"
-      placeholder={`Write your ${type} here...`}
+      placeholder={t("composer.contentPlaceholder")}
       value={content}
       onChange={(e) => setContent(e.target.value)}
-      aria-label={`Write your ${type} here...`}
+      aria-label={t("composer.contentPlaceholder")}
     />
   );
 };

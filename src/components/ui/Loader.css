@@ -1,0 +1,112 @@
+/* ============================================================
+   Loader — Bayan (Apple-simple, مصقول)
+   ============================================================ */
+
+.bayan-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue-light, #eaf6ff);
+  /* لا layout shift: الخروج عبر opacity فقط */
+  opacity: 1;
+  transition: opacity .4s ease;
+  pointer-events: auto;
+}
+
+.bayan-loader--leave {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bayan-loader__mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  /* حركة دخول واحدة ناعمة: fade + scale محسوبة */
+  animation: bayan-loader-in .9s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.bayan-loader__logo {
+  height: 68px;
+  width: auto;
+  object-fit: contain;
+  background: rgba(255, 255, 255, .96);
+  padding: 10px 22px;
+  border-radius: 18px;
+  box-shadow: 0 12px 44px rgba(8, 102, 168, .14);
+}
+
+/* مؤشر تحميل رفيع جدًا — خط أزرق يمضي تحت الشعار */
+.bayan-loader__bar {
+  position: relative;
+  width: 140px;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(15, 142, 226, .14);
+  overflow: hidden;
+}
+
+.bayan-loader__bar::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: -40%;
+  width: 40%;
+  border-radius: 2px;
+  background: var(--blue, #0f8ee2);
+  animation: bayan-loader-slide 1.1s ease-in-out infinite;
+}
+
+@keyframes bayan-loader-in {
+  from {
+    opacity: 0;
+    transform: scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bayan-loader-slide {
+  from {
+    left: -40%;
+  }
+
+  to {
+    left: 100%;
+  }
+}
+
+[data-theme="dark"] .bayan-loader {
+  background: var(--navy, #071b33);
+}
+
+[data-theme="dark"] .bayan-loader__logo {
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 12px 44px rgba(0, 0, 0, .4);
+}
+
+[data-theme="dark"] .bayan-loader__bar {
+  background: rgba(15, 142, 226, .2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bayan-loader__mark {
+    animation: none;
+  }
+
+  .bayan-loader__bar::after {
+    animation: none;
+    left: 30%;
+  }
+
+  .bayan-loader {
+    transition: none;
+  }
+}

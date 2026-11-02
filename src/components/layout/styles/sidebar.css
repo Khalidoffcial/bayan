@@ -4,24 +4,30 @@
 
   position: fixed;
   top: 0;
-  left: 0;
+  /* الخصائص المنطقية: السايدبار يلتصق ببداية الاتجاه تلقائيًا
+     (يسار في LTR، يمين في RTL) دون أي كود إضافي */
+  inset-inline-start: 0;
 
-  padding: 80px 16px 20px;
+  padding: 60px 16px 20px;
 
-  background: rgba(255,255,255,.78);
+  background: var(--glass, rgba(255,255,255,.78));
 
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 
-  border-right: 1px solid rgba(0,0,0,.08);
+  /* الحد الداخلي يواجه المحتوى في كلا الاتجاهين */
+  border-inline-end: 1px solid var(--border, rgba(0,0,0,.08));
 
   display: flex;
   flex-direction: column;
 
-  box-shadow: 0 10px 40px rgba(0,0,0,.06);
+  box-shadow: var(--shadow-lg, 0 10px 40px rgba(0,0,0,.06));
 
   transition: transform .45s cubic-bezier(.22,1,.36,1);
 }
+
+/* الشعار أعلى القائمة — img حقيقي بدل background-image لدعم تبديل الثيم */
+.sidebar-logo { display: none; }
 
 .sidebar-list {
   display: flex;
@@ -38,13 +44,15 @@
 
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  /* الأيقونة في بداية الاتجاه والنص بعدها — ترتيب طبيعي يتبع RTL/LTR
+     تلقائيًا دون row-reverse */
+  gap: 12px;
 
   padding: 0 14px;
 
   border-radius: 14px;
 
-  color: #1d1d1f;
+  color: var(--text-primary, #1d1d1f);
   font-size: 16px;
   font-weight: 500;
 
@@ -63,17 +71,23 @@
 }
 
 .sidebar-item:hover {
-  background: rgba(0,0,0,.05);
-  transform: translateX(4px);
+  background: var(--surface-hover, rgba(0,0,0,.05));
+  /* انزلاق نحو داخل السايدبار في كلا الاتجاهين */
+  transform: translateX(calc(4px * var(--dir-factor, 1)));
+}
+
+html[dir="rtl"] .sidebar-item:hover {
+  --dir-factor: -1;
 }
 
 .sidebar-item.active {
-  background: #f5f5f7;
-  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  background: var(--bg4, #f5f5f7);
+  box-shadow: var(--shadow-md, 0 4px 20px rgba(0,0,0,.08));
 }
 
 .sidebar-item span {
-  margin-left: 10px;
+  flex: 1;
+  /* اتجاه النص يتبع لغة الواجهة تلقائيًا من dir على html */
 }
 
 .settings-icon {
@@ -82,6 +96,7 @@
   object-fit: contain;
 }
 
+/* التبويبات الأصلية — الشعار أعلى، الإعدادات في آخر القائمة */
 .settings-link {
   margin-top: auto;
 }
@@ -93,7 +108,7 @@
 
   position: fixed;
   top: 0px;
-  left: 0px;
+  inset-inline-start: 0px;
 
   width: 48px;
   height: 48px;
@@ -104,7 +119,7 @@
   border: none;
   border-radius: 14px;
 
-  background: rgba(255,255,255,.85);
+  background: var(--glass, rgba(255,255,255,.85));
 
 
   cursor: pointer;
@@ -123,7 +138,7 @@
   position: fixed;
   inset: 0;
 
-  background: rgba(0,0,0,.25);
+  background: var(--surface, rgba(0,0,0,.25));
 
   z-index: 9998;
 }
@@ -136,8 +151,10 @@
     display: flex;
   }
 
+  /* الإخفاء خارج الشاشة نحو بداية الاتجاه — يعمل في RTL و LTR
+     عبر متغير الاتجاه بدل قيمة فيزيائية ثابتة */
   .sidebar {
-    transform: translateX(-100%);
+    transform: translateX(calc(-100% * var(--dir-factor, 1)));
     z-index: 9999;
   }
 
