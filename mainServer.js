@@ -51,6 +51,30 @@ const {
     validateMediaManifest,
     deleteCloudinaryAssetsIfUnused,
 } = require("./service/cloudinary.service.js");
+const {
+    initAudioHub,
+    searchOpenverse,
+    searchItunes,
+    AMBIENT_TRACKS,
+    QURAN_RECITERS,
+    quranSurahTrack,
+} = require("./service/audioHub.service.js");
+// Firebase Realtime Database — المستخدمة في getFocusData و/update(ref(db...)))
+// (كانت تُستخدم دون استيراد في أجزاء قديمة — تصحيح: استيراد موحد هنا)
+const {
+    db,
+    ref,
+    set,
+    get,
+    update,
+    remove,
+    child,
+    push,
+    query,
+    equalTo,
+    orderByChild,
+    runTransaction,
+} = require("./datastore/firebase");
 
 const categories = JSON.parse(fs.readFileSync("./categories.json", "utf8"));
 const novel_categories = JSON.parse(fs.readFileSync("novel_categories.json", "utf8"));
@@ -64,6 +88,12 @@ const allowedOrigins = [
     "https://bayan-production-0201.up.railway.app",
     "http://localhost:3000",
 ];
+
+// Dev-only: allow the local React dev server(s). Production keeps the
+// strict list above — no wildcard, and these are never sent in prod.
+if (process.env.NODE_ENV !== "production") {
+    allowedOrigins.push("http://localhost:3001", "http://localhost:3011");
+}
 
 const app = express();
 const httpServer = createServer(app);
@@ -267,6 +297,9 @@ async function cacheDel(key) {
         console.error("cacheDel error:", err.message);
     }
 }
+
+// نظام الصوت (Audio Hub) — حقن الكاش والـ fetch من هذا الملف
+initAudioHub({ cacheGet, cacheSet, fetchImpl: fetch });
 
 
 async function cacheDelPattern(pattern) {
@@ -1638,6 +1671,434 @@ app.put(
                 error: err.message
             });
 
+        }
+    }
+);
+
+// ======================================================
+// FOCUS SPACE — بيانات مساحة التركيز لكل مستخدم
+// الهوية دائمًا من verifyToken (req.user.id) — لا نثق بـ userId من الواجهة
+// ======================================================
+const FOCUS_LIMITS = {
+    notes: 100,
+    tasks: 100,
+    sessions: 100,
+    notifications: 50,
+    customBackgrounds: 5,
+};
+const FOCUS_ROOT = "user_data/FocusSpace";
+
+async function getFocusData(userId) {
+    const snap = await get(ref(db, `${FOCUS_ROOT}/${userId}`));
+    return snap.exists() ? snap.val() : {};
+}
+
+// تنقية الملاحظات — نصوص آمنة فقط، بلا أي HTML/Script
+function sanitizeNotes(notes) {
+    if (!Array.isArray(notes)) return [];
+    return notes.slice(0, FOCUS_LIMITS.notes).map((n) => ({
+        id: String(n.id || "").slice(0, 40),
+        title: String(n.title || "").slice(0, 200),
+        content: String(n.content || "").slice(0, 5000),
+        pinned: Boolean(n.pinned),
+        taskId: n.taskId ? String(n.taskId).slice(0, 40) : null,
+        updatedAt: String(n.updatedAt || new Date().toISOString()).slice(0, 30),
+    })).filter((n) => n.id);
+}
+
+// تنقية المهام — حقول محددة فقط، قيم آمنة
+function sanitizeTasks(tasks) {
+    if (!Array.isArray(tasks)) return [];
+    const PRIORITIES = ["low", "medium", "high"];
+    const STATUSES = ["pending", "in_progress", "completed"];
+    return tasks.slice(0, FOCUS_LIMITS.tasks).map((t) => ({
+        id: String(t.id || "").slice(0, 40),
+        title: String(t.title || "").slice(0, 200),
+        description: String(t.description || "").slice(0, 2000),
+        dueDate: t.dueDate ? String(t.dueDate).slice(0, 30) : null,
+        reminder: t.reminder ? String(t.reminder).slice(0, 30) : null,
+        priority: PRIORITIES.includes(t.priority) ? t.priority : "medium",
+        category: String(t.category || "").slice(0, 60),
+        status: STATUSES.includes(t.status) ? t.status : "pending",
+        deferred: Boolean(t.deferred),
+        repeat: ["none", "daily", "weekly", "monthly"].includes(t.repeat) ? t.repeat : "none",
+        createdAt: String(t.createdAt || new Date().toISOString()).slice(0, 30),
+        completedAt: t.completedAt ? String(t.completedAt).slice(0, 30) : null,
+    })).filter((t) => t.id);
+}
+
+// تنقية سجل جلسات التركيز — أرقام محصورة
+function sanitizeSessions(sessions) {
+    if (!Array.isArray(sessions)) return [];
+    return sessions.slice(0, FOCUS_LIMITS.sessions).map((s) => ({
+        id: String(s.id || "").slice(0, 40),
+        mode: ["pomodoro", "deep_focus", "long_study", "custom", "timer"].includes(s.mode) ? s.mode : "pomodoro",
+        startedAt: String(s.startedAt || "").slice(0, 30),
+        endedAt: String(s.endedAt || "").slice(0, 30),
+        plannedMinutes: Math.min(Math.max(Number(s.plannedMinutes) || 25, 1), 240),
+        actualMinutes: Math.min(Math.max(Number(s.actualMinutes) || 0, 0), 240),
+        completed: Boolean(s.completed),
+        type: ["focus", "break"].includes(s.type) ? s.type : "focus",
+    })).filter((s) => s.id);
+}
+
+// تنقية إعدادات مساحة التركيز
+const FOCUS_SETTING_KEYS = ["background", "backgroundFit", "overlayOpacity", "brightness",
+    "clockType", "clockStyle", "clockColor", "clockSize", "clockFont", "clockFontWeight",
+    "showSeconds", "showDate", "use12Hour", "soundPreferences", "defaultStudyMode",
+    "defaultSessionDuration", "ayaNotifications", "savedContentReminders", "hideControls",
+    "reduceMotion", "overlayVisible"];
+
+function sanitizeFocusSettings(settings) {
+    if (!settings || typeof settings !== "object") return {};
+    const clean = {};
+    for (const key of FOCUS_SETTING_KEYS) {
+        if (settings[key] === undefined) continue;
+        clean[key] = settings[key];
+    }
+    // تحقق من الأنواع والقيم
+    if (clean.clockType && !["digital", "analog"].includes(clean.clockType)) delete clean.clockType;
+    if (clean.clockStyle && !["minimal", "classic", "modern"].includes(clean.clockStyle)) delete clean.clockStyle;
+    if (typeof clean.clockColor === "string" && !/^#[0-9a-fA-F]{6}$/.test(clean.clockColor)) delete clean.clockColor;
+    if (clean.defaultStudyMode && !["classic", "deep_focus", "long_study", "custom"].includes(clean.defaultStudyMode)) delete clean.defaultStudyMode;
+    if (clean.defaultSessionDuration != null) {
+        const dur = Number(clean.defaultSessionDuration);
+        if (Number.isFinite(dur) && dur >= 5 && dur <= 180) clean.defaultSessionDuration = dur;
+        else delete clean.defaultSessionDuration;
+    }
+    for (const numKey of ["overlayOpacity", "brightness", "clockSize"]) {
+        if (clean[numKey] != null) {
+            const v = Number(clean[numKey]);
+            if (Number.isFinite(v) && v >= 0 && v <= 100) clean[numKey] = v;
+            else delete clean[numKey];
+        }
+    }
+    // strings آمنة ومحصورة الطول
+    for (const strKey of ["background", "backgroundFit", "clockFont", "clockFontWeight"]) {
+        if (clean[strKey] != null) clean[strKey] = String(clean[strKey]).slice(0, 300);
+    }
+    if (clean.soundPreferences && typeof clean.soundPreferences === "object") {
+        const prefs = {};
+        for (const [k, v] of Object.entries(clean.soundPreferences).slice(0, 30)) {
+            prefs[String(k).slice(0, 40)] = Boolean(v);
+        }
+        clean.soundPreferences = prefs;
+    }
+    for (const boolKey of ["ayaNotifications", "savedContentReminders", "hideControls", "reduceMotion", "overlayVisible", "showSeconds", "showDate", "use12Hour"]) {
+        if (clean[boolKey] !== undefined) clean[boolKey] = Boolean(clean[boolKey]);
+    }
+    return clean;
+}
+
+function sanitizeFocusData(data) {
+    if (!data || typeof data !== "object") return {};
+    const clean = {};
+    if (data.settings) clean.settings = sanitizeFocusSettings(data.settings);
+    if (data.notes !== undefined) clean.notes = sanitizeNotes(data.notes);
+    if (data.tasks !== undefined) clean.tasks = sanitizeTasks(data.tasks);
+    if (data.sessions !== undefined) clean.sessions = sanitizeSessions(data.sessions);
+    if (data.notifications !== undefined) {
+        clean.notifications = (Array.isArray(data.notifications) ? data.notifications : [])
+            .slice(0, FOCUS_LIMITS.notifications)
+            .map((n) => ({
+                id: String(n.id || "").slice(0, 40),
+                type: ["task_reminder", "session_end", "saved_content", "aya"].includes(n.type) ? n.type : "aya",
+                title: String(n.title || "").slice(0, 200),
+                body: String(n.body || "").slice(0, 500),
+                createdAt: String(n.createdAt || "").slice(0, 30),
+                read: Boolean(n.read),
+            })).filter((n) => n.id);
+    }
+    if (data.customBackgrounds !== undefined) {
+        clean.customBackgrounds = (Array.isArray(data.customBackgrounds) ? data.customBackgrounds : [])
+            .slice(0, FOCUS_LIMITS.customBackgrounds)
+            .map((b) => ({
+                id: String(b.id || "").slice(0, 40),
+                url: /^https?:\/\//.test(String(b.url || "")) ? String(b.url).slice(0, 2000) : "",
+                name: String(b.name || "").slice(0, 100),
+                createdAt: String(b.createdAt || "").slice(0, 30),
+            })).filter((b) => b.id && b.url);
+    }
+    return clean;
+}
+
+app.get(
+    "/focus-space",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const data = await getFocusData(req.user.id);
+            res.json(data);
+        } catch (err) {
+            console.error("GET /focus-space error:", err.message);
+            res.status(500).json({ error: err.message });
+        }
+    }
+);
+
+app.put(
+    "/focus-space",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const clean = sanitizeFocusData(req.body || {});
+            if (Object.keys(clean).length === 0) {
+                return res.status(400).json({ error: "No valid focus fields" });
+            }
+            // دمج فوق الموجود — لا استبدال كامل
+            const existing = await getFocusData(req.user.id);
+            const merged = { ...existing, ...clean, updatedAt: new Date().toISOString() };
+            await update(ref(db, `${FOCUS_ROOT}/${req.user.id}`), merged);
+            res.json({ status: "ok", data: merged });
+        } catch (err) {
+            console.error("PUT /focus-space error:", err.message);
+            res.status(500).json({ error: err.message });
+        }
+    }
+);
+
+// المحتوى المحفوظ الحقيقي — يجمع المقالات والروايات والبوستات المحفوظة من قاعدة البيانات
+app.get(
+    "/focus-space/saved-content",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const uid = req.user.id;
+            // user_data/Profile/<uid>/savedContent يحتوي مفاتيح كل محتوى حفظه المستخدم
+            // الشكل: { articles: {id1: true}, novels: {id2: true}, posts: {id3: true} }
+            const userSnap = await get(ref(db, `user_data/Profile/${uid}`));
+            const userData = userSnap.exists() ? userSnap.val() : {};
+            const saved = userData.savedContent || userData.saved || {};
+            const result = [];
+            for (const type of ["articles", "novels", "posts"]) {
+                const ids = saved[type] ? Object.keys(saved[type]).slice(0, 100) : [];
+                for (const id of ids) {
+                    try {
+                        let item = null;
+                        if (type === "articles") item = await dao.getArticleID(id);
+                        else if (type === "novels") item = await dao.getnovelsID(id);
+                        else item = await dao.getPostID(id);
+                        if (!item) continue;
+                        result.push({
+                            id,
+                            type: type.slice(0, -1), // article | novel | post
+                            title: String(item.title || "").slice(0, 300),
+                            description: String(item.descrip || item.content || "").slice(0, 300),
+                            image: Array.isArray(item.img) && item.img[0] ? String(item.img[0]).slice(0, 1000) : null,
+                            savedAt: saved[type][id]?.savedAt || saved[type][id] === true ? (saved[type][id]?.savedAt || null) : null,
+                            read: Boolean(saved[type][id]?.read),
+                            link: type === "posts" ? `/rp/${id}` : `/r/${id}`,
+                        });
+                    } catch (e) { /* المحتوى محذوف — تخطَّ */ }
+                }
+            }
+            res.json({ items: result });
+        } catch (err) {
+            console.error("GET /focus-space/saved-content error:", err.message);
+            res.status(500).json({ error: err.message });
+        }
+    }
+);
+
+// ======================================================
+// AUDIO HUB — نظام الاكتشاف والتشغيل الصوتي
+// الهوية دائمًا من verifyToken — تخزين بيانات المستخدم في Firebase
+// البحث الخارجي عبر Openverse (CC-licensed) مع Cache + Rate-limit خادمي
+// ======================================================
+const AUDIOHUB_LIMITS = {
+    favorites: 500,
+    playlists: 50,
+    tracksPerPlaylist: 200,
+    history: 200,
+};
+const AUDIOHUB_ROOT = "user_data/AudioHub";
+
+async function getAudioHubDoc(userId) {
+    const snap = await get(ref(db, `${AUDIOHUB_ROOT}/${userId}`));
+    return snap.exists() ? snap.val() : {};
+}
+
+// تنقية بيانات المقطع — نصوص آمنة، أطوال محصورة
+function sanitizeTrack(t) {
+    if (!t || typeof t !== "object") return null;
+    const id = String(t.id || "").slice(0, 120);
+    if (!id) return null;
+    return {
+        id,
+        title: String(t.title || "").slice(0, 300),
+        author: String(t.author || "").slice(0, 120),
+        durationSec: Math.min(Math.max(Number(t.durationSec) || 0, 0), 86400),
+        thumbnail: /^https?:\/\//.test(String(t.thumbnail || "")) ? String(t.thumbnail).slice(0, 1000) : null,
+        audioUrl: /^https?:\/\//.test(String(t.audioUrl || "")) ? String(t.audioUrl).slice(0, 1000) : "",
+        licenseCode: String(t.licenseCode || "").slice(0, 60),
+        licenseUrl: /^https?:\/\//.test(String(t.licenseUrl || "")) ? String(t.licenseUrl).slice(0, 1000) : "",
+        source: String(t.source || "").slice(0, 60),
+        section: ["music", "quran", "ambient"].includes(t.section) ? t.section : "music",
+        foreignLandingUrl: /^https?:\/\//.test(String(t.foreignLandingUrl || "")) ? String(t.foreignLandingUrl).slice(0, 1000) : "",
+        addedAt: String(t.addedAt || new Date().toISOString()).slice(0, 30),
+    };
+}
+
+// تنقية سجل الاستماع — قواعد الاستماع الفعلي (وليس كل ضغطة Play)
+function sanitizeListenEvent(e) {
+    if (!e || typeof e !== "object") return null;
+    const track = sanitizeTrack(e.track);
+    if (!track) return null;
+    const playedSec = Math.min(Math.max(Number(e.playedSec) || 0, 0), 86400);
+    const durationSec = Math.min(Math.max(Number(e.durationSec) || 0, 0), 86400);
+    // استماع فعلي: ≥30 ثانية أو ≥50% من المدة (أيهما أقل)
+    const listenedFully = (durationSec > 0 && playedSec >= Math.min(30, durationSec * 0.5)) || playedSec >= 30;
+    return {
+        track,
+        playedSec: Math.round(playedSec * 10) / 10,
+        durationSec,
+        listened: listenedFully,
+        at: String(e.at || new Date().toISOString()).slice(0, 30),
+    };
+}
+
+// بحث موسيقى CC عبر Openverse — محمي بالكاش وrate-limit خادمي
+app.get(
+    "/audio-hub/search",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const { q, page, limit } = req.query;
+            const result = await searchOpenverse({ query: q, section: "music", page, limit });
+            res.json({ status: "ok", ...result });
+        } catch (err) {
+            console.error("GET /audio-hub/search error:", err.message);
+            res.status(err.status || 500).json({ error: err.message });
+        }
+    }
+);
+
+// بحث الموسيقى الحقيقي: iTunes (فنان/ألبوم/غلاف + معاينة 30 ث قانونية)
+// + Openverse (تشغيل كامل CC). source=itunes|openverse لاختيار المزود.
+app.get(
+    "/audio-hub/search-music",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const { q, page, limit, source } = req.query;
+            if (source === "openverse") {
+                const result = await searchOpenverse({ query: q, section: "music", page, limit });
+                return res.json({ status: "ok", provider: "openverse", ...result });
+            }
+            const result = await searchItunes({ query: q, page, limit });
+            res.json({ status: "ok", provider: "itunes", ...result });
+        } catch (err) {
+            console.error("GET /audio-hub/search-music error:", err.message);
+            res.status(err.status || 500).json({ error: err.message });
+        }
+    }
+);
+
+// بيانات المستخدم: favorites + playlists + history
+app.get(
+    "/audio-hub/library",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const doc = await getAudioHubDoc(req.user.id);
+            res.json({
+                favorites: doc.favorites || [],
+                playlists: doc.playlists || [],
+                history: doc.history || [],
+            });
+        } catch (err) {
+            console.error("GET /audio-hub/library error:", err.message);
+            res.status(500).json({ error: err.message });
+        }
+    }
+);
+
+// مزامنة بيانات المستخدم — المفضلة/القوائم/السجل (كتابة كاملة للحقول المرسلة)
+app.put(
+    "/audio-hub/library",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const body = req.body || {};
+            const clean = {};
+            if (body.favorites !== undefined) {
+                clean.favorites = (Array.isArray(body.favorites) ? body.favorites : [])
+                    .slice(0, AUDIOHUB_LIMITS.favorites)
+                    .map(sanitizeTrack).filter(Boolean);
+            }
+            if (body.playlists !== undefined) {
+                clean.playlists = (Array.isArray(body.playlists) ? body.playlists : [])
+                    .slice(0, AUDIOHUB_LIMITS.playlists)
+                    .map((p) => ({
+                        id: String(p?.id || "").slice(0, 40),
+                        name: String(p?.name || "").slice(0, 120),
+                        createdAt: String(p?.createdAt || new Date().toISOString()).slice(0, 30),
+                        tracks: (Array.isArray(p?.tracks) ? p.tracks : [])
+                            .slice(0, AUDIOHUB_LIMITS.tracksPerPlaylist)
+                            .map(sanitizeTrack).filter(Boolean),
+                    })).filter((p) => p.id);
+            }
+            if (body.history !== undefined) {
+                clean.history = (Array.isArray(body.history) ? body.history : [])
+                    .slice(0, AUDIOHUB_LIMITS.history)
+                    .map(sanitizeListenEvent).filter(Boolean);
+            }
+            if (body.progress !== undefined && body.progress && typeof body.progress === "object") {
+                // استكمال الاستماع — خريطة trackId -> positionSec
+                const prog = {};
+                for (const [k, v] of Object.entries(body.progress).slice(0, 200)) {
+                    const sec = Number(v);
+                    if (Number.isFinite(sec) && sec >= 0 && sec < 86400) {
+                        prog[String(k).slice(0, 120)] = Math.round(sec * 10) / 10;
+                    }
+                }
+                clean.progress = prog;
+            }
+            if (Object.keys(clean).length === 0) {
+                return res.status(400).json({ error: "No valid audio-hub fields" });
+            }
+            const existing = await getAudioHubDoc(req.user.id);
+            const merged = { ...existing, ...clean, updatedAt: new Date().toISOString() };
+            await update(ref(db, `${AUDIOHUB_ROOT}/${req.user.id}`), merged);
+            res.json({ status: "ok", data: merged });
+        } catch (err) {
+            console.error("PUT /audio-hub/library error:", err.message);
+            res.status(500).json({ error: err.message });
+        }
+    }
+);
+
+// الأكثر تشغيلًا على المنصة (عام) — تجميع من سجل الاستماع لكل المستخدمين
+// بدون أي بيانات شخصية: فقط عدد مرات الاستماع لكل مقطع
+app.get(
+    "/audio-hub/trending",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const cached = await cacheGet("audiohub:trending");
+            if (cached) return res.json({ status: "ok", items: cached });
+
+            const snap = await get(ref(db, AUDIOHUB_ROOT));
+            if (!snap.exists()) return res.json({ status: "ok", items: [] });
+            const all = snap.val() || {};
+            const counts = new Map();
+            for (const userDoc of Object.values(all)) {
+                for (const ev of userDoc.history || []) {
+                    if (!ev?.listened || !ev?.track?.id) continue;
+                    const key = ev.track.id;
+                    if (!counts.has(key)) counts.set(key, { track: ev.track, plays: 0 });
+                    counts.get(key).plays += 1;
+                }
+            }
+            const items = [...counts.values()]
+                .sort((a, b) => b.plays - a.plays)
+                .slice(0, 50)
+                .map((x) => ({ ...x.track, plays: x.plays }));
+            await cacheSet("audiohub:trending", items, 300);
+            res.json({ status: "ok", items });
+        } catch (err) {
+            console.error("GET /audio-hub/trending error:", err.message);
+            res.status(500).json({ error: err.message });
         }
     }
 );
