@@ -9,7 +9,7 @@
  * overlayVisible) to reduce distractions; Exit is always reachable via
  * a keyboard shortcut too (Escape).
  */
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../i18n/useTranslation";
 import { useSettings } from "../../contexts/SettingsContext";
@@ -27,10 +27,33 @@ import FocusSettingsPanel from "./components/FocusSettingsPanel";
 import FocusSmartTool from "./components/FocusSmartTool";
 import FocusAya from "./components/FocusAya";
 import FocusMusicWidget from "./components/FocusMusicWidget";
+import FocusBackgroundGallery from "./components/FocusBackgroundGallery";
+import { resolveBackground } from "./constants/focusBackgrounds";
 import { RAIL_ICONS, MoreVerticalIcon, CloseIcon, ArrowLeftIcon, BookmarkIcon } from "./constants/focusIcons";
 import "./styles/focus-space.css";
 
 const uid = () => `nt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+/** Motion background video — muted loop with an explicit play() retry:
+ *  some browsers (and headless test browsers) refuse autoPlay alone. */
+const BgVideo = ({ src, k }) => {
+  const ref = useRef(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    let tries = 0;
+    const tryPlay = () => {
+      if (tries++ > 5 || !v.paused) return;
+      v.play().catch(() => setTimeout(tryPlay, 600));
+    };
+    v.addEventListener("loadeddata", tryPlay);
+    tryPlay();
+    return () => v.removeEventListener("loadeddata", tryPlay);
+  }, [src]);
+  return (
+    <video ref={ref} key={k} className="fc-bg-video" src={src} loop muted playsInline preload="metadata" aria-hidden />
+  );
+};
 
 const RailIcon = ({ icon: Icon, label, active, onClick }) => (
   <button
@@ -58,11 +81,24 @@ export const FocusSpacePage = () => {
   const [sessionJustEnded, setSessionJustEnded] = useState(false);
 
   const backgroundEntry = useMemo(
-    () => getBackgroundById(data.background) || { css: "linear-gradient(160deg,#0b1023,#2b3355)" },
-    [data.background]
+    () => resolveBackground(data.background, data.customBgType ? { type: data.customBgType, src: "__custom__" } : null),
+    [data.background, data.customBgType]
   );
-  const backgroundCss = resolveBackgroundCss(backgroundEntry);
-  const backgroundIsAnimated = Boolean(backgroundEntry?.motion) && data.backgroundAnim !== false && !data.reduceMotion;
+  const motionAllowed = data.backgroundAnim !== false && !data.reduceMotion;
+  const isVideoBg = backgroundEntry.type === "video" && motionAllowed;
+
+  // load the locally-stored custom background blob (IndexedDB) when selected
+  const [customSrc, setCustomSrc] = useState(null);
+  useEffect(() => {
+    let dead = false;
+    if (data.background !== "custom" || !data.customBgType) { setCustomSrc(null); return; }
+    import("./components/FocusBackgroundGallery").then(async ({ ensureCustomLoaded }) => {
+      if (dead) return;
+      const url = await ensureCustomLoaded();
+      if (!dead) setCustomSrc(url);
+    }).catch(() => setCustomSrc(null));
+    return () => { dead = true; };
+  }, [data.background, data.customBgType]);
 
   const overlayStyle = useMemo(
     () => ({
@@ -76,7 +112,11 @@ export const FocusSpacePage = () => {
   // ONLY to the bg layer so panels/text above stay crisp.
   const bgLayerStyle = useMemo(
     () => ({
-      background: backgroundCss,
+      background: isVideoBg && !customSrc
+        ? backgroundEntry.fallbackCss // static poster/fallback under the video
+        : backgroundEntry.type === "image" && customSrc
+          ? `url("${customSrc}")`
+          : resolveBackgroundCss(backgroundEntry),
       backgroundSize: data.backgroundFit === "contain" ? "contain" : "cover",
       backgroundPosition: data.backgroundPosition || "center",
       filter: [
@@ -86,7 +126,7 @@ export const FocusSpacePage = () => {
         data.bgSaturation !== 100 ? `saturate(${data.bgSaturation / 100})` : "",
       ].filter(Boolean).join(" ") || undefined,
     }),
-    [backgroundCss, data.backgroundFit, data.backgroundPosition,
+    [backgroundEntry, customSrc, data.backgroundFit, data.backgroundPosition,
       data.bgBlur, data.bgBrightness, data.bgContrast, data.bgSaturation]
   );
 
@@ -169,6 +209,7 @@ export const FocusSpacePage = () => {
 
   const railItems = [
     { key: "sounds", icon: RAIL_ICONS.sounds },
+    { key: "backgrounds", icon: RAIL_ICONS.backgrounds || RAIL_ICONS.notes },
     { key: "notes", icon: RAIL_ICONS.notes },
     { key: "tasks", icon: RAIL_ICONS.tasks },
     { key: "smart", icon: RAIL_ICONS.smart },
@@ -180,7 +221,14 @@ export const FocusSpacePage = () => {
   return (
     <div className={`fc-root ${data.reduceMotion ? "fc-root--reduce" : ""}`} dir={language === "ar" ? "rtl" : "ltr"}>
       {/* Background layer */}
-      <div className="fc-bg" style={{ background: backgroundCss, backgroundSize: data.backgroundFit === "contain" ? "contain" : "cover", backgroundPosition: "center" }} />
+      <div className="fc-bg" style={{ background: bgLayerStyle.background, backgroundSize: bgLayerStyle.backgroundSize, backgroundPosition: bgLayerStyle.backgroundPosition, filter: bgLayerStyle.filter }} />
+      {/* Motion background video — muted, looping, poster-backed, only when motion allowed */}
+      {isVideoBg && backgroundEntry.src && !customSrc && (
+        <BgVideo src={backgroundEntry.src} k={backgroundEntry.id} />
+      )}
+      {isVideoBg && customSrc && data.customBgType === "video" && (
+        <BgVideo src={customSrc} k={customSrc} />
+      )}
       <div className="fc-overlay" style={overlayStyle} />
 
       {/* Exit — always visible */}
@@ -201,6 +249,7 @@ export const FocusSpacePage = () => {
             defaultStudyMode={data.defaultStudyMode}
             onTimerExpire={handleTimerExpire}
             onSessionComplete={handlePomodoroSession}
+            data={data}
           />
         )}
       </div>
@@ -240,6 +289,7 @@ export const FocusSpacePage = () => {
           </div>
           <div className="fc-side__body">
             {openPanel === "sounds" && <FocusSoundBoard />}
+            {openPanel === "backgrounds" && <FocusBackgroundGallery data={data} update={update} />}
             {openPanel === "notes" && (
               <FocusNotes
                 notes={data.notes || []}

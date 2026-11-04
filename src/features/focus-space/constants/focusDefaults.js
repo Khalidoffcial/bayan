@@ -41,6 +41,7 @@ export const FOCUS_DEFAULTS = {
   // Timer behaviour
   timerPreset: 25,             // minutes (quick preset)
   timerSound: "chime",         // chime | bell | soft | none
+  timerSoundVolume: 0.7,       // 0–1
   // Stopwatch
   stopwatchLaps: [],           // [{ totalMs, deltaMs, at }]
   // Pomodoro

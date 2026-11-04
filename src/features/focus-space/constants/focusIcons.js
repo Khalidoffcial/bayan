@@ -220,6 +220,7 @@ export {
  */
 export const RAIL_ICONS = {
   sounds: AudioLines,
+  backgrounds: Image,
   notes: NotebookPen,
   tasks: ListTodo,
   smart: Sparkles,

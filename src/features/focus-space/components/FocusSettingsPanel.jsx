@@ -94,6 +94,36 @@ export const FocusSettingsPanel = ({ data, update }) => {
       <div className="fc-settings__group">
         <h4>{t("focus.settings.study")}</h4>
         <label className="fc-setting-row">
+          <span>{t("focus.settings.timerSound")}</span>
+          <select className="fc-select" value={data.timerSound ?? "chime"}
+            onChange={(e) => set({ timerSound: e.target.value })}>
+            <option value="chime">Chime</option>
+            <option value="bell">Bell</option>
+            <option value="soft">Soft</option>
+            <option value="none">—</option>
+          </select>
+        </label>
+        <label className="fc-setting-row">
+          <span>{t("focus.settings.timerVolume")} ({Math.round((data.timerSoundVolume ?? 0.7) * 100)}%)</span>
+          <input type="range" min="0" max="1" step="0.05" value={data.timerSoundVolume ?? 0.7}
+            onChange={(e) => set({ timerSoundVolume: Number(e.target.value) })} />
+        </label>
+        <label className="fc-setting-row">
+          <span>{t("focus.settings.pomoShort")}</span>
+          <input type="number" min="1" max="30" value={data.pomodoroShortBreak ?? 5}
+            onChange={(e) => set({ pomodoroShortBreak: Math.max(1, Math.min(30, Number(e.target.value) || 5)) })} />
+        </label>
+        <label className="fc-setting-row">
+          <span>{t("focus.settings.pomoLong")}</span>
+          <input type="number" min="5" max="60" value={data.pomodoroLongBreak ?? 15}
+            onChange={(e) => set({ pomodoroLongBreak: Math.max(5, Math.min(60, Number(e.target.value) || 15)) })} />
+        </label>
+        <label className="fc-setting-row">
+          <span>{t("focus.settings.pomoBefore")}</span>
+          <input type="number" min="2" max="8" value={data.pomodoroSessionsBeforeLong ?? 4}
+            onChange={(e) => set({ pomodoroSessionsBeforeLong: Math.max(2, Math.min(8, Number(e.target.value) || 4)) })} />
+        </label>
+        <label className="fc-setting-row">
           <span>{t("focus.settings.defaultMode")}</span>
           <select className="fc-select" value={data.defaultStudyMode}
             onChange={(e) => set({ defaultStudyMode: e.target.value })}>

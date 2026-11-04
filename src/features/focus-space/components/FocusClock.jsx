@@ -88,6 +88,7 @@ export const FocusClock = ({
   showSeconds,
   now,
   immersive,
+  onOpen,
 }) => {
   // Accept the whole focus-document as `settings` (FocusSpacePage shape) or
   // plain individual props. Explicit props win over settings fields.
@@ -113,12 +114,17 @@ export const FocusClock = ({
     showSeconds: cShowSeconds,
   });
 
+  const clickProps = onOpen
+    ? { onClick: onOpen, role: "button", tabIndex: 0, onKeyDown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } } }
+    : {};
+
   // ── ANALOG: a fully separate component, not a theme variant ──
   if (cType === "analog") {
     return (
       <div
         className={`fclk fclk--analog ${cImmersive ? "fclk--immersive" : ""}`}
-        style={{ fontFamily: `"${cFont}", system-ui, sans-serif` }}
+        style={{ fontFamily: `"${cFont}", system-ui, sans-serif`, cursor: onOpen ? "pointer" : undefined }}
+        {...clickProps}
       >
         <FocusAnalogClock
           now={safeNow}
@@ -251,7 +257,7 @@ export const FocusClock = ({
     : null;
 
   return (
-    <div className={cls} style={style} role="timer" aria-label="clock">
+    <div className={cls} style={style} role="timer" aria-label="clock" {...clickProps}>
       {timeNode}
       {dateStr && <div className="fclk__date">{dateStr}</div>}
     </div>
