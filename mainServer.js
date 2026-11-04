@@ -1744,7 +1744,11 @@ function sanitizeSessions(sessions) {
 
 // تنقية إعدادات مساحة التركيز
 const FOCUS_SETTING_KEYS = ["background", "backgroundFit", "overlayOpacity", "brightness",
+    "bgBlur", "bgBrightness", "bgContrast", "bgSaturation", "backgroundAnim", "backgroundPosition",
     "clockType", "clockStyle", "clockColor", "clockSize", "clockFont", "clockFontWeight",
+    "clockTheme", "immersiveClock", "clockArabicNumerals",
+    "timerPreset", "timerSound", "stopwatchLaps", "pomodoroShortBreak", "pomodoroLongBreak",
+    "pomodoroSessionsBeforeLong", "unifiedToolTheme", "timerTheme", "stopwatchTheme", "pomodoroTheme",
     "showSeconds", "showDate", "use12Hour", "soundPreferences", "defaultStudyMode",
     "defaultSessionDuration", "ayaNotifications", "savedContentReminders", "hideControls",
     "reduceMotion", "overlayVisible"];
@@ -1766,7 +1770,8 @@ function sanitizeFocusSettings(settings) {
         if (Number.isFinite(dur) && dur >= 5 && dur <= 180) clean.defaultSessionDuration = dur;
         else delete clean.defaultSessionDuration;
     }
-    for (const numKey of ["overlayOpacity", "brightness", "clockSize"]) {
+    for (const numKey of ["overlayOpacity", "brightness", "clockSize", "bgBlur", "bgBrightness", "bgContrast", "bgSaturation",
+        "timerPreset", "pomodoroShortBreak", "pomodoroLongBreak", "pomodoroSessionsBeforeLong"]) {
         if (clean[numKey] != null) {
             const v = Number(clean[numKey]);
             if (Number.isFinite(v) && v >= 0 && v <= 100) clean[numKey] = v;
@@ -1774,7 +1779,8 @@ function sanitizeFocusSettings(settings) {
         }
     }
     // strings آمنة ومحصورة الطول
-    for (const strKey of ["background", "backgroundFit", "clockFont", "clockFontWeight"]) {
+    for (const strKey of ["background", "backgroundFit", "clockFont", "clockFontWeight", "clockTheme", "timerSound",
+        "backgroundPosition", "timerTheme", "stopwatchTheme", "pomodoroTheme"]) {
         if (clean[strKey] != null) clean[strKey] = String(clean[strKey]).slice(0, 300);
     }
     if (clean.soundPreferences && typeof clean.soundPreferences === "object") {
@@ -1784,7 +1790,16 @@ function sanitizeFocusSettings(settings) {
         }
         clean.soundPreferences = prefs;
     }
-    for (const boolKey of ["ayaNotifications", "savedContentReminders", "hideControls", "reduceMotion", "overlayVisible", "showSeconds", "showDate", "use12Hour"]) {
+    if (clean.timerSound && !["chime", "bell", "soft", "none"].includes(clean.timerSound)) delete clean.timerSound;
+    if (Array.isArray(clean.stopwatchLaps)) {
+        clean.stopwatchLaps = clean.stopwatchLaps.slice(0, 50).map((l) => ({
+            totalMs: Math.max(0, Math.min(Number(l.totalMs) || 0, 86400000)),
+            deltaMs: Math.max(0, Math.min(Number(l.deltaMs) || 0, 86400000)),
+            at: String(l.at || "").slice(0, 30),
+        }));
+    } else if (clean.stopwatchLaps !== undefined) delete clean.stopwatchLaps;
+    for (const boolKey of ["ayaNotifications", "savedContentReminders", "hideControls", "reduceMotion", "overlayVisible", "showSeconds", "showDate", "use12Hour",
+        "backgroundAnim", "immersiveClock", "clockArabicNumerals", "unifiedToolTheme"]) {
         if (clean[boolKey] !== undefined) clean[boolKey] = Boolean(clean[boolKey]);
     }
     return clean;
