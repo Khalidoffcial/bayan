@@ -1751,7 +1751,7 @@ const FOCUS_SETTING_KEYS = ["background", "backgroundFit", "overlayOpacity", "br
     "pomodoroSessionsBeforeLong", "unifiedToolTheme", "timerTheme", "stopwatchTheme", "pomodoroTheme",
     "showSeconds", "showDate", "use12Hour", "soundPreferences", "defaultStudyMode",
     "defaultSessionDuration", "ayaNotifications", "savedContentReminders", "hideControls",
-    "reduceMotion", "overlayVisible"];
+    "reduceMotion", "overlayVisible", "ayaIntervention", "ayaEnabled"];
 
 function sanitizeFocusSettings(settings) {
     if (!settings || typeof settings !== "object") return {};
@@ -1799,9 +1799,10 @@ function sanitizeFocusSettings(settings) {
         }));
     } else if (clean.stopwatchLaps !== undefined) delete clean.stopwatchLaps;
     for (const boolKey of ["ayaNotifications", "savedContentReminders", "hideControls", "reduceMotion", "overlayVisible", "showSeconds", "showDate", "use12Hour",
-        "backgroundAnim", "immersiveClock", "clockArabicNumerals", "unifiedToolTheme"]) {
+        "backgroundAnim", "immersiveClock", "clockArabicNumerals", "unifiedToolTheme", "ayaEnabled"]) {
         if (clean[boolKey] !== undefined) clean[boolKey] = Boolean(clean[boolKey]);
     }
+    if (clean.ayaIntervention && !["gentle", "balanced", "active"].includes(clean.ayaIntervention)) delete clean.ayaIntervention;
     return clean;
 }
 
@@ -1894,14 +1895,18 @@ app.get(
                         else if (type === "novels") item = await dao.getnovelsID(id);
                         else item = await dao.getPostID(id);
                         if (!item) continue;
+                        const rec = saved[type][id];
+                        const recObj = rec && typeof rec === "object" ? rec : {};
                         result.push({
                             id,
                             type: type.slice(0, -1), // article | novel | post
                             title: String(item.title || "").slice(0, 300),
                             description: String(item.descrip || item.content || "").slice(0, 300),
                             image: Array.isArray(item.img) && item.img[0] ? String(item.img[0]).slice(0, 1000) : null,
-                            savedAt: saved[type][id]?.savedAt || saved[type][id] === true ? (saved[type][id]?.savedAt || null) : null,
-                            read: Boolean(saved[type][id]?.read),
+                            savedAt: recObj.savedAt || null,
+                            readStatus: recObj.readStatus || (recObj.read ? "completed" : "not_started"),
+                            readProgressPercent: Number(recObj.readProgressPercent) || 0,
+                            lastReadAt: recObj.lastReadAt || null,
                             link: type === "posts" ? `/rp/${id}` : `/r/${id}`,
                         });
                     } catch (e) { /* المحتوى محذوف — تخطَّ */ }
@@ -1911,6 +1916,176 @@ app.get(
         } catch (err) {
             console.error("GET /focus-space/saved-content error:", err.message);
             res.status(500).json({ error: err.message });
+        }
+    }
+);
+
+// ======================================================
+// READ LATER — حفظ/إزالة/تحديث تقدم أي محتوى (مقال/رواية/منشور)
+// الشكل في قاعدة البيانات:
+//   user_data/Profile/{uid}/savedContent/{type}/{contentId} =
+//     { savedAt, readStatus: not_started|in_progress|completed,
+//       readProgressPercent, lastReadAt, completedAt }
+// الهوية دائمًا من verifyToken — لا يُثق بمعرف المستخدم من الواجهة.
+// ======================================================
+const READ_LATER_TYPES = ["articles", "novels", "posts"];
+const READ_STATUSES = ["not_started", "in_progress", "completed"];
+
+function sanitizeReadLaterBody(body) {
+    const contentType = READ_LATER_TYPES.includes(String(body.contentType || "")) ? String(body.contentType) : null;
+    const contentId = String(body.contentId || "").slice(0, 100);
+    if (!contentType || !contentId) return null;
+    const clean = { contentType, contentId };
+    if (body.title !== undefined) clean.title = String(body.title || "").slice(0, 300);
+    if (body.image !== undefined) clean.image = /^https?:\/\//.test(String(body.image || "")) ? String(body.image).slice(0, 1000) : "";
+    if (body.readStatus !== undefined) {
+        if (!READ_STATUSES.includes(body.readStatus)) return null;
+        clean.readStatus = body.readStatus;
+    }
+    if (body.readProgressPercent !== undefined) {
+        const p = Number(body.readProgressPercent);
+        if (!Number.isFinite(p) || p < 0 || p > 100) return null;
+        clean.readProgressPercent = Math.round(p);
+    }
+    return clean;
+}
+
+// PUT /read-later — toggle / add / update progress
+app.put(
+    "/read-later",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const clean = sanitizeReadLaterBody(req.body || {});
+            if (!clean) return res.status(400).json({ status: "error", message: "Invalid read-later payload" });
+            const uid = req.user.id;
+            const base = `user_data/Profile/${uid}/savedContent/${clean.contentType}/${clean.contentId}`;
+            const existingSnap = await get(ref(db, base));
+
+            // Toggle: العنصر محفوظ بالفعل ولم يطلب المستخدم تحديث تقدم → إزالة
+            if (existingSnap.exists() && clean.readStatus === undefined && clean.readProgressPercent === undefined) {
+                await set(ref(db, base), null);
+                return res.json({ status: "ok", saved: false });
+            }
+
+            const prev = existingSnap.exists() ? existingSnap.val() : {};
+            const now = new Date().toISOString();
+            const record = {
+                savedAt: prev.savedAt || now,
+                readStatus: clean.readStatus || prev.readStatus || "not_started",
+                readProgressPercent: clean.readProgressPercent !== undefined
+                    ? clean.readProgressPercent
+                    : (Number(prev.readProgressPercent) || 0),
+                lastReadAt: (clean.readStatus === "in_progress" || clean.readProgressPercent !== undefined)
+                    ? now
+                    : (prev.lastReadAt || null),
+                completedAt: clean.readStatus === "completed" ? (prev.completedAt || now) : (clean.readStatus ? null : prev.completedAt || null),
+            };
+            await set(ref(db, base), record);
+            return res.json({ status: "ok", saved: true, record });
+        } catch (err) {
+            console.error("PUT /read-later error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// GET /read-later/:contentType/:contentId — هل المحتوى محفوظ لهذا المستخدم؟
+app.get(
+    "/read-later/:contentType/:contentId",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const contentType = String(req.params.contentType || "");
+            const contentId = String(req.params.contentId || "").slice(0, 100);
+            if (!READ_LATER_TYPES.includes(contentType) || !contentId) {
+                return res.status(400).json({ status: "error", message: "Invalid params" });
+            }
+            const snap = await get(ref(db, `user_data/Profile/${req.user.id}/savedContent/${contentType}/${contentId}`));
+            res.json({ status: "ok", saved: snap.exists(), record: snap.exists() ? snap.val() : null });
+        } catch (err) {
+            console.error("GET /read-later status error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// GET /read-later — كل المحتوى المحفوظ للمستخدم الحالي فقط (metadata للعرض)
+app.get(
+    "/read-later",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const snap = await get(ref(db, `user_data/Profile/${req.user.id}/savedContent`));
+            const saved = snap.exists() ? snap.val() : {};
+            const items = [];
+            for (const type of READ_LATER_TYPES) {
+                const entries = saved[type] ? Object.entries(saved[type]).slice(0, 200) : [];
+                for (const [id, rec] of entries) {
+                    if (!rec || typeof rec !== "object") continue;
+                    items.push({
+                        contentId: id,
+                        contentType: type.slice(0, -1),
+                        savedAt: rec.savedAt || null,
+                        readStatus: rec.readStatus || "not_started",
+                        readProgressPercent: Number(rec.readProgressPercent) || 0,
+                        lastReadAt: rec.lastReadAt || null,
+                        completedAt: rec.completedAt || null,
+                    });
+                }
+            }
+            res.json({ status: "ok", items });
+        } catch (err) {
+            console.error("GET /read-later error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// GET /focus-space/saved-content/:contentType/:contentId/full — المحتوى الأصلي كاملًا
+// للقراءة داخل Focus Space. متاح فقط إذا كان المحتوى محفوظًا فعليًا للمستخدم
+// (Authorization: القائمة خاصة بمستخدمها — لا قراءة لمحتوى مستخدم آخر).
+app.get(
+    "/focus-space/saved-content/:contentType/:contentId/full",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const contentType = String(req.params.contentType || "");
+            const contentId = String(req.params.contentId || "").slice(0, 100);
+            if (!READ_LATER_TYPES.includes(contentType) || !contentId) {
+                return res.status(400).json({ status: "error", message: "Invalid params" });
+            }
+            const uid = req.user.id;
+            const savedSnap = await get(ref(db, `user_data/Profile/${uid}/savedContent/${contentType}/${contentId}`));
+            if (!savedSnap.exists()) {
+                return res.status(403).json({ status: "error", message: "Not in your read-later list" });
+            }
+            let item = null;
+            if (contentType === "articles") item = await dao.getArticleID(contentId);
+            else if (contentType === "novels") item = await dao.getnovelsID(contentId);
+            else item = await dao.getPostID(contentId);
+            if (!item) return res.status(404).json({ status: "error", message: "Content not found" });
+            const profile = await getUser(item.autherID);
+            res.json({
+                status: "ok",
+                content: {
+                    id: contentId,
+                    type: contentType,
+                    title: item.title || "",
+                    descrip: item.descrip || "",
+                    content: item.content || "",
+                    img: Array.isArray(item.img) ? item.img : [],
+                    date: item.date || "",
+                    time: item.time || "",
+                    savedRecord: savedSnap.val(),
+                    userData: profile
+                        ? { Id_user: profile.Id_user ?? item.autherID, F_user: profile.F_user || "", S_user: profile.S_user || "", imgProfile: profile.imgProfile || "" }
+                        : null,
+                },
+            });
+        } catch (err) {
+            console.error("GET saved-content full error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
         }
     }
 );
