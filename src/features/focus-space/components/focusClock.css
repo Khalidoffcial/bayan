@@ -1,0 +1,415 @@
+/**
+ * focusClock.css — the 12 real clock themes.
+ * Each `.fclk--kind` is a distinct visual design, not a color swap.
+ */
+
+.fclk {
+  --clock-color: #fff;
+  --clock-size: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--clock-color);
+  user-select: none;
+  line-height: 1;
+}
+
+.fclk__time {
+  font-size: var(--clock-size);
+  font-weight: 250;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+.fclk__colon {
+  opacity: 0.55;
+  animation: fclk-blink 2s steps(1) infinite;
+}
+
+@keyframes fclk-blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.fclk__sec {
+  opacity: 0.75;
+  font-size: 0.45em;
+}
+
+.fclk__suffix {
+  font-size: 0.22em;
+  margin-inline-start: 0.35em;
+  opacity: 0.6;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.fclk__date {
+  font-size: clamp(13px, 1.4vw, 18px);
+  opacity: 0.72;
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+
+/* ─── clean: tighter tracking, softer shadow ─────────────────────── */
+.fclk--clean .fclk__time {
+  letter-spacing: -0.055em;
+  font-weight: 300;
+  text-shadow: none;
+}
+
+.fclk--clean .fclk__colon {
+  animation: none;
+}
+
+/* ─── flip: split cards, flip on change ───────────────────────────── */
+.fclk__flip {
+  display: flex;
+  align-items: center;
+  gap: 0.12em;
+}
+
+.fclk__card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35em;
+  padding: 0.12em 0.18em;
+  font-size: var(--clock-size);
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.16em;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.fclk--flip .fclk__colon {
+  font-size: var(--clock-size);
+  color: var(--clock-color);
+}
+
+.fclk__card--sec {
+  font-size: calc(var(--clock-size) * 0.55);
+}
+
+/* ─── serif: elegant thin numerals ────────────────────────────────── */
+.fclk--serif .fclk__serif,
+.fclk__serif {
+  font-family: Georgia, "Times New Roman", "Amiri", serif;
+  font-size: var(--clock-size);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+.fclk__tick {
+  opacity: 0.4;
+  margin: 0 0.08em;
+  font-size: 0.6em;
+}
+
+.fclk--serif .fclk__sec {
+  font-size: 0.5em;
+  opacity: 0.6;
+}
+
+/* ─── glass: frosted pill behind digits ───────────────────────────── */
+.fclk__glass {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3em;
+  padding: 0.28em 0.6em;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.22);
+}
+
+.fclk--glass .fclk__time {
+  font-size: var(--clock-size);
+}
+
+/* ─── neon: glow-stroked digits ───────────────────────────────────── */
+.fclk--neon .fclk__time {
+  color: var(--clock-color);
+  text-shadow:
+    0 0 6px color-mix(in srgb, var(--clock-color) 80%, transparent),
+    0 0 22px color-mix(in srgb, var(--clock-color) 45%, transparent),
+    0 0 64px color-mix(in srgb, var(--clock-color) 25%, transparent);
+  font-weight: 400;
+}
+
+.fclk--neon .fclk__date {
+  text-shadow: 0 0 10px color-mix(in srgb, var(--clock-color) 40%, transparent);
+}
+
+/* ─── outline: huge hollow numerals ───────────────────────────────── */
+.fclk__outline {
+  font-size: var(--clock-size);
+  font-weight: 800;
+  color: transparent;
+  -webkit-text-stroke: 2.5px var(--clock-color);
+  letter-spacing: 0.01em;
+}
+
+.fclk__thin {
+  opacity: 0.35;
+  font-weight: 200;
+  -webkit-text-stroke: 1px var(--clock-color);
+}
+
+.fclk--outline .fclk__sec {
+  font-size: 0.45em;
+  -webkit-text-stroke: 1.5px var(--clock-color);
+  opacity: 0.7;
+}
+
+/* ─── mono: terminal style ────────────────────────────────────────── */
+.fclk__mono {
+  font-family: "SF Mono", "Cascadia Code", Consolas, monospace;
+  font-size: var(--clock-size);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+.fclk--mono .fclk__time {
+  display: none;
+}
+
+/* ─── ring: SVG progress ring ─────────────────────────────────────── */
+.fclk__ring-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.fclk__ring {
+  width: calc(var(--clock-size) * 2.2);
+  height: auto;
+  transform: rotate(-90deg);
+}
+
+.fclk__ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 2.5;
+}
+
+.fclk__ring-prog {
+  fill: none;
+  stroke: var(--clock-color);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s linear;
+}
+
+.fclk__ring-time {
+  position: absolute;
+  font-size: calc(var(--clock-size) * 0.5);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── bar: thin progress under digits ─────────────────────────────── */
+.fclk__bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.fclk__bar {
+  width: calc(var(--clock-size) * 2.6);
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+}
+
+.fclk__bar-fill {
+  height: 100%;
+  background: var(--clock-color);
+  border-radius: inherit;
+  transition: width 1s linear;
+}
+
+/* ─── dots: minute dots under minimal digits ──────────────────────── */
+.fclk__dots-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.fclk__dots {
+  display: flex;
+  gap: 7px;
+}
+
+.fclk__dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 0.3s, transform 0.3s;
+}
+
+.fclk__dots i.is-on {
+  background: var(--clock-color);
+  transform: scale(1.25);
+}
+
+/* ─── brick: stacked HH/MM/SS rows ────────────────────────────────── */
+.fclk__brick {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.06em;
+}
+
+.fclk__row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35em;
+}
+
+.fclk--brick .fclk__num {
+  font-size: calc(var(--clock-size) * 0.55);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+.fclk__lbl {
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  opacity: 0.5;
+  text-transform: uppercase;
+}
+
+/* ─── Immersive mode: scale to ~90% viewport ──────────────────────── */
+.fclk--immersive .fclk__time,
+.fclk--immersive .fclk__card,
+.fclk--immersive .fclk__outline,
+.fclk--immersive .fclk__serif,
+.fclk--immersive .fclk__mono {
+  font-size: clamp(48px, 16vmin, calc(var(--clock-size) * 3));
+}
+
+.fclk--immersive .fclk__num {
+  font-size: clamp(36px, 9vmin, calc(var(--clock-size) * 1.8));
+}
+
+.fclk--immersive .fclk__ring {
+  width: min(60vmin, 70vh);
+}
+
+.fclk--immersive .fclk__ring-time {
+  font-size: clamp(28px, 7vmin, 120px);
+}
+
+.fclk--immersive .fclk__date {
+  font-size: clamp(15px, 2vmin, 24px);
+}
+
+/* RTL: keep digit groups LTR */
+.fclk[dir="rtl"] .fclk__time,
+.fclk[dir="rtl"] .fclk__outline,
+.fclk[dir="rtl"] .fclk__mono {
+  direction: ltr;
+}
+
+/* Reduced motion: stop blink + transitions */
+@media (prefers-reduced-motion: reduce) {
+
+  .fclk__colon,
+  .fclk__bar-fill,
+  .fclk__ring-prog,
+  .fclk__dots i {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+/* ─── ANALOG clock (clockType === "analog") ───────────────────────── */
+.fclock-analog {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.fclock-analog__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fclock-analog__face {
+  fill: rgba(0, 0, 0, 0.32);
+  stroke: color-mix(in srgb, var(--analog-color) 55%, transparent);
+  stroke-width: 1;
+  backdrop-filter: blur(4px);
+}
+
+.fclock-analog__tick {
+  stroke: var(--analog-color);
+  stroke-width: 0.8;
+  opacity: 0.45;
+}
+
+.fclock-analog__tick--major {
+  stroke-width: 2;
+  opacity: 0.9;
+}
+
+.fclock-analog__numeral {
+  fill: var(--analog-color);
+  font-family: var(--analog-font, inherit);
+  font-weight: var(--analog-weight, 400);
+  font-size: 7px;
+  opacity: 0.9;
+}
+
+.fclock-analog__hand {
+  stroke: var(--analog-color);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  transition: transform 0.25s cubic-bezier(0.4, 2.2, 0.6, 0.9);
+}
+
+.fclock-analog__hand--hour { stroke-width: 3.6; }
+.fclock-analog__hand--second {
+  stroke-width: 1;
+  opacity: 0.75;
+  transition: none; /* smooth continuous sweep */
+}
+
+.fclock-analog__pin {
+  fill: var(--analog-color);
+}
+
+.fclock-analog__digital {
+  position: absolute;
+  bottom: 6%;
+  font-family: var(--analog-font, inherit);
+  font-weight: var(--analog-weight, 400);
+  font-size: clamp(11px, 2.2vmin, 16px);
+  font-variant-numeric: tabular-nums;
+  color: var(--analog-color);
+  opacity: 0.75;
+  letter-spacing: 0.06em;
+}
+
+.fclock-analog__suffix {
+  font-size: 0.75em;
+  opacity: 0.8;
+}
+
+/* Analog date inherits the same digital date style */
+.fclk--analog .fclk__date {
+  font-family: var(--analog-font, inherit);
+}
