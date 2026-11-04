@@ -92,11 +92,15 @@ function ensureInit() {
 
 // ---- تطبيع نتيجة Openverse إلى الشكل الموحد للواجهة ----
 function normalizeOpenverseResult(r) {
+    // Openverse يعيد duration بالمللي ثانية (وثّق: 186000ms = 3:06 دقيقة).
+    // القيم الحقيقية للثواني نادرًا تتجاوز 7200 — إذا تجاوزت فالمصدر ms.
+    const rawDur = Number(r.duration) || 0;
+    const durationSec = rawDur > 7200 ? Math.round(rawDur / 1000) : rawDur;
     return {
         id: `ov:${r.id}`,
         title: String(r.title || "Untitled").slice(0, 300),
         author: String(r.creator || r.username || "Unknown").slice(0, 120),
-        durationSec: Number(r.duration) || 0,
+        durationSec,
         thumbnail: r.thumbnail ? String(r.thumbnail).slice(0, 1000) : null,
         audioUrl: String(r.url).slice(0, 1000),
         license: {
@@ -236,7 +240,9 @@ async function searchItunes({ query, page = 1, limit = 20 }) {
 }
 
 // ---- Openverse search مع الكاش + الحد ----
-async function searchOpenverse({ query, section = "music", page = 1, limit = 20 }) {
+// ovSource: "" (كل المصادر) أو "jamendo" — كتالوج Jamendo الكامل المرخّص CC
+// (تشغيل كامل حقيقي، ليس previews — تم التحقق: durations > 180s، audio/mpeg 200).
+async function searchOpenverse({ query, section = "music", page = 1, limit = 20, ovSource = "" }) {
     ensureInit();
     if (!query || !String(query).trim()) {
         throw Object.assign(new Error("MISSING_PARAMS"), { status: 400 });
@@ -245,7 +251,8 @@ async function searchOpenverse({ query, section = "music", page = 1, limit = 20 
     const trimmed = String(query).trim().slice(0, 120);
     const safePage = Math.min(Math.max(1, Number(page) || 1), 5);
     const safeLimit = Math.min(Math.max(1, Number(limit) || 20), 50);
-    const cacheKey = `audiohub:search:${section}:${trimmed.toLowerCase()}:${safePage}:${safeLimit}`;
+    const srcTag = ovSource === "jamendo" ? "jamendo" : "all";
+    const cacheKey = `audiohub:search:${section}:${srcTag}:${trimmed.toLowerCase()}:${safePage}:${safeLimit}`;
 
     // 1) الكاش أولًا
     const cached = await injectedCache.cacheGet(cacheKey);
@@ -265,6 +272,8 @@ async function searchOpenverse({ query, section = "music", page = 1, limit = 20 
         filter_dead: "true", // ضمان روابط حية فقط
         filter_category: "music",
     });
+    // كتالوج Jamendo فقط — أغانٍ كاملة مرخّصة CC (وليس مقتطفات)
+    if (ovSource === "jamendo") params.set("source", "jamendo");
 
     try {
         const data = await fetchJson(`${OPENVERSE_BASE}?${params}`, {}, 30000); // Openverse can be slow

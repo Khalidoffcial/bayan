@@ -1751,7 +1751,7 @@ const FOCUS_SETTING_KEYS = ["background", "backgroundFit", "overlayOpacity", "br
     "pomodoroSessionsBeforeLong", "unifiedToolTheme", "timerTheme", "stopwatchTheme", "pomodoroTheme",
     "showSeconds", "showDate", "use12Hour", "soundPreferences", "defaultStudyMode",
     "defaultSessionDuration", "ayaNotifications", "savedContentReminders", "hideControls",
-    "reduceMotion", "overlayVisible", "ayaIntervention", "ayaEnabled"];
+    "musicWidgetHidden", "reduceMotion", "overlayVisible", "ayaIntervention", "ayaEnabled"];
 
 function sanitizeFocusSettings(settings) {
     if (!settings || typeof settings !== "object") return {};
@@ -2171,6 +2171,11 @@ app.get(
     async(req, res) => {
         try {
             const { q, page, limit, source } = req.query;
+            // jamendo — كتالوج Jamendo الكامل (CC، تشغيل كامل) عبر Openverse
+            if (source === "jamendo") {
+                const result = await searchOpenverse({ query: q, section: "music", page, limit, ovSource: "jamendo" });
+                return res.json({ status: "ok", provider: "jamendo", ...result });
+            }
             if (source === "openverse") {
                 const result = await searchOpenverse({ query: q, section: "music", page, limit });
                 return res.json({ status: "ok", provider: "openverse", ...result });
