@@ -1928,8 +1928,16 @@ app.get(
 //       readProgressPercent, lastReadAt, completedAt }
 // الهوية دائمًا من verifyToken — لا يُثق بمعرف المستخدم من الواجهة.
 // ======================================================
-const READ_LATER_TYPES = ["articles", "novels", "posts"];
+const READ_LATER_TYPES = ["articles", "novels", "posts", "books"];
 const READ_STATUSES = ["not_started", "in_progress", "completed"];
+const ReadingEngine_FORMATS = ["pdf", "epub", "html", "text", "embed"];
+
+/** deterministic record key for a provider book id (safe path segment) */
+function bookRecordKey(provider, providerBookId) {
+    const p = String(provider || "").replace(/[^a-z_-]/gi, "").slice(0, 20);
+    const id = String(providerBookId || "").replace(/[^A-Za-z0-9._-]/g, "").slice(0, 100);
+    return p && id ? `${p}__${id}` : null;
+}
 
 function sanitizeReadLaterBody(body) {
     const contentType = READ_LATER_TYPES.includes(String(body.contentType || "")) ? String(body.contentType) : null;
@@ -2299,7 +2307,495 @@ app.get(
 );
 
 // ======================================================
-// SOCKET.IO EVENTS
+// TRIVIA — Open Trivia DB (server-side proxy + cache + session answer key)
+// الهوية دائمًا من verifyToken حيث تتطلب؛ حفظ النتائج في user_data/Profile/{uid}/triviaResults
+// المصدر المجاني: https://opentdb.com — بلا مفتاح، احترام rate limits عبر الكاش
+// ======================================================
+const trivia = require("./service/trivia.service.js");
+trivia.initTrivia({ cacheGet, cacheSet });
+
+// in-memory session keys (short TTL via periodic cleanup — a session lives minutes)
+const triviaSessions = new Map();
+
+// ---- BOOKS — unified provider registry (Gutenberg, Open Library, Google
+// Books, Wikisource, Internet Archive, DOAB/OAPEN via local OAI index) ----
+const booksRegistry = require("./service/books/registry.js");
+booksRegistry.initBooksRegistry({ cacheGet, cacheSet });
+const { startDoabHarvest } = require("./service/books/doabHarvest.js");
+startDoabHarvest();
+
+app.get(
+    "/books/search",
+    async(req, res) => {
+        try {
+            const { q, language, yearFrom, yearTo, author, subject, isbn, source, page, sort } = req.query;
+            const result = await booksRegistry.searchBooks(q, {
+                language, yearFrom, yearTo, author, subject, isbn,
+                sources: source ? String(source).split(",").map((s) => s.trim()).filter(Boolean) : undefined,
+                sort,
+            }, { page });
+            res.json({ status: "ok", ...result });
+        } catch (err) {
+            console.error("GET /books/search error:", err.message);
+            res.status(err.status || 500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// book details — provider + providerBookId are explicit (no parsing of
+// composite ids in the frontend); response carries readingSources resolved
+app.get(
+    "/books/:provider/:providerBookId",
+    async(req, res) => {
+        try {
+            const { provider, providerBookId } = req.params;
+            const book = await booksRegistry.getBook(provider, providerBookId);
+            if (!book) return res.status(404).json({ status: "error", message: "BOOK_NOT_FOUND" });
+            // Open Library works get enriched with author/year/covers + IA access
+            if (provider === "openlibrary") {
+                const p = booksRegistry.getProvider("openlibrary");
+                const extra = await p.enrichWork(providerBookId);
+                if (extra.authorName) book.authors = [extra.authorName];
+                if (extra.firstPublishYear && !book.publishedDate) book.publishedDate = String(extra.firstPublishYear).slice(0, 4);
+                if (!book.cover && extra.covers?.length) {
+                    const c = extra.covers.find((x) => Number(x) > 0);
+                    if (c) book.cover = `https://covers.openlibrary.org/b/id/${c}-M.jpg?default=false`;
+                }
+                if (book.iaId) {
+                    const ia = booksRegistry.getProvider("internetarchive");
+                    const access = await ia.getAccess(book.iaId);
+                    book.accessLevel = access.level;
+                    book.pdfFile = access.pdfFile || null;
+                    book.fullTextAvailable = access.level === "full";
+                    book.downloadAllowed = access.level === "full" && Boolean(access.pdfFile);
+                    if (access.level === "full") book.license = "public-domain";
+                }
+            }
+            if (provider === "internetarchive") {
+                // access classification already inside the item fetch
+                book.readingSources = await booksRegistry.getBookReadingSources(book);
+                return res.json({ status: "ok", book });
+            }
+            book.readingSources = await booksRegistry.getBookReadingSources(book);
+            res.json({ status: "ok", book });
+        } catch (err) {
+            console.error("GET /books/:provider/:id error:", err.message);
+            res.status(err.status || 500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// in-site reading content — Gutenberg HTML/text or Wikisource HTML, proxied
+// (sanitized downstream in the reader UI; scripts stripped before render)
+app.get(
+    "/books/:provider/:providerBookId/read",
+    async(req, res) => {
+        try {
+            const { provider, providerBookId } = req.params;
+            const p = booksRegistry.getProvider(provider);
+            if (!p || typeof p.getReadContent !== "function") return res.status(400).json({ status: "error", message: "NO_IN_SITE_READER_FOR_SOURCE" });
+            const text = await p.getReadContent(providerBookId);
+            if (!text) return res.status(404).json({ status: "error", message: "NO_READABLE_FORMAT" });
+            res.json({ status: "ok", format: text.format, content: text.content.slice(0, 2000000) });
+        } catch (err) {
+            console.error("GET /books/:provider/:id/read error:", err.message);
+            res.status(err.status || 500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// PDF proxy — public-domain PDFs only (Gutenberg ebook / IA public scan).
+// Streams Range requests so pdf.js lazy-fetches pages instead of pulling
+// whole files. Access level is re-verified server-side before streaming.
+app.get(
+    "/books/:provider/:providerBookId/pdf",
+    async(req, res) => {
+        try {
+            const { provider, providerBookId } = req.params;
+            let url = null;
+            if (provider === "gutenberg") {
+                url = await booksRegistry.getProvider("gutenberg").getPdfUrl(providerBookId);
+            } else if (provider === "internetarchive") {
+                const ia = booksRegistry.getProvider("internetarchive");
+                const access = await ia.getAccess(providerBookId);
+                if (access.level !== "full") return res.status(403).json({ status: "error", message: "BORROW_ONLY_OR_RESTRICTED" });
+                url = access.pdfFile;
+            } else if (provider === "doab") {
+                const b = await booksRegistry.getBook("doab", providerBookId);
+                url = b?.formats?.pdf || null; // publisher-hosted OA PDF
+            }
+            if (!url) return res.status(404).json({ status: "error", message: "NO_PDF" });
+            const headers = { Accept: "application/pdf", "User-Agent": "BayanSpace/1.0" };
+            if (req.headers.range) headers.Range = req.headers.range;
+            const upstream = await fetch(url, { headers });
+            if (!upstream.ok && upstream.status !== 206) {
+                return res.status(502).json({ status: "error", message: `UPSTREAM_${upstream.status}` });
+            }
+            const outHeaders = { "Content-Type": "application/pdf", "Accept-Ranges": "bytes" };
+            for (const h of ["content-length", "content-range", "etag", "last-modified"]) {
+                const v = upstream.headers.get(h);
+                if (v) outHeaders[h] = v;
+            }
+            res.writeHead(upstream.status, outHeaders);
+            // upstream.body is a Node-readable (PassThrough) in this fetch polyfill
+            if (typeof upstream.body.pipe === "function") {
+                upstream.body.pipe(res);
+                upstream.body.on("error", () => res.destroy());
+            } else {
+                const { Readable } = require("stream");
+                Readable.fromWeb(upstream.body).pipe(res);
+            }
+            req.on("close", () => { try { upstream.body?.destroy?.(); } catch { /* gone */ } });
+        } catch (err) {
+            console.error("GET /books/:provider/:id/pdf error:", err.message);
+            if (!res.headersSent) res.status(err.status || 500).json({ status: "error", message: err.message });
+            else res.destroy();
+        }
+    }
+);
+// GET /books/:provider/:providerBookId/progress — restore reading progress
+app.get(
+    "/books/:provider/:providerBookId/progress",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const bookKey = bookRecordKey(req.params.provider, req.params.providerBookId);
+            if (!bookKey) return res.status(400).json({ status: "error", message: "INVALID_BOOK_ID" });
+            const snap = await get(ref(db, `user_data/Profile/${req.user.id}/savedContent/books/${bookKey}`));
+            res.json({ status: "ok", record: snap.exists() ? snap.val() : null });
+        } catch (err) {
+            console.error("GET books progress error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// PUT /books/:provider/:providerBookId/progress — save reading position.
+// Identity from verifyToken only; field sizes validated; owner can never
+// touch another user's record because the path is derived from the token.
+app.put(
+    "/books/:provider/:providerBookId/progress",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const bookKey = bookRecordKey(req.params.provider, req.params.providerBookId);
+            if (!bookKey) return res.status(400).json({ status: "error", message: "INVALID_BOOK_ID" });
+            const b = req.body || {};
+            const allowed = ["readingFormat", "currentPage", "totalPages", "currentChapter", "currentLocation", "scrollPosition", "progressPercent", "readingStatus"];
+            const update = {};
+            for (const k of allowed) if (b[k] !== undefined) update[k] = b[k];
+            if (update.readingFormat && !ReadingEngine_FORMATS.includes(update.readingFormat)) return res.status(400).json({ status: "error", message: "INVALID_FORMAT" });
+            if (update.readingStatus && !READ_STATUSES.includes(update.readingStatus)) return res.status(400).json({ status: "error", message: "INVALID_STATUS" });
+            for (const k of ["currentPage", "totalPages"]) {
+                if (update[k] !== undefined && (!Number.isFinite(Number(update[k])) || update[k] < 0 || update[k] > 100000)) return res.status(400).json({ status: "error", message: `INVALID_${k.toUpperCase()}` });
+            }
+            if (update.progressPercent !== undefined) {
+                const p = Number(update.progressPercent);
+                if (!Number.isFinite(p) || p < 0 || p > 100) return res.status(400).json({ status: "error", message: "INVALID_PROGRESS" });
+                update.progressPercent = Math.round(p);
+            }
+            if (update.currentLocation !== undefined && String(update.currentLocation).length > 500) return res.status(400).json({ status: "error", message: "INVALID_LOCATION" });
+            if (update.currentChapter !== undefined && String(update.currentChapter).length > 200) return res.status(400).json({ status: "error", message: "INVALID_CHAPTER" });
+            if (Object.keys(update).length === 0) return res.status(400).json({ status: "error", message: "EMPTY_UPDATE" });
+
+            const base = `user_data/Profile/${req.user.id}/savedContent/books/${bookKey}`;
+            const snap = await get(ref(db, base));
+            const prev = snap.exists() ? snap.val() : {};
+            const now = new Date().toISOString();
+            const record = {
+                bookId: bookKey,
+                ...prev,
+                ...update,
+                savedAt: prev.savedAt || now,
+                lastReadAt: now,
+                completedAt: update.readingStatus === "completed" ? (prev.completedAt || now) : (update.readingStatus ? null : prev.completedAt || null),
+                updatedAt: now,
+            };
+            await set(ref(db, base), record);
+            res.json({ status: "ok", record });
+        } catch (err) {
+            console.error("PUT books progress error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// DELETE — remove a book from the user's saved list (same authorization)
+app.delete(
+    "/books/:provider/:providerBookId/progress",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const bookKey = bookRecordKey(req.params.provider, req.params.providerBookId);
+            if (!bookKey) return res.status(400).json({ status: "error", message: "INVALID_BOOK_ID" });
+            await set(ref(db, `user_data/Profile/${req.user.id}/savedContent/books/${bookKey}`), null);
+            res.json({ status: "ok" });
+        } catch (err) {
+            console.error("DELETE books progress error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+setInterval(() => {
+    const cutoff = Date.now() - 60 * 60 * 1000; // 1h
+    for (const [k, v] of triviaSessions) if (v.at < cutoff) triviaSessions.delete(k);
+}, 15 * 60 * 1000).unref();
+
+app.get(
+    "/trivia/categories",
+    async(req, res) => {
+        try {
+            res.json({ status: "ok", ...(await trivia.getCategories()) });
+        } catch (err) {
+            console.error("GET /trivia/categories error:", err.message);
+            res.status(err.status || 500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+app.post(
+    "/trivia/session",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const { amount, category, difficulty, type } = req.body || {};
+            const { sessionId, questions, key, config } = await trivia.createSession({ amount, category, difficulty, type });
+            triviaSessions.set(sessionId, { key, userId: req.user.id, at: Date.now() });
+            // server-side ownership: only the creator can grade this session
+            res.json({ status: "ok", sessionId, questions, config });
+        } catch (err) {
+            console.error("POST /trivia/session error:", err.message);
+            res.status(err.status || 500).json({ status: "error", message: err.message, code: err.code });
+        }
+    }
+);
+
+app.post(
+    "/trivia/answer",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const { sessionId, question, answer } = req.body || {};
+            const session = triviaSessions.get(String(sessionId || ""));
+            if (!session) return res.status(404).json({ status: "error", message: "SESSION_NOT_FOUND" });
+            if (session.userId !== req.user.id) return res.status(403).json({ status: "error", message: "NOT_YOUR_SESSION" });
+            // منع إرسال إجابة السؤال أكثر من مرة
+            session.answered = session.answered || new Set();
+            const answeredKey = String(question || "");
+            if (session.answered.has(answeredKey)) {
+                return res.status(409).json({ status: "error", message: "ALREADY_ANSWERED" });
+            }
+            const result = trivia.checkAnswer(session, String(question || ""), answer);
+            if (!result) return res.status(404).json({ status: "error", message: "QUESTION_NOT_IN_SESSION" });
+            session.answered.add(answeredKey);
+            res.json({ status: "ok", ...result });
+        } catch (err) {
+            console.error("POST /trivia/answer error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// حفظ نتيجة مكتملة — السكور يُحسب من إجابات محققة مسبقًا على الخادم،
+// لا يُثق بأي رقم قادم من العميل.
+app.post(
+    "/trivia/save-result",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const { sessionId, config, answers, timeSpentSec } = req.body || {};
+            const session = triviaSessions.get(String(sessionId || ""));
+            if (!session) return res.status(404).json({ status: "error", message: "SESSION_NOT_FOUND" });
+            if (session.userId !== req.user.id) return res.status(403).json({ status: "error", message: "NOT_YOUR_SESSION" });
+            if (!Array.isArray(answers) || !answers.length) {
+                return res.status(400).json({ status: "error", message: "NO_ANSWERS" });
+            }
+            let correct = 0;
+            const review = [];
+            for (const a of answers.slice(0, 20)) {
+                const r = trivia.checkAnswer(session, String(a.question || ""), a.answer);
+                if (!r) continue;
+                if (r.isCorrect) correct++;
+                review.push({ question: String(a.question || "").slice(0, 300), answer: String(a.answer || "").slice(0, 300), correctAnswer: r.correct.slice(0, 300), isCorrect: r.isCorrect });
+            }
+            const total = review.length;
+            if (!total) return res.status(400).json({ status: "error", message: "NO_VALID_ANSWERS" });
+            const record = {
+                sessionId: String(sessionId).slice(0, 40),
+                category: String(config?.category || "").slice(0, 60),
+                categoryName: String(config?.categoryName || "").slice(0, 80),
+                difficulty: String(config?.difficulty || "any").slice(0, 10),
+                type: String(config?.type || "any").slice(0, 10),
+                total,
+                correct,
+                accuracy: Math.round((correct / total) * 100),
+                timeSpentSec: Math.min(Math.max(Number(timeSpentSec) || 0, 0), 3600),
+                review,
+                savedAt: new Date().toISOString(),
+            };
+            const path = `user_data/Profile/${req.user.id}/triviaResults/${record.sessionId}`;
+            await set(ref(db, path), record);
+            res.json({ status: "ok", record });
+        } catch (err) {
+            console.error("POST /trivia/save-result error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// سجل اختبارات المستخدم — عزل كامل: uid من الـ JWT فقط
+app.get(
+    "/trivia/history",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const snap = await get(ref(db, `user_data/Profile/${req.user.id}/triviaResults`));
+            const val = snap.exists() ? snap.val() : {};
+            const history = Object.values(val)
+                .filter((r) => r && typeof r === "object")
+                .sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)))
+                .slice(0, 50);
+            res.json({ status: "ok", history });
+        } catch (err) {
+            console.error("GET /trivia/history error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// ======================================================
+// QURAN — AlQuran Cloud (proxy + cache؛ النص كما هو بلا أي تعديل)
+// العامة (بلا توكن) — قراءة فقط، لا بيانات شخصية
+// ======================================================
+const quranService = require("./service/quran.service.js");
+quranService.initQuran({ cacheGet, cacheSet });
+
+app.get(
+    "/quran/surahs",
+    async(req, res) => {
+        try {
+            res.json({ status: "ok", ...(await quranService.getSurahs()) });
+        } catch (err) {
+            console.error("GET /quran/surahs error:", err.message);
+            res.status(err.status || 500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+app.get(
+    "/quran/translations",
+    async(req, res) => {
+        try {
+            res.json({ status: "ok", ...(await quranService.getTranslations()) });
+        } catch (err) {
+            console.error("GET /quran/translations error:", err.message);
+            res.status(err.status || 500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+app.get(
+    "/quran/reciters",
+    async(req, res) => {
+        try {
+            res.json({ status: "ok", ...(await quranService.getReciters()) });
+        } catch (err) {
+            console.error("GET /quran/reciters error:", err.message);
+            res.status(err.status || 500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+app.get(
+    "/quran/surah/:number",
+    async(req, res) => {
+        try {
+            const { translation, reciter, bitrate } = req.query;
+            res.json({ status: "ok", ...(await quranService.getSurah(req.params.number, { translation, reciter, bitrate })) });
+        } catch (err) {
+            console.error("GET /quran/surah/:number error:", err.message);
+            res.status(err.status || 500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// آخر موضع قراءة + إشارات مرجعية — نفس بنية المستخدم الحالية، uid من الـ JWT
+app.get(
+    "/quran/progress",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const snap = await get(ref(db, `user_data/Profile/${req.user.id}/quranProgress`));
+            res.json({ status: "ok", progress: snap.exists() ? snap.val() : null });
+        } catch (err) {
+            console.error("GET /quran/progress error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+app.put(
+    "/quran/progress",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const surah = Math.min(Math.max(1, Number(req.body?.surah) || 1), 114);
+            const ayah = Math.max(1, Number(req.body?.ayah) || 1);
+            const record = { surah, ayah, updatedAt: new Date().toISOString() };
+            await set(ref(db, `user_data/Profile/${req.user.id}/quranProgress`), record);
+            res.json({ status: "ok", record });
+        } catch (err) {
+            console.error("PUT /quran/progress error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+app.get(
+    "/quran/bookmarks",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const snap = await get(ref(db, `user_data/Profile/${req.user.id}/quranBookmarks`));
+            const val = snap.exists() ? snap.val() : {};
+            const bookmarks = Object.values(val).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, 100);
+            res.json({ status: "ok", bookmarks });
+        } catch (err) {
+            console.error("GET /quran/bookmarks error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+app.put(
+    "/quran/bookmarks",
+    verifyToken,
+    async(req, res) => {
+        try {
+            const surah = Math.min(Math.max(1, Number(req.body?.surah) || 1), 114);
+            const ayah = Math.max(1, Number(req.body?.ayah) || 1);
+            const note = String(req.body?.note || "").slice(0, 140);
+            const id = `s${surah}a${ayah}`;
+            const existing = await get(ref(db, `user_data/Profile/${req.user.id}/quranBookmarks/${id}`));
+            if (existing.exists()) {
+                await set(ref(db, `user_data/Profile/${req.user.id}/quranBookmarks/${id}`), null);
+                return res.json({ status: "ok", bookmarked: false });
+            }
+            const record = { id, surah, ayah, note, createdAt: new Date().toISOString() };
+            await set(ref(db, `user_data/Profile/${req.user.id}/quranBookmarks/${id}`), record);
+            res.json({ status: "ok", bookmarked: true, record });
+        } catch (err) {
+            console.error("PUT /quran/bookmarks error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
+// ======================================================
+// BOOKS — Gutendex (Project Gutenberg) + Open Library proxy
+// الكاش خادمي؛ لا مفاتيح؛ لا تكلفة. التصنيف القانوني صريح
+// (full / borrow / readonline / metadata) — لا روابط وهمية.
 // ======================================================
 
 io.on("connection", (socket) => {
