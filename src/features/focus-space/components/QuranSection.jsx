@@ -10,7 +10,8 @@ import React, { useCallback, useState } from "react";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { useAudio } from "../../audio/AudioContext";
 import { QURAN_CATALOG, RECITERS } from "../../audio/constants/audioCatalog";
-import { PlayIcon, PauseIcon } from "../constants/focusIcons";
+import { PlayIcon, PauseIcon, BookOpen } from "../constants/focusIcons";
+import { QuranReader } from "../../quran/components/QuranReader";
 import "../styles/focus-space.css";
 
 export const QuranSection = () => {
@@ -18,6 +19,7 @@ export const QuranSection = () => {
   const { playTrack, currentTrack, isPlaying, toggle } = useAudio();
   const [reciter, setReciter] = useState(RECITERS[0]);
   const [surah, setSurah] = useState(1);
+  const [readerOpen, setReaderOpen] = useState(false);
 
   const surahs = QURAN_CATALOG.filter((tr) => tr.reciterId === reciter.id);
 
@@ -64,7 +66,17 @@ export const QuranSection = () => {
             ? <><PauseIcon size={14} strokeWidth={2} aria-hidden /> {t("focus.quran.pause")}</>
             : <><PlayIcon size={14} strokeWidth={2} aria-hidden /> {t("focus.quran.play")}</>}
         </button>
+        {/* القراءة الكاملة (AlQuran Cloud): نص عثماني + ترجمات + تلاوة آية-آية */}
+        <button className="fc-btn" onClick={() => setReaderOpen(true)}>
+          <BookOpen size={14} strokeWidth={1.75} aria-hidden /> {t("focus.quran.read")}
+        </button>
       </div>
+
+      {readerOpen && (
+        <div className="fc-quran-reader">
+          <QuranReader onClose={() => setReaderOpen(false)} />
+        </div>
+      )}
     </div>
   );
 };

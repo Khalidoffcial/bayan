@@ -12,16 +12,21 @@
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "../../../i18n/useTranslation";
-import { useTimerEngine } from "../hooks/useTimerEngine";
 import { STUDY_MODES, TIMER_PRESETS, FOCUS_DEFAULTS } from "../constants/focusDefaults";
 import { PlayIcon, PauseIcon, RetryIcon, CloseIcon, FlagIcon } from "../constants/focusIcons";
 import "../styles/focus-space.css";
 
 const fmt = (ms, withHours = true, withCentis = false) => {
-  const total = Math.max(0, Math.floor(ms / (withCentis ? 10 : 1000)));
-  const h = Math.floor(total / 360000);
-  const m = Math.floor((total % 360000) / 6000);
-  const s = Math.floor((total % 6000) / 100);
+  // Two modes — never mix unit scales:
+  //   centis mode: ms→centiseconds (h:360000, m:6000, s:100)
+  //   seconds mode: ms→seconds    (h:3600,    m:60,   s:1)
+  const div = withCentis ? 10 : 1000;
+  const total = Math.max(0, Math.floor(ms / div));
+  const hBase = withCentis ? 360000 : 3600;
+  const mBase = withCentis ? 6000 : 60;
+  const h = Math.floor(total / hBase);
+  const m = Math.floor((total % hBase) / mBase);
+  const s = Math.floor(total % mBase) % 60;
   const cs = total % 100;
   const pad = (n) => String(n).padStart(2, "0");
   const base = withHours ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
@@ -215,23 +220,35 @@ const PomodoroPane = ({ engine, onSessionComplete, prefs, data }) => {
     engine.startCountdown("pomodoro", ms, { engineId: `pomo-${phase}-${cycle}`, phase, modeKey, minutes });
   };
 
-  // advance the cycle machine when a phase expires (or is skipped)
+  // advance the cycle machine when a phase expires (or is skipped).
+  // Auto-starts the NEXT phase so the cycle never sits at a static display.
   const advance = useCallback((expired = false) => {
+    const wasFocus = phase === "focus";
     if (expired) {
-      playAlert(phase === "focus" ? (data.timerSound || "chime") : "soft", data.timerSoundVolume ?? 0.6);
-      if (phase === "focus") { onSessionComplete?.({ modeKey, minutes }); bumpStat("focus"); }
+      playAlert(wasFocus ? (data.timerSound || "chime") : "soft", data.timerSoundVolume ?? 0.6);
+      if (wasFocus) { onSessionComplete?.({ modeKey, minutes }); bumpStat("focus"); }
       else bumpStat(phase === "long" ? "long" : "short");
     }
-    if (phase === "focus") {
+    engine.reset();
+    pendingPhaseRef.current = true; // auto-start the next phase on render
+    if (wasFocus) {
       const nextIsLong = (cycle + 1) % beforeLong === 0;
       setPhase(nextIsLong ? "long" : "short");
     } else {
       setCycle((c) => c + 1);
       setPhase("focus");
     }
-    engine.reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, cycle, beforeLong, engine, onSessionComplete, modeKey, minutes, data.timerSound]);
+
+  // auto-start the newly-selected phase once it renders
+  const pendingPhaseRef = useRef(null);
+  useEffect(() => {
+    if (pendingPhaseRef.current === null) return;
+    const ms = minutes * 60 * 1000;
+    pendingPhaseRef.current = null;
+    engine.startCountdown("pomodoro", ms, { engineId: `pomo-${phase}-${cycle}`, phase, modeKey, minutes });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, cycle]);
 
   // expiry bridge — only for the ACTIVE engine id
   const expiredRef = useRef(null);
@@ -298,10 +315,12 @@ const PomodoroPane = ({ engine, onSessionComplete, prefs, data }) => {
   );
 };
 
-export const FocusClockPanel = ({ open, onClose, onSessionComplete, defaultStudyMode, onTimerExpire, data }) => {
+export const FocusClockPanel = ({ open, onClose, onSessionComplete, defaultStudyMode, data, engine: externalEngine }) => {
   const { t } = useTranslation();
   const [tab, setTab] = useState("timer");
-  const engine = useTimerEngine({ onExpire: onTimerExpire });
+  // Shared engine — passed down from the page level, so closing this panel
+  // (unmount) never stops or loses a running timer.
+  const engine = externalEngine;
 
   if (!open) return null;
 

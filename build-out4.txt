@@ -1,0 +1,32 @@
+
+> tiar@0.1.0 build
+> react-scripts build
+
+(node:16760) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Creating an optimized production build...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+
+#
+# Fatal process out of memory: Re-embedded builtins: set permissions
+#
+----- Native stack trace -----
+
+ 1: 00007FF6E7B092DD 
+ 2: 00007FF6E6F4D9B6 
+ 3: 00007FF6E67B2366 
+ 4: 00007FF6E661954E 
+ 5: 00007FF6E664CBAF 
+ 6: 00007FF6E664D662 
+ 7: 00007FF6E664E042 
+ 8: 00007FF6E614A1F3 
+ 9: 00007FF6E67DD2D6 
+10: 00007FF6E7CEA9FD 
+11: 00007FF6E7A21CCE 
+12: 00007FF6E6807796 
+13: 00007FF6E7F14C53 
+14: 00007FFB0A39E8D7 BaseThreadInitThunk+23
+15: 00007FFB0C4A8D9C RtlUserThreadStart+44

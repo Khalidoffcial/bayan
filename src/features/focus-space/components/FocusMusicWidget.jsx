@@ -95,7 +95,7 @@ const PlaylistPane = ({ onPick }) => {
   );
 };
 
-export const FocusMusicWidget = ({ reduceMotion }) => {
+export const FocusMusicWidget = ({ reduceMotion, onHide }) => {
   const { t } = useTranslation();
   const { language } = useSettings();
   const {
@@ -112,11 +112,18 @@ export const FocusMusicWidget = ({ reduceMotion }) => {
   const accent = hue != null ? `hsl(${hue} 70% 62%)` : "var(--fmw-accent, #7dd3fc)";
 
   // keep local progress in sync for a smooth bar
-  const pct = duration > 0 ? Math.min(100, (positionSec / duration) * 100) : 0;
+  // بعد الاستعادة من رحلة خارج Focus Space قد تتأخر metadata؛ نستخدم
+  // مدة المسار المعروفة (durationSec) كبديل حتى يعبّئ العنصر duration.
+  const effDuration = duration > 0 ? duration : (Number(currentTrack?.durationSec) || 0);
+  const pct = effDuration > 0 ? Math.min(100, (positionSec / effDuration) * 100) : 0;
 
   // Drag (pointer events — works for mouse + touch)
+  // إصلاح Pause: السحب كان يلتقط المؤشر (setPointerCapture) حتى عند الضغط
+  // على الأزرار — فلا يصل click إلى زر Play/Pause أبدًا (Pointer Events
+  // توجه كل الأحداث للعنصر الملتقط). نبدأ السحب فقط من غير الأزرار.
   const onPointerDown = (e) => {
     if (expanded) return; // expanded is centered — no drag
+    if (e.target.closest("button, input")) return; // أزرار التحكم أولاً
     const el = dragRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -169,7 +176,7 @@ export const FocusMusicWidget = ({ reduceMotion }) => {
             {isPlaying && !reduceMotion && <span className="fmw-eq" aria-hidden><i /><i /><i /></span>}
           </button>
 
-          <button className="fmw-mini__meta" onClick={() => setExpanded(true)}>
+  <button className="fmw-mini__meta" onClick={() => setExpanded(true)}>
             <strong className="fmw-mini__title">{currentTrack.title}</strong>
             <span className="fmw-mini__sub">{currentTrack.author || currentTrack.reciter || ""}</span>
           </button>
@@ -177,12 +184,24 @@ export const FocusMusicWidget = ({ reduceMotion }) => {
           <button
             className="fmw-btn fmw-btn--play"
             onClick={toggle}
-            disabled={isLoading || Boolean(error)}
+            disabled={isLoading}
             aria-label={isPlaying ? t("audio.pause") : t("audio.play")}
           >
             {isLoading ? <span className="mini-spinner" /> : isPlaying
               ? <PauseIcon size={17} strokeWidth={2} aria-hidden />
               : <PlayIcon size={17} strokeWidth={2} aria-hidden />}
+          </button>
+
+          {/* Hide the widget — never touches the audio element: music keeps
+              playing, position keeps advancing. Restore via the small fixed
+              Music pill. Persisted per user via focus settings. */}
+          <button
+            className="fmw-mini__hide"
+            onClick={(e) => { e.stopPropagation(); onHide?.(); }}
+            aria-label={t("focus.music.hide")}
+            title={t("focus.music.hide")}
+          >
+            <ChevronDownIcon size={14} strokeWidth={2} aria-hidden />
           </button>
 
           <div className="fmw-mini__bar" aria-hidden>
@@ -209,16 +228,16 @@ export const FocusMusicWidget = ({ reduceMotion }) => {
 
           <div className="fmw-exp__seek">
             <input
-              type="range" min="0" max={duration || 0} step="1"
+              type="range" min="0" max={effDuration || 0} step="1"
               value={positionSec}
               onChange={(e) => seekTo(Number(e.target.value))}
               aria-label={t("audio.seek")}
-              disabled={!duration}
+              disabled={!effDuration}
               style={{ "--fmw-accent": accent }}
             />
             <div className="fmw-exp__times">
               <span>{fmt(positionSec)}</span>
-              <span>{fmt(duration)}</span>
+              <span>{fmt(effDuration)}</span>
             </div>
           </div>
 
@@ -229,7 +248,7 @@ export const FocusMusicWidget = ({ reduceMotion }) => {
             <button
               className="fmw-btn fmw-btn--play-lg"
               onClick={toggle}
-              disabled={isLoading || Boolean(error)}
+              disabled={isLoading}
               aria-label={isPlaying ? t("audio.pause") : t("audio.play")}
             >
               {isLoading ? <span className="mini-spinner" /> : isPlaying
@@ -253,7 +272,15 @@ export const FocusMusicWidget = ({ reduceMotion }) => {
             />
           </div>
 
-          {error && <div className="fmw-exp__error" role="alert">{t("audio.error")}</div>}
+          {error && (
+            <div className="fmw-exp__error" role="alert">
+              {error === "NOT_SUPPORTED"
+                ? t("audio.errorUnsupported")
+                : error === "DECODE_FAILED"
+                ? t("audio.errorDecode")
+                : t("audio.errorRetry")}
+            </div>
+          )}
 
           <div className="fmw-exp__pl">
             <h4>{t("focus.music.queue")}</h4>
@@ -262,6 +289,31 @@ export const FocusMusicWidget = ({ reduceMotion }) => {
         </div>
       )}
     </div>
+  );
+};
+
+/**
+ * MusicRevealButton — the ONLY way back to the widget after hiding it.
+ * Fixed, small, inside Focus Space only (mounted by FocusSpacePage).
+ * Shows the live play state (equalizer while playing) so the user can see
+ * music is still running even with the widget hidden.
+ * يستقبل onReveal من الصفحة نفسها — نسخة useFocusData مستقلة هنا لن تصلح:
+ * كل useContext/useState منفصل لا يشارك الحالة مع instance الصفحة.
+ */
+export const MusicRevealButton = ({ onReveal }) => {
+  const { t } = useTranslation();
+  const { currentTrack, isPlaying } = useAudio();
+  if (!currentTrack) return null; // nothing playing — no need to reveal
+  return (
+    <button
+      className={`fmw-reveal ${isPlaying ? "is-playing" : ""}`}
+      onClick={() => onReveal?.()}
+      aria-label={t("focus.music.show")}
+      title={t("focus.music.show")}
+    >
+      {isPlaying && <span className="fmw-eq fmw-eq--sm" aria-hidden><i /><i /><i /></span>}
+      {t("focus.music.show")}
+    </button>
   );
 };
 

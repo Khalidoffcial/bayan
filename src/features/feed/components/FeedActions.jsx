@@ -9,6 +9,7 @@ export const FeedActions = ({
   onLike,
   onComment,
   onShare,
+  extra,
 }) => {
 
   
@@ -41,6 +42,9 @@ export const FeedActions = ({
       >
         <FaShareAlt />
       </button>
+
+      {/* اقرأها لاحقًا — extra slot from PostCard */}
+      {extra}
     </div>
   );
 };

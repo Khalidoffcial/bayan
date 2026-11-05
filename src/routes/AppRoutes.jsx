@@ -15,6 +15,10 @@ const LandingPage = lazy(() => import("../features/landing/LandingPage"));
 const PrivacyPage = lazy(() => import("../pages/LegalPages").then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import("../pages/LegalPages").then(m => ({ default: m.TermsPage })));
 const CookiesPage = lazy(() => import("../pages/LegalPages").then(m => ({ default: m.CookiesPage })));
+const FocusSpacePage = lazy(() => import("../features/focus-space/FocusSpacePage"));
+const ExamsPage = lazy(() => import("../pages/ExamsPage"));
+const BooksPage = lazy(() => import("../pages/BooksPage"));
+const BookReaderPage = lazy(() => import("../pages/BookReaderPage"));
 
 export const AppRoutes = () => {
   return (
@@ -38,6 +42,13 @@ export const AppRoutes = () => {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/signin" element={<LoginPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        {/* Books — free & legally-readable library (unified providers) */}
+        <Route path="/books" element={<BooksPage />} />
+        <Route path="/books/:provider/:providerBookId" element={<BookReaderPage />} />
+        {/* Knowledge Challenges — قسم Exams الحقيقي (يجب أن يسبق /:typeArticle) */}
+        <Route path="/exams" element={<ExamsPage />} />
+        {/* Focus Space — مساحة الدراسة الغامرة (full-screen) */}
+        <Route path="/focus" element={<FocusSpacePage />} />
         <Route path="/p/:idOtherUser" element={<ProfilePage />} />
         <Route path="/:typeArticle" element={<FeedPage />} />
         <Route path="/r/:articleId" element={<ArticlePage />} />

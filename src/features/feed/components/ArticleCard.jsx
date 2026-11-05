@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import ViewCounter from "../../../components/common/ViewCounter";
 import FeedUser from "./FeedUser";
+import { ReadLaterButton } from "../../focus-space/components/ReadLaterButton";
 
 const KIND_LABELS = {
   article: "مقال",
@@ -44,6 +45,14 @@ export const ArticleCard = ({ item, kind }) => {
           contentId={item.id}
           contentType={item.type === "novels" ? "novels" : "articles"}
           initialViews={item.views}
+        />
+        {/* اقرأها لاحقًا — compact على كروت الفيد */}
+        <ReadLaterButton
+          compact
+          contentId={item.id}
+          contentType={item.type === "novels" ? "novels" : "articles"}
+          title={item.title}
+          image={cover}
         />
       </div>
       <FeedUser userData={item.userData} />

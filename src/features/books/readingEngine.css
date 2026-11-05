@@ -1,0 +1,246 @@
+/* ===========================
+   READING ENGINE — PDF / EPUB / text / Google viewer
+   Same tokens as books.css and the feed design system.
+=========================== */
+
+/* ── PDF ── */
+.re-pdf {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 22px;
+}
+
+.re-pdf__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.re-pdf__sep {
+  width: 1px;
+  height: 22px;
+  background: var(--border, #ececec);
+  margin-inline: 4px;
+}
+
+.re-pdf__page {
+  font-size: 13px;
+  color: var(--text2, #374151);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.re-pdf__pageInput {
+  width: 56px;
+  padding: 4px 6px;
+  border: 1px solid var(--border, #ececec);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #111827);
+}
+
+.re-pdf__search {
+  padding: 6px 12px;
+  border: 1px solid var(--border, #ececec);
+  border-radius: 999px;
+  font-size: 13px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #111827);
+  min-width: 160px;
+}
+
+.re-pdf__hits {
+  font-size: 12px;
+  color: var(--blue, #1da1f2);
+  font-weight: 600;
+}
+
+.re-pdf__stage {
+  display: flex;
+  justify-content: center;
+  background: var(--bg-secondary, #f3f4f6);
+  border-radius: 16px;
+  padding: 14px;
+  min-height: 320px;
+  overflow: auto;
+}
+
+.re-pdf__canvas {
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .15);
+  background: #fff;
+}
+
+.re-pdf__stage:fullscreen {
+  padding: 20px;
+  background: #1f2937;
+  align-items: center;
+}
+
+/* ── EPUB ── */
+.re-epub {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.re-epub__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.re-epub__toc {
+  max-width: 260px;
+  padding: 7px 10px;
+  border: 1px solid var(--border, #ececec);
+  border-radius: 8px;
+  font-size: 13px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #111827);
+}
+
+.re-epub__host {
+  height: 70vh;
+  border: 1px solid var(--border, #ececec);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* stays in the DOM while epub.js renders (display:none breaks iframe sizing) */
+.re-epub__host--pending { opacity: 0; pointer-events: none; }
+.re-epub__host iframe { width: 100%; height: 100%; border: 0; }
+
+.re-epub__host--dark {
+  background: #111827;
+}
+
+.re-epub__host--sepia {
+  background: #f4ecd8;
+}
+
+/* ── text / HTML ── */
+.re-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.re-text__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.re-text__theme.active {
+  border-color: var(--blue, #1da1f2);
+  color: var(--blue, #1da1f2);
+}
+
+.re-text__body {
+  background: var(--bg-primary, #fff);
+  border: 1px solid var(--border, #ececec);
+  border-radius: 22px;
+  padding: 26px clamp(18px, 4vw, 40px);
+  max-height: 78vh;
+  overflow-y: auto;
+  line-height: 1.9;
+  color: var(--text-primary, #111827);
+  transition: background .25s ease, color .25s ease;
+}
+
+.re-text--sepia .re-text__body {
+  background: #f4ecd8;
+  color: #3a2f1b;
+  border-color: #e5d9bf;
+}
+
+.re-text--dark .re-text__body {
+  background: #111827;
+  color: #e5e7eb;
+  border-color: #1f2937;
+}
+
+.re-text__content { max-width: 100%; overflow-wrap: break-word; text-align: start; }
+.re-text__content h1,
+.re-text__content h2,
+.re-text__content h3 {
+  line-height: 1.4;
+  margin: 1.4em 0 .6em;
+  text-align: start;
+}
+.re-text__content p, .re-text__content div { text-align: start; }
+
+.re-text__content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.re-text__content blockquote {
+  border-inline-start: 3px solid var(--border-md, #dadada);
+  margin: 1em 0;
+  padding-inline-start: 14px;
+  color: inherit;
+  opacity: .85;
+}
+
+.re-text__content a {
+  color: var(--blue, #1da1f2);
+}
+
+.re-text__content--plain {
+  word-break: break-word;
+}
+
+/* ── Google Books viewer ── */
+.re-gb {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.re-gb__notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--blue-dim, #eef6fd);
+  color: var(--blue, #1da1f2);
+  font-size: 13px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.re-gb__host {
+  height: 72vh;
+  border: 1px solid var(--border, #ececec);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg-secondary, #f3f4f6);
+}
+
+@media (max-width: 768px) {
+
+  .re-epub__host,
+  .re-gb__host {
+    height: 60vh;
+  }
+
+  .re-text__body {
+    padding: 18px 16px;
+    max-height: none;
+  }
+
+  .re-pdf__search {
+    min-width: 110px;
+  }
+}

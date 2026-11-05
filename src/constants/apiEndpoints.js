@@ -1,5 +1,14 @@
-// export const API_BASE_URL = 'http://localhost:4000';
-export const API_BASE_URL = 'https://bayan-production-0201.up.railway.app';
+// REACT_APP_API_BASE_URL decides the backend:
+//   - set in .env.development / .env.local  → that value (localhost:4000 for dev)
+//   - unset (Vercel/production build)       → the Railway production URL
+// A dev bundle can therefore never ship pointing at production, and a
+// production build never points at localhost (the fallback is prod).
+const PROD_API_BASE_URL = 'https://bayan-production-0201.up.railway.app';
+const DEV_API_BASE_URL = 'http://localhost:4000';
+
+export const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL ||
+  (process.env.NODE_ENV === 'development' ? DEV_API_BASE_URL : PROD_API_BASE_URL);
 
 export const API_ENDPOINTS = {
   AUTH: `${API_BASE_URL}/auth`,

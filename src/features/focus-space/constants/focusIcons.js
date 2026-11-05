@@ -29,6 +29,12 @@ import {
   Focus,
   Settings2,
   Menu,
+  Info,
+  Download,
+  ZoomIn,
+  ZoomOut,
+  Maximize,
+  Library,
 
   // Focus Space rail
   AudioLines,
@@ -82,6 +88,7 @@ import {
   // Misc UI
   X,
   Search,
+  Share2,
   MoreVertical,
   ChevronLeft,
   ChevronRight,
@@ -165,6 +172,14 @@ export {
   ArrowLeft as ArrowLeftIcon,
   ExternalLink as ExternalLinkIcon,
   History as HistoryIcon,
+  Share2 as ShareIcon,
+  Download as DownloadIcon,
+  ZoomIn as ZoomInIcon,
+  ZoomOut as ZoomOutIcon,
+  Maximize as MaximizeIcon,
+  Library as LibraryIcon,
+  BookOpen as BookOpenIcon,
+  Info as InfoIcon,
 
   // (raw, for consumers that need the unaliased glyph)
   LayoutDashboard,
@@ -235,6 +250,7 @@ export const NAV_ICONS = {
   posts: FileText,
   articles: BookOpen,
   novels: BookOpenCheck,
+  books: Library,
   exams: GraduationCap,
   focus: Focus,
   settings: Settings2,

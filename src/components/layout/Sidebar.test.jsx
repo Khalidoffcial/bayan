@@ -94,7 +94,7 @@ describe("Sidebar component — same markup in both directions", () => {
     document.documentElement.setAttribute("dir", "ltr");
     const { container } = renderSidebar();
     const items = container.querySelectorAll(".sidebar-item");
-    expect(items.length).toBe(6); // 5 channels + settings — لا تبويب حساب
+    expect(items.length).toBe(7); // 5 channels + focus + settings
     expect(document.querySelector(".menu-btn")).toBeTruthy();
   });
 
@@ -102,7 +102,7 @@ describe("Sidebar component — same markup in both directions", () => {
     document.documentElement.setAttribute("dir", "rtl");
     const { container } = renderSidebar();
     const items = container.querySelectorAll(".sidebar-item");
-    expect(items.length).toBe(6);
+    expect(items.length).toBe(7);
     // The component must NOT add any dir-specific classes or inline styles
     const sidebar = container.querySelector(".sidebar");
     expect(sidebar.className).not.toMatch(/rtl|ltr/i);

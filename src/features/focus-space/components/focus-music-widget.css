@@ -297,3 +297,63 @@
 @media (max-height: 700px) {
   .fmw { bottom: 56px; }
 }
+
+/* -- Hide button (mini bar) — collapses the widget, audio untouched -- */
+.fmw-mini__hide {
+  position: absolute;
+  inset-inline-end: 10px;
+  top: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.fmw-mini__hide:hover,
+.fmw-mini__hide:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* -- Reveal pill — small fixed music button inside Focus Space only -- */
+.fmw-reveal {
+  position: fixed;
+  bottom: 88px;
+  inset-inline-end: 24px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(20, 24, 38, 0.55);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.fmw-reveal:hover,
+.fmw-reveal:focus-visible { background: rgba(20, 24, 38, 0.75); }
+.fmw-reveal:active { transform: scale(0.97); }
+
+.fmw-eq--sm { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; }
+.fmw-eq--sm i {
+  width: 3px;
+  background: #7dd3fc;
+  border-radius: 2px;
+  animation: fmw-eq 1s ease-in-out infinite;
+}
+.fmw-eq--sm i:nth-child(1) { height: 60%; animation-delay: 0s; }
+.fmw-eq--sm i:nth-child(2) { height: 100%; animation-delay: 0.18s; }
+.fmw-eq--sm i:nth-child(3) { height: 45%; animation-delay: 0.36s; }

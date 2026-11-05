@@ -1,5 +1,6 @@
 import React from "react";
 import { FaHeart, FaComment, FaShareAlt, FaFilePdf } from "react-icons/fa";
+import { ReadLaterButton } from "../../focus-space/components/ReadLaterButton";
 
 export const ArticleActions = ({
   liked,
@@ -8,6 +9,7 @@ export const ArticleActions = ({
   onComment,
   onShare,
   onDownloadPDF,
+  article,
 }) => {
   return (
     <div className="article-actions">
@@ -34,6 +36,16 @@ export const ArticleActions = ({
       >
         <FaShareAlt />
       </button>
+
+      {/* اقرأها لاحقًا — يُحفظ في قاعدة بيانات المستخدم، ويزول عند الضغط تاني */}
+      {article?.id && (
+        <ReadLaterButton
+          contentId={article.id}
+          contentType={article.type || "articles"}
+          title={article.title}
+          image={Array.isArray(article.img) ? article.img[0] : article.img}
+        />
+      )}
 
       <button
         className="action-btn pdf"

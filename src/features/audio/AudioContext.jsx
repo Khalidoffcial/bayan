@@ -88,18 +88,34 @@ export const AudioProvider = ({ children }) => {
         try { lib?.saveProgress?.(currentTrackRef.current.id, audio.currentTime); } catch { /* ignore */ }
       }
     };
-    const onPlaying = () => { setIsPlaying(true); setIsLoading(false); setError(null); };
+    // حالة الصوت الحقيقية تأتي من العنصر نفسه — لا من play()/catch
+    const syncFromElement = () => {
+      setIsPlaying(!audio.paused && !audio.ended);
+      setIsLoading(audio.readyState < 3 && !audio.paused);
+      if (!audio.paused && !audio.ended) setError(null); // clearing the error allows retry
+    };
+    const onPlay = () => syncFromElement();
+    const onPlaying = () => syncFromElement();
     const onWaiting = () => setIsLoading(true);
-    const onPause = () => setIsPlaying(false);
-    const onEnded = () => handleEndedRef.current();
+    const onPause = () => syncFromElement();
+    const onEnded = () => { syncFromElement(); handleEndedRef.current(); };
     const onError = () => {
       setIsLoading(false);
       setIsPlaying(false);
-      setError("LOAD_FAILED");
+      // رسالة خطأ مفهومة — بدلاً من بقاء الزر معطّلًا أبدًا
+      const code = audio.error?.code;
+      setError(
+        code === 1 ? "LOAD_ABORTED"
+        : code === 2 ? "LOAD_FAILED"
+        : code === 3 ? "DECODE_FAILED"
+        : code === 4 ? "NOT_SUPPORTED"
+        : "LOAD_FAILED"
+      );
     };
 
     audio.addEventListener("loadedmetadata", onLoadedMeta);
     audio.addEventListener("timeupdate", onTime);
+    audio.addEventListener("play", onPlay);
     audio.addEventListener("playing", onPlaying);
     audio.addEventListener("waiting", onWaiting);
     audio.addEventListener("pause", onPause);
@@ -110,6 +126,7 @@ export const AudioProvider = ({ children }) => {
       try { audio.pause(); audio.src = ""; } catch { /* ignore */ }
       audio.removeEventListener("loadedmetadata", onLoadedMeta);
       audio.removeEventListener("timeupdate", onTime);
+      audio.removeEventListener("play", onPlay);
       audio.removeEventListener("playing", onPlaying);
       audio.removeEventListener("waiting", onWaiting);
       audio.removeEventListener("pause", onPause);
@@ -162,10 +179,13 @@ export const AudioProvider = ({ children }) => {
       audio.addEventListener("loadedmetadata", seekOnMeta);
     }
     if (autoplay) {
-      audio.play().catch(() => {
+      audio.play().catch((err) => {
+        // NOT_SUPPORTED / aborted → real error state; NotAllowedError (autoplay
+        // policy) → the element stays paused, state comes from its events —
+        // the user simply presses Play again (the gesture IS the permission).
         setIsLoading(false);
         setIsPlaying(false);
-        setError("LOAD_FAILED");
+        setError(err?.name === "NotAllowedError" ? null : "LOAD_FAILED");
       });
     }
   }, []);
@@ -173,6 +193,7 @@ export const AudioProvider = ({ children }) => {
   const play = useCallback(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
+    setError(null); // Play = explicit retry after any failure
     // a track restored from sessionStorage may have no src yet on a fresh
     // mount — reattach it so Play resumes instead of failing silently
     if (!audio.src && currentTrack.audioUrl) {
@@ -188,7 +209,12 @@ export const AudioProvider = ({ children }) => {
       }
     }
     setIsLoading(true);
-    audio.play().catch(() => { setIsLoading(false); setError("LOAD_FAILED"); });
+    audio.play().catch((err) => {
+      // الحالة من العنصر — الفشل لا يترك زر Play معطّلًا أبدًا
+      setIsLoading(false);
+      setIsPlaying(false);
+      setError(err?.name === "NotAllowedError" ? null : "LOAD_FAILED");
+    });
   }, [currentTrack]);
 
   const pause = useCallback(() => {

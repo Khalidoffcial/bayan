@@ -111,11 +111,11 @@ export const FocusMusicDiscovery = () => {
 
       <div className="fc-md__sources" role="tablist" aria-label={t("focus.music.source")}>
         <button
-          role="tab" aria-selected={source === "itunes"}
-          className={`fc-md__src ${source === "itunes" ? "is-active" : ""}`}
-          onClick={() => setSource("itunes")}
+          role="tab" aria-selected={source === "jamendo"}
+          className={`fc-md__src ${source === "jamendo" ? "is-active" : ""}`}
+          onClick={() => setSource("jamendo")}
         >
-          {t("focus.music.sourceReal")}
+          {t("focus.music.sourceJamendo")}
         </button>
         <button
           role="tab" aria-selected={source === "openverse"}
@@ -124,6 +124,13 @@ export const FocusMusicDiscovery = () => {
         >
           {t("focus.music.sourceCC")}
         </button>
+        <button
+          role="tab" aria-selected={source === "itunes"}
+          className={`fc-md__src ${source === "itunes" ? "is-active" : ""}`}
+          onClick={() => setSource("itunes")}
+        >
+          {t("focus.music.sourceReal")}
+        </button>
       </div>
 
       {source === "itunes" && status !== "idle" && (
@@ -131,6 +138,9 @@ export const FocusMusicDiscovery = () => {
       )}
       {source === "openverse" && status !== "idle" && (
         <p className="fc-md__note">{t("focus.music.ccNote")}</p>
+      )}
+      {source === "jamendo" && status !== "idle" && (
+        <p className="fc-md__note">{t("focus.music.jamendoNote")}</p>
       )}
       {cached && <p className="fc-md__note fc-md__note--dim">{t("audio.music.cachedNote")}</p>}
 
@@ -155,36 +165,50 @@ export const FocusMusicDiscovery = () => {
         <ul className="fc-md__list">
           {items.map((track) => {
             const isCurrent = currentTrack?.id === track.id;
-            const playable = Boolean(track.audioUrl);
+            // فصل صارم: زر Play يظهر فقط لما له مصدر تشغيل كامل (ليس 30s preview).
+            // iTunes نتائج metadata فقط — تُعرض كمعلومة مع بيانات ترخيصها.
+            const isPreviewOnly = track.source === "itunes";
+            const playable = Boolean(track.audioUrl) && !isPreviewOnly;
             return (
               <li key={track.id} className={`fc-md__row ${isCurrent ? "is-current" : ""}`}>
-                <button
-                  className="fc-md__play"
-                  disabled={!playable}
-                  onClick={() => handlePlay(track)}
-                  aria-label={t("common.play")}
-                >
-                  {track.thumbnail
-                    ? <img src={track.thumbnail} alt="" className="fc-md__cover" loading="lazy" />
-                    : <span className="fc-md__cover fc-md__cover--ph"><MusicIcon size={16} strokeWidth={1.5} aria-hidden /></span>}
-                  {isCurrent && isPlaying
-                    ? <span className="fc-md__play-ic"><PauseIcon size={14} strokeWidth={2} aria-hidden /></span>
-                    : <span className="fc-md__play-ic"><PlayIcon size={14} strokeWidth={2} aria-hidden /></span>}
-                </button>
-                <button className="fc-md__meta" onClick={() => handlePlay(track)} disabled={!playable}>
+                {playable ? (
+                  <button
+                    className="fc-md__play"
+                    onClick={() => handlePlay(track)}
+                    aria-label={t("common.play")}
+                  >
+                    {track.thumbnail
+                      ? <img src={track.thumbnail} alt="" className="fc-md__cover" loading="lazy" />
+                      : <span className="fc-md__cover fc-md__cover--ph"><MusicIcon size={16} strokeWidth={1.5} aria-hidden /></span>}
+                    {isCurrent && isPlaying
+                      ? <span className="fc-md__play-ic"><PauseIcon size={14} strokeWidth={2} aria-hidden /></span>
+                      : <span className="fc-md__play-ic"><PlayIcon size={14} strokeWidth={2} aria-hidden /></span>}
+                  </button>
+                ) : (
+                  <span className="fc-md__play fc-md__play--info">
+                    {track.thumbnail
+                      ? <img src={track.thumbnail} alt="" className="fc-md__cover" loading="lazy" />
+                      : <span className="fc-md__cover fc-md__cover--ph"><MusicIcon size={16} strokeWidth={1.5} aria-hidden /></span>}
+                  </span>
+                )}
+                <div className="fc-md__meta" role={playable ? "button" : undefined} onClick={playable ? () => handlePlay(track) : undefined}>
                   <strong className="fc-md__title">{track.title}</strong>
                   <span className="fc-md__sub">
                     {track.author}
                     {track.album ? ` · ${track.album}` : ""}
                     {track.durationSec ? ` · ${fmtTime(track.durationSec)}` : ""}
                   </span>
-                </button>
-                {track.source === "openverse" && track.license?.code && (
+                </div>
+                {track.license?.code && (
                   <a className="fc-md__license" href={track.license.url} target="_blank" rel="noreferrer noopener">
                     {track.license.code.toUpperCase()}
                   </a>
                 )}
-                {!playable && <span className="fc-md__unplayable">{t("audio.unplayable")}</span>}
+                {!playable && (
+                  <span className="fc-md__unplayable">
+                    {isPreviewOnly ? t("focus.music.metadataOnly") : t("audio.unplayable")}
+                  </span>
+                )}
               </li>
             );
           })}

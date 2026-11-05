@@ -139,6 +139,7 @@ export const PostReading = () => {
           onLike={handleLike}
           onComment={() => setCommented((prev) => !prev)}
           onShare={handleShare}
+          post={dataPost}
           extraStats={<ViewCounter contentId={dataPost.id} contentType="posts" initialViews={dataPost.views} />}
         />
 

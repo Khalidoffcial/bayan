@@ -335,4 +335,7 @@
 .post-card-head .dropdown-menu-root {
   flex-shrink: 0;
   margin-top: 2px;
+  width: 10%;
+  align-self: center;
+  justify-content: center;
 }

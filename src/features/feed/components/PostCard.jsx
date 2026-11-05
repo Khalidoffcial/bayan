@@ -14,6 +14,8 @@ import { useToast } from "../../../components/ui/Toast";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { deletePost } from "../../post/services/post.service";
 
+import { ReadLaterButton } from "../../focus-space/components/ReadLaterButton";
+
 export const PostCard = ({
   item,
   liked,
@@ -130,6 +132,7 @@ export const PostCard = ({
         onLike={onLike}
         onComment={onComment}
         onShare={() => onShare(item)}
+        extra={<ReadLaterButton compact contentId={item.id} contentType="posts" title={(item.content || "").slice(0, 80)} />}
       />
 
       {commentsOpen && <InlineComments userData={user} commentOnId={item.id} contentType="posts" />}

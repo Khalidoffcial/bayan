@@ -1,0 +1,416 @@
+/* ===========================
+   BOOKS — same visual language as the feed's .box cards.
+   Width/padding/radius/shadow/typography mirror
+   src/features/feed/styles/feed.css (.box, .feed-main).
+   RTL/LTR handled with logical properties only.
+=========================== */
+
+/* ── heading ── */
+.books-head h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+}
+
+.books-head p {
+  margin: 6px 0 0;
+  color: var(--text2, #374151);
+  font-size: 15px;
+}
+
+/* ── search bar ── */
+.books-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.books-search__ic {
+  position: absolute;
+  inset-inline-start: 16px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  opacity: 0.55;
+  /* magnifier drawn with borders — no emoji, no extra asset */
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.books-search__ic::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -6px;
+  bottom: -3px;
+  width: 8px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+.books-search input {
+  width: 100%;
+  padding: 13px 44px;
+  border: 1px solid var(--border, #ececec);
+  border-radius: 999px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #111827);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.books-search input:focus {
+  border-color: var(--blue, #1da1f2);
+  box-shadow: 0 0 0 3px rgba(29, 161, 242, 0.12);
+}
+
+.books-clear {
+  position: absolute;
+  inset-inline-end: 14px;
+  border: 0;
+  background: var(--bg-secondary, #f3f4f6);
+  color: var(--text2, #374151);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ── filters ── */
+.books-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.books-filters select {
+  padding: 8px 14px;
+  border: 1px solid var(--border, #ececec);
+  border-radius: 10px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #111827);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.books-clear-filters {
+  border: 0;
+  background: none;
+  color: var(--blue, #1da1f2);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.books-quota-note {
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--blue-dim, #eef6fd);
+  color: var(--blue, #1da1f2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.books-filter-input {
+  padding: 8px 14px;
+  border: 1px solid var(--border, #ececec);
+  border-radius: 10px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #111827);
+  font-size: 14px;
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.books-filter-year { flex: 0 1 110px; }
+
+/* ── grid of book cards ── */
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 18px;
+  width: 100%;
+}
+
+/* ── book card — extends the shared .box card ── */
+.book-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  cursor: pointer;
+}
+
+.book-card__access {
+  position: absolute;
+  top: 10px;
+  inset-inline-start: 10px;
+  z-index: 1;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text2, #374151);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.book-card__access--full { color: #059669; }
+.book-card__access--borrow { color: #d97706; }
+.book-card__access--readonline { color: var(--blue, #1da1f2); }
+.book-card__access--metadata { color: var(--text2, #374151); }
+
+.book-card__cover-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 14px 14px 0;
+}
+
+.book-card__cover {
+  width: 110px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+  background: var(--bg-secondary, #f3f4f6);
+}
+
+.book-card__cover--ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2, #9ca3af);
+}
+
+.book-card__title {
+  margin: 12px 16px 2px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-primary, #111827);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.book-card__author {
+  margin: 0 16px;
+  font-size: 13px;
+  color: var(--text2, #6b7280);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-card__meta {
+  display: flex;
+  gap: 8px;
+  margin: 6px 16px 0;
+  font-size: 12px;
+  color: var(--text2, #6b7280);
+}
+
+.book-card__lang {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--bg-secondary, #f3f4f6);
+  text-transform: uppercase;
+}
+
+.book-card__actions {
+  display: flex;
+  gap: 8px;
+  margin: 10px 16px 16px;
+  margin-top: auto;
+  padding-top: 10px;
+  align-items: center;
+}
+
+.book-card__metaonly {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text2, #6b7280);
+}
+
+/* ── buttons (shared shape with Bayan's small buttons) ── */
+.books-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border, #ececec);
+  border-radius: 10px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #111827);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.books-btn:hover { border-color: var(--border-md, #dadada); }
+
+.books-btn--primary {
+  background: var(--blue, #1da1f2);
+  border-color: var(--blue, #1da1f2);
+  color: #fff;
+}
+
+.books-btn--primary:hover { filter: brightness(1.06); }
+
+.books-btn--ic {
+  padding: 7px;
+  border-radius: 8px;
+}
+
+.books-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ── load more / states ── */
+.books-more { display: flex; justify-content: center; }
+
+.books-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 20px;
+  color: var(--text2, #374151);
+  text-align: center;
+}
+
+/* skeleton lines — same shimmer language as other features */
+.sk-line {
+  height: 12px;
+  border-radius: 6px;
+  margin: 0 16px 8px;
+  background: linear-gradient(90deg, var(--bg-secondary, #f3f4f6) 25%, #e9ebee 50%, var(--bg-secondary, #f3f4f6) 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.4s infinite;
+}
+
+.sk-line--title { height: 15px; }
+.sk-line--short { width: 55%; margin-inline-end: auto; }
+
+@keyframes sk-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── reader page ── */
+.br-page { gap: 16px; }
+
+.br-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.br-head__meta { flex: 1; min-width: 240px; }
+
+.br-head__meta h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+}
+
+.br-head__meta p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text2, #374151);
+}
+
+.br-head__src { font-size: 13px !important; color: var(--text2, #6b7280) !important; }
+
+.br-head__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.br-choose {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.br-choose__hint { font-size: 13px; color: var(--text2, #6b7280); }
+
+.br-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text2, #374151);
+}
+
+.br-progress { font-size: 13px; color: var(--blue, #1da1f2); font-weight: 600; }
+
+.br-body {
+  background: var(--bg-primary, #fff);
+  border: 1px solid var(--border, #ececec);
+  border-radius: 22px;
+  padding: 26px clamp(18px, 4vw, 40px);
+  max-height: 75vh;
+  overflow-y: auto;
+  line-height: 1.9;
+  color: var(--text-primary, #111827);
+}
+
+.br-html h1, .br-html h2, .br-html h3 { line-height: 1.4; }
+.br-html img { max-width: 100%; height: auto; }
+.br-html--text { white-space: pre-wrap; word-break: break-word; }
+
+/* ── PDF viewer ── */
+.br-pdf {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.br-pdf__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.br-pdf__page { font-size: 13px; color: var(--text2, #374151); min-width: 64px; text-align: center; }
+
+.br-pdf__stage {
+  display: flex;
+  justify-content: center;
+  background: var(--bg-secondary, #f3f4f6);
+  border-radius: 16px;
+  padding: 14px;
+  min-height: 300px;
+  overflow: auto;
+}
+
+.br-pdf__canvas {
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+.br-pdf__stage:fullscreen {
+  padding: 20px;
+  background: #1f2937;
+  align-items: center;
+}
+
+/* ── responsive ── */
+@media (max-width: 768px) {
+  .books-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .book-card__cover { width: 92px; }
+  .br-head { flex-direction: column; }
+  .br-body { padding: 18px 16px; max-height: none; }
+}

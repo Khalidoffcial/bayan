@@ -1,0 +1,110 @@
+
+> tiar@0.1.0 build
+> react-scripts build
+
+(node:21096) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Creating an optimized production build...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[0;33mOne of your dependencies, babel-preset-react-app, is importing the
+"@babel/plugin-proposal-private-property-in-object" package without
+declaring it in its dependencies. This is currently working because
+"@babel/plugin-proposal-private-property-in-object" is already in your
+node_modules folder for unrelated reasons, but it [1mmay break at any time[0;33m.
+
+babel-preset-react-app is part of the create-react-app project, [1mwhich
+is not maintianed anymore[0;33m. It is thus unlikely that this bug will
+ever be fixed. Add "@babel/plugin-proposal-private-property-in-object" to
+your devDependencies to work around this error. This will make this message
+go away.[0m
+  
+
+
+#
+# Fatal process out of memory: Re-embedded builtins: set permissions
+#
+----- Native stack trace -----
+
+
+
+#
+# Fatal process out of memory: Re-embedded builtins: set permissions
+#
+----- Native stack trace -----
+
+
+
+#
+# Fatal process out of memory: Re-embedded builtins: set permissions
+#
+----- Native stack trace -----
+
+
+
+#
+# Fatal process out of memory: Re-embedded builtins: set permissions
+#
+----- Native stack trace -----
+
+ 1: 00007FF6E7B092DD 
+ 1: 00007FF6E7B092DD 
+ 1: 00007FF6E7B092DD 
+ 2: 00007FF6E6F4D9B6 
+ 2: 00007FF6E6F4D9B6 
+ 3: 00007FF6E67B2366 
+ 3: 00007FF6E67B2366 
+ 4: 00007FF6E661954E 
+ 2: 00007FF6E6F4D9B6 
+ 5: 00007FF6E664CBAF 
+ 3: 00007FF6E67B2366 
+ 6: 00007FF6E664D662 
+ 4: 00007FF6E661954E 
+ 4: 00007FF6E661954E 
+ 7: 00007FF6E664E042 
+ 5: 00007FF6E664CBAF 
+ 8: 00007FF6E614A1F3 
+ 6: 00007FF6E664D662 
+ 9: 00007FF6E67DD2D6 
+ 7: 00007FF6E664E042 
+10: 00007FF6E7CEA9FD 
+ 8: 00007FF6E614A1F3 
+ 5: 00007FF6E664CBAF 
+11: 00007FF6E7A21CCE 
+ 6: 00007FF6E664D662 
+12: 00007FF6E6807796 
+ 9: 00007FF6E67DD2D6 
+13: 00007FF6E7F14C53 
+10: 00007FF6E7CEA9FD 
+14: 00007FFB0A39E8D7 
+ 7: 00007FF6E664E042 
+11: 00007FF6E7A21CCE 
+15: 00007FFB0C4A8D9C 
+12: 00007FF6E6807796 
+ 8: 00007FF6E614A1F3 
+13: 00007FF6E7F14C53 
+ 9: 00007FF6E67DD2D6 
+14: 00007FFB0A39E8D7 
+10: 00007FF6E7CEA9FD 
+15: 00007FFB0C4A8D9C 
+11: 00007FF6E7A21CCE 
+12: 00007FF6E6807796 
+13: 00007FF6E7F14C53 
+14: 00007FFB0A39E8D7 
+15: 00007FFB0C4A8D9C 
+ 1: 00007FF6E7B092DD 
+ 2: 00007FF6E6F4D9B6 
+ 3: 00007FF6E67B2366 
+ 4: 00007FF6E661954E 
+ 5: 00007FF6E664CBAF 
+ 6: 00007FF6E664D662 
+ 7: 00007FF6E664E042 
+ 8: 00007FF6E614A1F3 
+ 9: 00007FF6E67DD2D6 
+10: 00007FF6E7CEA9FD 
+11: 00007FF6E7A21CCE 
+12: 00007FF6E6807796 
+13: 00007FF6E7F14C53 
+14: 00007FFB0A39E8D7 
+15: 00007FFB0C4A8D9C 

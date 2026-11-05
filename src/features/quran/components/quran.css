@@ -1,0 +1,384 @@
+/**
+ * quran.css — AlQuran Cloud reader inside Focus Space.
+ * الوراثة من فلسفة Focus Space: زجاجي هادئ، RTL أصلي، بدون مبالغة.
+ */
+
+.qr {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+}
+
+.qr--center {
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 16px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.qr__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qr__title {
+  font-size: 16px;
+  color: #fff;
+}
+
+.qr__meta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.qr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.qr-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.qr-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.qr-btn--sm {
+  padding: 5px 8px;
+  border-radius: 7px;
+}
+
+.qr-btn--play {
+  background: rgba(15, 142, 226, 0.25);
+  border-color: rgba(15, 142, 226, 0.5);
+}
+
+.qr-btn.is-bookmarked {
+  color: #7dd3fc;
+  border-color: rgba(125, 211, 252, 0.5);
+  background: rgba(125, 211, 252, 0.1);
+}
+
+.qr-select {
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: rgba(20, 24, 38, 0.7);
+  color: #fff;
+  font-size: 13px;
+  max-width: 220px;
+}
+
+.qr-select--tr {
+  max-width: 190px;
+}
+
+.qr-continue {
+  padding: 10px 14px;
+  border: 1px solid rgba(125, 211, 252, 0.4);
+  border-radius: 10px;
+  background: rgba(125, 211, 252, 0.08);
+  color: #7dd3fc;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: start;
+}
+
+.qr-continue:hover {
+  background: rgba(125, 211, 252, 0.14);
+}
+
+/* ── surah picker ── */
+.qr-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.qr-picker__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.qr-picker__input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.qr-picker__input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.qr-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 46vh;
+}
+
+.qr-picker__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  text-align: start;
+}
+
+.qr-picker__row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.qr-picker__row.is-current {
+  background: rgba(15, 142, 226, 0.18);
+}
+
+.qr-picker__num {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.qr-picker__names {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.qr-picker__names strong {
+  font-size: 14.5px;
+}
+
+.qr-picker__names span {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.qr-picker__meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.qr-picker__empty {
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+
+/* ── toolbar ── */
+.qr__toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.qr__fontsize {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.qr-chip {
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.qr-chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.qr__showtr {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+}
+
+/* ── reciter bar ── */
+.qr-reciter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.qr-reciter__controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qr-reciter__progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 140px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.qr-reciter__bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.qr-reciter__bar>div {
+  height: 100%;
+  background: #7dd3fc;
+  transition: width 0.25s linear;
+}
+
+.qr-reciter__volume {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qr-reciter__volume input[type="range"] {
+  width: 80px;
+  accent-color: #7dd3fc;
+}
+
+/* ── ayahs ── */
+.qr__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+  padding-bottom: 12px;
+}
+
+.qr-ayah {
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: default;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.qr-ayah:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.qr-ayah.is-active {
+  border-color: rgba(125, 211, 252, 0.35);
+  background: rgba(125, 211, 252, 0.05);
+}
+
+.qr-ayah__arabic {
+  font-size: var(--qr-font, 26px);
+  line-height: 2;
+  color: #fff;
+  font-family: "Amiri", "Traditional Arabic", serif;
+  text-align: justify;
+}
+
+.qr-ayah__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  margin-inline-start: 8px;
+  border: 1px solid rgba(125, 211, 252, 0.45);
+  border-radius: 50%;
+  font-size: 11px;
+  color: #7dd3fc;
+  vertical-align: middle;
+}
+
+.qr-ayah__translation {
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+}
+
+.qr-ayah__actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
+}
+
+.qr-ayah:hover .qr-ayah__actions,
+.qr-ayah.is-active .qr-ayah__actions {
+  opacity: 1;
+}
+
+.qr__source {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.qr__nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}

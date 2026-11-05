@@ -71,9 +71,9 @@
 }
 
 .sidebar-item:hover {
-  background: var(--surface-hover, rgba(0,0,0,.05));
   /* انزلاق نحو داخل السايدبار في كلا الاتجاهين */
-  transform: translateX(calc(4px * var(--dir-factor, 1)));
+  /*background: var(--surface-hover, rgba(0,0,0,.05));
+  transform: translateX(calc(4px * var(--dir-factor, 1)));*/
 }
 
 html[dir="rtl"] .sidebar-item:hover {
@@ -85,20 +85,35 @@ html[dir="rtl"] .sidebar-item:hover {
   box-shadow: var(--shadow-md, 0 4px 20px rgba(0,0,0,.08));
 }
 
-.sidebar-item span {
-  flex: 1;
-  /* اتجاه النص يتبع لغة الواجهة تلقائيًا من dir على html */
-}
 
-.settings-icon {
+/* أيقونة Lucide داخل حاوية — اللون محايد افتراضيًا، أزرق في النشط */
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 22px;
   height: 22px;
-  object-fit: contain;
+  color: var(--text-secondary, #6e6e73);
+  flex-shrink: 0;
+  transition: color .3s ease;
+}
+
+.sidebar-item:hover .nav-icon {
+  color: var(--text-primary, #1d1d1f);
+}
+
+.sidebar-item.active .nav-icon {
+  color: var(--brand, #0f8ee2);
 }
 
 /* التبويبات الأصلية — الشعار أعلى، الإعدادات في آخر القائمة */
 .settings-link {
   margin-top: auto;
+}
+
+/* Focus Space — مساحة الدراسة الغامرة (أيقونة Lucide من السجل المركزي) */
+.focus-link .nav-icon {
+  color: var(--text-secondary, #6e6e73);
 }
 
 /* Menu Button */

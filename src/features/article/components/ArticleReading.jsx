@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Top from "../../../components/layout/Top";
+import AdSidebar from "../../ads/AdSidebar";
 import InlineComments from "../../../components/common/InlineComments";
 import Loader from "../../../components/ui/Loader";
 import ArticleHeader from "./ArticleHeader";
@@ -49,6 +50,7 @@ export const ArticleReading = () => {
   return (
     <div className="article-reading-container">
       <Top />
+      <AdSidebar />
 
       <div className="article-reading-content">
         <button className="back-btn" onClick={() => navigate(-1)}>
@@ -81,6 +83,7 @@ export const ArticleReading = () => {
           onComment={() => setCommented((prev) => !prev)}
           onShare={handleShare}
           onDownloadPDF={handleDownloadPDF}
+          article={dataArticle}
         />
 
         {commented && <InlineComments userData={user} commentOnId={dataArticle.id} contentType="articles" />}

@@ -53,11 +53,10 @@ export const searchAudio = async (query, { page = 1, limit = 20, source = "itune
   }
 
   try {
-    const endpoint = source === "openverse" ? "/search" : "/search-music";
+    // jamendo — full-length CC catalog (via Openverse, source=jamendo on the server)
+    const endpoint = source === "openverse" || source === "jamendo" ? "/search-music" : "/search-music";
     const response = await api.get(HUB_ENDPOINT + endpoint, {
-      params: source === "openverse"
-        ? { q, page, limit }
-        : { q, page, limit, source: "itunes" },
+      params: { q, page, limit, source: source === "openverse" || source === "jamendo" ? source : "itunes" },
     });
     const items = Array.isArray(response?.data?.items) ? response.data.items : [];
     searchCache.set(key, { at: Date.now(), items });

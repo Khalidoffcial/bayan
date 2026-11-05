@@ -1,10 +1,13 @@
 /**
- * useSavedContent — loads the user's REAL saved items from the backend
- * (`/focus-space/saved-content` → user_data/Profile/{uid}/savedContent).
- * No demo data — when the user has nothing saved the panel says so.
+ * useSavedContent — loads the user's REAL read-later items from the backend
+ * (`/read-later` metadata) enriched with display data from the existing
+ * `/focus-space/saved-content` endpoint (titles, covers).
+ * One fetch on mount (not per render); `reload()` is called after every
+ * save/remove mutation so the cache never goes stale.
  */
 import { useCallback, useEffect, useState } from "react";
-import { fetchSavedContent } from "../services/focusSpace.service";
+import { fetchSavedContent, fetchReadLaterList } from "../services/focusSpace.service";
+import { fetchReadLaterList as fetchReadLaterMeta, invalidateSavedCache } from "../services/savedContent.service";
 
 export const useSavedContent = () => {
   const [items, setItems] = useState([]);
@@ -14,9 +17,42 @@ export const useSavedContent = () => {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const { ok, items: fresh, error: err } = await fetchSavedContent();
-    if (ok) setItems(fresh);
-    else setError(err || "NETWORK");
+    invalidateSavedCache();
+    // metadata (progress/status) + display data (title/cover) — parallel
+    const [meta, display] = await Promise.all([fetchReadLaterMeta(), fetchSavedContent()]);
+    if (!meta.ok && !display.ok) {
+      setError(meta.error || display.error || "NETWORK");
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+    const byKey = new Map();
+    for (const it of display.items || []) byKey.set(`${it.type}:${it.id}`, it);
+    let list;
+    if (meta.ok) {
+      list = (meta.items || []).map((m) => {
+        const d = byKey.get(`${m.contentType === "article" ? "articles" : m.contentType === "novel" ? "novels" : "posts"}:${m.contentId}`) || {};
+        return {
+          ...d,
+          contentId: m.contentId,
+          contentType: m.contentType,
+          savedAt: m.savedAt || d.savedAt,
+          readStatus: m.readStatus,
+          readProgressPercent: m.readProgressPercent,
+          lastReadAt: m.lastReadAt,
+        };
+      });
+    } else {
+      // metadata endpoint failed — degrade to display-only data
+      list = (display.items || []).map((d) => ({
+        ...d,
+        contentId: d.id,
+        contentType: d.type,
+        readStatus: d.readStatus || "not_started",
+        readProgressPercent: 0,
+      }));
+    }
+    setItems(list);
     setLoading(false);
   }, []);
 
@@ -24,7 +60,7 @@ export const useSavedContent = () => {
     load();
   }, [load]);
 
-  const unreadCount = items.filter((i) => !i.read).length;
+  const unreadCount = items.filter((i) => i.readStatus === "not_started").length;
 
   return { items, loading, error, reload: load, unreadCount };
 };

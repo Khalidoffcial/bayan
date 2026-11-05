@@ -1,0 +1,61 @@
+/* ===========================
+   ADS — quiet reserved rail
+   Same tokens as the rest of Bayan. No sticky, no overlay, no flash.
+=========================== */
+
+.ad-rail {
+  position: fixed;
+  /* LTR: main sidebar is inline-start → ad rail on inline-end (right).
+     RTL: main sidebar flips automatically → ad rail lands left. */
+  inset-inline-end: 12px;
+  top: 90px;
+  z-index: 40;
+  width: 260px;
+  max-height: 560px;
+  pointer-events: auto;
+}
+
+.ad-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 120px;
+  padding: 10px;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: 14px;
+  background: var(--bg-primary, rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(14px);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.ad-slot__label {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text2, #6b7280);
+  opacity: 0.75;
+}
+
+/* before the network fills the zone: quiet placeholder, no layout jump */
+.ad-slot--pending::after {
+  content: "";
+  display: block;
+  flex: 1;
+  border-radius: 10px;
+  background: var(--bg-secondary, rgba(0, 0, 0, 0.03));
+}
+
+/* when the zone collapses (no fill / adblock / offline) keep it subtle */
+.ad-slot--filled:empty {
+  min-height: 0;
+  border-style: dashed;
+  opacity: 0.5;
+}
+
+/* ── narrow screens: no comfortable rail space → don't render at all ── */
+@media (max-width: 1419px) {
+  .ad-rail {
+    display: none;
+  }
+}

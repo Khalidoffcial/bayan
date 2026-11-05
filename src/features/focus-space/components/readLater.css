@@ -1,0 +1,34 @@
+/* readLater.css — "اقرأها لاحقًا" button: small, elegant, beside Share.
+   Logical properties only → correct in RTL and LTR. */
+.read-later-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(120, 130, 150, .3);
+  background: transparent;
+  color: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+  white-space: nowrap;
+}
+.read-later-btn:hover { background: rgba(120, 130, 150, .12); }
+.read-later-btn.is-saved {
+  border-color: #0f8ee2;
+  color: #0f8ee2;
+  background: rgba(15, 142, 226, .08);
+}
+.read-later-btn:disabled { opacity: .6; cursor: progress; }
+.read-later-btn__text { line-height: 1; }
+
+/* compact variant for feed cards — icon + short text, less visual weight */
+.read-later-btn.is-compact {
+  padding: 4px 9px;
+  font-size: 11.5px;
+  border: none;
+  border-radius: 12px;
+  color: #667;
+}
+.read-later-btn.is-compact.is-saved { color: #0f8ee2; background: rgba(15, 142, 226, .08); }

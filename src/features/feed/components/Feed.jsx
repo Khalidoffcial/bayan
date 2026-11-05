@@ -16,6 +16,7 @@ import { feedStore } from "../services/feedStore";
 import Top from "../../../components/layout/Top";
 import Sidebar from "../../../components/layout/Sidebar";
 import InterestsPopup from "../../../components/common/InterestsModal";
+import AdSidebar from "../../ads/AdSidebar";
 import Loader from "../../../components/ui/Loader";
 
 // Feature Components
@@ -183,6 +184,7 @@ const handleLike = useCallback(
       <Top />
       <Sidebar />
       <InterestsPopup />
+      <AdSidebar />
 
       <div className="feed-main">
         <Writer />

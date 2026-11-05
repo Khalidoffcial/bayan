@@ -63,6 +63,14 @@
 }
 
 /* ---------- Center clock ---------- */
+/*
+ * ROOT-CAUSE NOTE (clock-click bug):
+ * `.fc-center` is a full-viewport container with pointer-events: none.
+ * The old exception rule targeted `.fc-clock-wrapper`, a class the clock
+ * component never rendered (it renders `.fclk`) — so the click never
+ * reached the clock and the Timer panel could not open. The exception now
+ * targets the real clock element `.fclk` so clicks land on it directly.
+ */
 .fc-center {
   position: absolute;
   inset: 0;
@@ -72,6 +80,10 @@
   justify-content: center;
   pointer-events: none;
 }
+.fc-center .fclk {
+  pointer-events: auto;
+}
+/* Kept for backwards compatibility (legacy markup/tests) */
 .fc-clock-wrapper {
   pointer-events: auto;
   background: transparent;
@@ -494,6 +506,22 @@
   border-radius: 22px;
 }
 
+/* Clock panel sits above the saved pill + drawer (it opens from the
+   clock at the same vertical zone and must never be covered). */
+.fc-clock-panel { z-index: 60; }
+
+/* When the clock panel is open, push the saved pill out from under it
+   so Pause/Reset stay fully visible and clickable. On narrow screens
+   the top row is already crowded — hide the pill instead. */
+.fc-root.has-clock-panel .fc-saved-pill {
+  bottom: auto;
+  top: 20px;
+  left: 50%;
+}
+@media (max-width: 720px) {
+  .fc-root.has-clock-panel .fc-saved-pill { display: none; }
+}
+
 /* ---------- Saved pill + drawer ---------- */
 .fc-saved-pill {
   position: absolute;
@@ -566,6 +594,8 @@ input[type="range"] { accent-color: #0f8ee2; }
   .fc-clock-panel { top: calc(50% + 110px); }
   .fc-side { width: 100vw; }
   .fc-aya { flex-direction: column; align-items: stretch; }
+  /* clock panel open → rail moves up so it never covers Pause/Reset */
+  .fc-root.has-clock-panel .fc-rail { top: 20%; }
 }
 
 /* ─── Music Discovery (Focus Space sounds panel) ─────────────────── */
@@ -941,4 +971,21 @@ input[type="range"] { accent-color: #0f8ee2; }
 
 @media (prefers-reduced-motion: reduce) {
   .fc-bg-video { display: none; }
+}
+
+/* -- Metadata-only rows (iTunes) � no play button, info chip instead -- */
+.fc-md__play--info { cursor: default; }
+.fc-md__play--info .fc-md__cover { opacity: 0.75; }
+
+/* Quran reader overlay � full reading experience inside the sounds panel */
+.fc-quran-reader {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  background: rgba(15,18,30,0.85);
+  backdrop-filter: blur(14px);
+  max-height: 70vh;
+  overflow: hidden;
+  display: flex;
 }

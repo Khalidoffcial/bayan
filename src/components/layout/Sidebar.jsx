@@ -1,22 +1,16 @@
+/**
+ * Sidebar — main navigation.
+ *
+ * Icons come from the central Lucide registry (focusIcons.js) — no PNG
+ * swaps, no emoji. The active state colors the glyph with the brand blue
+ * via CSS (.sidebar-item.active .nav-icon), so the component itself
+ * stays direction-agnostic (RTL/LTR handled in CSS).
+ */
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./styles/sidebar.css";
 import { useTranslation } from "../../i18n/useTranslation";
-
-// Assets
-import menu from "../../assets/icons/menu.png";
-import setting from "../../assets/icons/setting.png";
-import settingOutline from "../../assets/icons/settingoutline.png";
-import PostIcon from "../../assets/icons/post.png";
-import PostIconOutline from "../../assets/icons/PostOutline.png";
-import articleIcon from "../../assets/icons/article.png";
-import articleOutline from "../../assets/icons/articleOutline.png";
-import novelIcon from "../../assets/icons/novel.png";
-import novelOutline from "../../assets/icons/novelOutline.png";
-import examIcon from "../../assets/icons/exam.png";
-import examOutline from "../../assets/icons/examOutline.png";
-import allIcon from "../../assets/icons/all.png";
-import allOutline from "../../assets/icons/allOutline.png";
+import { NAV_ICONS, MenuIcon } from "../../features/focus-space/constants/focusIcons";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -24,17 +18,20 @@ const Sidebar = () => {
   const { t } = useTranslation();
 
   const channels = [
-    { key: "nav.all", path: "/", activeIcon: allIcon, inactiveIcon: allOutline, match: (p) => p === "/" || p === "/all" },
-    { key: "nav.posts", path: "/posts", activeIcon: PostIcon, inactiveIcon: PostIconOutline, match: (p) => p === "/posts" },
-    { key: "nav.articles", path: "/articles", activeIcon: articleIcon, inactiveIcon: articleOutline, match: (p) => p === "/articles" },
-    { key: "nav.novels", path: "/novels", activeIcon: novelIcon, inactiveIcon: novelOutline, match: (p) => p === "/novels" },
-    { key: "nav.exams", path: "/exams", activeIcon: examIcon, inactiveIcon: examOutline, match: (p) => p === "/exams" },
+    { key: "nav.all", icon: NAV_ICONS.all, path: "/", match: (p) => p === "/" || p === "/all" },
+    { key: "nav.posts", icon: NAV_ICONS.posts, path: "/posts", match: (p) => p === "/posts" },
+    { key: "nav.articles", icon: NAV_ICONS.articles, path: "/articles", match: (p) => p === "/articles" },
+    { key: "nav.novels", icon: NAV_ICONS.novels, path: "/novels", match: (p) => p === "/novels" },
+    { key: "nav.books", icon: NAV_ICONS.books, path: "/books", match: (p) => p.startsWith("/books") },
+    { key: "nav.exams", icon: NAV_ICONS.exams, path: "/exams", match: (p) => p === "/exams" },
+    // Focus Space — مساحة الدراسة الغامرة، مباشرة بعد Exams (per spec)
+    { key: "nav.focus", icon: NAV_ICONS.focus, path: "/focus", match: (p) => p === "/focus" },
   ];
 
   return (
     <>
-      <button className="menu-btn" onClick={() => setSidebarOpen(true)}>
-        <img src={menu} alt="Menu" />
+      <button className="menu-btn" onClick={() => setSidebarOpen(true)} aria-label="Menu">
+        <MenuIcon size={22} aria-hidden />
       </button>
 
       {sidebarOpen && (
@@ -47,6 +44,7 @@ const Sidebar = () => {
           {channels.map((channel) => {
             const path = channel.path;
             const isActive = channel.match(location.pathname);
+            const Icon = channel.icon;
             return (
               <Link
                 key={channel.key}
@@ -54,11 +52,9 @@ const Sidebar = () => {
                 className={`sidebar-item ${isActive ? "active" : ""}`}
                 onClick={() => setSidebarOpen(false)}
               >
-                <img
-                  src={isActive ? channel.activeIcon : channel.inactiveIcon}
-                  alt=""
-                  className="settings-icon"
-                />
+                <span className="nav-icon" aria-hidden>
+                  <Icon size={20} strokeWidth={1.75} />
+                </span>
                 <span>{t(channel.key)}</span>
               </Link>
             );
@@ -69,12 +65,10 @@ const Sidebar = () => {
           to="/settings"
           className={`sidebar-item settings-link ${location.pathname === "/settings" ? "active" : ""}`}
           onClick={() => setSidebarOpen(false)}
-          >
-          <img
-            src={location.pathname === "/settings" ? setting : settingOutline}
-            alt=""
-            className="settings-icon"
-          />
+        >
+          <span className="nav-icon" aria-hidden>
+            <NAV_ICONS.settings size={20} strokeWidth={1.75} />
+          </span>
           <span>{t("nav.settings")}</span>
         </Link>
       </div>

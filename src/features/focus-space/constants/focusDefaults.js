@@ -54,7 +54,11 @@ export const FOCUS_DEFAULTS = {
   defaultSessionDuration: 25,
   ayaNotifications: true,
   savedContentReminders: true,
+  // Aya companion
+  ayaEnabled: true,
+  ayaIntervention: "balanced",   // gentle | balanced | active
   hideControls: false,
+  musicWidgetHidden: false,     // Focus Music widget hidden (music keeps playing)
   reduceMotion: false,
   overlayVisible: true,
 };
