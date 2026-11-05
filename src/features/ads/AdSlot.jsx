@@ -17,8 +17,6 @@ import { resolveAdContext, AD_ZONES, hasRailSpace } from "./adsConfig";
 import { loadMonetag, canShowAds } from "./monetag";
 import "./ads.css";
 
-const H = () => (window.innerHeight || 800);
-
 export const AdSlot = ({ zoneKey = "sidebar" }) => {
     const location = useLocation();
     const { language } = useTranslation();
@@ -33,8 +31,6 @@ export const AdSlot = ({ zoneKey = "sidebar" }) => {
 
     const zoneId = AD_ZONES[zoneKey];
     const eligible = verdict.allowed && verdict.zoneKey === zoneKey && Boolean(zoneId) && canShowAds() && hasRailSpace();
-
-    // mount the zone inside the reserved host exactly once per mount
     useEffect(() => {
         if (!eligible || !hostRef.current) return;
         let dead = false;

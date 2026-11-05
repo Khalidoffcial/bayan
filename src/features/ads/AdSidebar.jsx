@@ -8,7 +8,7 @@
  */
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { resolveAdContext, AD_ZONES } from "./adsConfig";
+import { resolveAdContext } from "./adsConfig";
 import { AdSlot } from "./AdSlot";
 import useAuth from "../../hooks/useAuth";
 
