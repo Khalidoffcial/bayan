@@ -3,15 +3,19 @@
    Same tokens as the rest of Bayan. No sticky, no overlay, no flash.
 =========================== */
 
+/* ── Ad rail: a NORMAL element in the layout flow ────────────────────
+   The rail is a flex sibling of .app-content inside .app-workspace
+   (order: 2 → inline-end side: RIGHT in LTR, LEFT in RTL). Static part
+   of the document flow — never fixed, sticky, absolute, or following
+   the scroll. When the policy denies the ad it renders nothing and
+   reserves zero space. */
 .ad-rail {
-  position: fixed;
-  /* LTR: main sidebar is inline-start → ad rail on inline-end (right).
-     RTL: main sidebar flips automatically → ad rail lands left. */
-  inset-inline-end: 12px;
-  top: 90px;
-  z-index: 40;
+  position: static;
+  order: 2;
+  flex: 0 0 auto;
+  align-self: flex-start;
   width: 260px;
-  max-height: 560px;
+  box-sizing: border-box;
   pointer-events: auto;
 }
 
@@ -53,9 +57,81 @@
   opacity: 0.5;
 }
 
-/* ── narrow screens: no comfortable rail space → don't render at all ── */
+/* ── narrow screens: no sidebar region / no comfortable rail space →
+   don't render at all (never a popup, never an overlay) ── */
 @media (max-width: 1419px) {
   .ad-rail {
     display: none;
   }
+}
+/* ── AdSense In-Article unit (reading pages only) ──────────────────────
+   Flows between content blocks inside .article-body — never overlays,
+   never inside a paragraph. Keeps the reading column width & typography. */
+.adsense-in-article {
+  display: block;
+  margin: 28px auto;
+  max-width: 100%;
+  overflow: hidden;      /* ad can never overlap or cover reading content */
+  clear: both;
+}
+
+.adsense-in-article ins.adsbygoogle {
+  display: block;
+  text-align: center;
+  /* fluid in-article format: responsive across desktop / tablet / mobile */
+  min-height: 0;
+}
+
+/* if the library never arrived, the empty box must not leave a gap */
+.adsense-in-article:has(ins.adsbygoogle:empty) {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .adsense-in-article { margin: 20px auto; }
+}
+
+/* ── AdSense Sidebar display unit (slot 8671904268) ───────────────────
+   Lives inside the existing .ad-rail (inline-end = right in LTR, left in
+   RTL via logical properties). Responsive: the rail width caps it; the
+   auto format + full-width-responsive fill what fits. Never overlays,
+   never a popup/interstitial, never rendered without rail space. */
+.adsense-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 260px;
+  max-width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: 14px;
+  background: var(--bg-primary, rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(14px);
+  overflow: hidden;   /* the ad can never cover reading content */
+}
+
+.adsense-sidebar__label {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text2, #6b7280);
+  opacity: 0.75;
+}
+
+.adsense-sidebar ins.adsbygoogle {
+  display: block;
+  min-height: 0;
+  /* hard cap: even while a request is in flight (or hung), the reserved
+     space can never grow into a huge empty column */
+  max-height: 600px;
+  overflow: hidden;
+}
+
+/* no fill → the whole container disappears (not just the <ins>), so no
+   empty bordered box is left behind. The component also drops the unit
+   entirely after its grace period (adsense-sidebar--idle). */
+.adsense-sidebar:has(ins.adsbygoogle[data-ad-status="unfilled"]),
+.adsense-sidebar:has(ins.adsbygoogle:empty) {
+  display: none;
 }

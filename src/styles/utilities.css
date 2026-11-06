@@ -1,4 +1,20 @@
 /* Utility Classes */
+
+/* ── Unified content width system ───────────────────────────────────
+   Every primary content box uses this shared rule so all outer boxes
+   share identical width & horizontal alignment at any viewport:
+   full parent width inside the content column, capped centrally by
+   --content-max-width (820px), border-box so padding never widens it.
+   New content components should reuse this class (or the token) instead
+   of declaring their own width. Small inner elements (buttons, icons,
+   metadata rows) are NOT affected — this is for outer boxes only. */
+.app-content-width {
+  width: 100%;
+  max-width: var(--content-max-width, 820px);
+  box-sizing: border-box;
+  margin-inline: auto; /* consistent horizontal alignment (RTL/LTR safe) */
+}
+
 .flex {
   display: flex;
 }

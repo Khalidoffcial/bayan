@@ -1,0 +1,57 @@
+
+> tiar@0.1.0 build
+> react-scripts build
+
+(node:18704) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Creating an optimized production build...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Failed to compile.
+
+Failed to minify the bundle. Error: static/js/383.eead52bc.chunk.js from Terser plugin
+Data cannot be cloned, out of memory.
+DataCloneError: Data cannot be cloned, out of memory.
+    at new Promise (<anonymous>)
+    at D:\bayan\bayan\node_modules\react-scripts\scripts\build.js:179:23
+    at finalCallback (D:\bayan\bayan\node_modules\webpack\lib\Compiler.js:498:32)
+    at D:\bayan\bayan\node_modules\webpack\lib\Compiler.js:522:13
+    at Hook.eval [as callAsync] (eval at create (D:\bayan\bayan\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:15:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (D:\bayan\bayan\node_modules\tapable\lib\Hook.js:18:14)
+    at onCompiled (D:\bayan\bayan\node_modules\webpack\lib\Compiler.js:520:21)
+    at D:\bayan\bayan\node_modules\webpack\lib\Compiler.js:1348:17
+    at Hook.eval [as callAsync] (eval at create (D:\bayan\bayan\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (D:\bayan\bayan\node_modules\tapable\lib\Hook.js:18:14)
+    at D:\bayan\bayan\node_modules\webpack\lib\Compiler.js:1344:33
+    at finalCallback (D:\bayan\bayan\node_modules\webpack\lib\Compilation.js:2925:11)
+    at D:\bayan\bayan\node_modules\webpack\lib\Compilation.js:3238:11
+    at Hook.eval [as callAsync] (eval at create (D:\bayan\bayan\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (D:\bayan\bayan\node_modules\tapable\lib\Hook.js:18:14)
+    at D:\bayan\bayan\node_modules\webpack\lib\Compilation.js:3231:38
+    at eval (eval at create (D:\bayan\bayan\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:15:1)
+    at eval (eval at create (D:\bayan\bayan\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:14:1)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+Read more here: https://cra.link/failed-to-minify
+

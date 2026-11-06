@@ -1,14 +1,11 @@
 .profile-container {
-  width: 80%;
-  padding: 20px;
-  padding-top: 100px;
+  /* chrome + workspace + content column owned by AppLayout — the profile
+     fills the shared .app-content column with no width/offset of its own */
+  width: 100%;
+  padding: 20px 0;
   color: var(--text-primary, #222);
   border-radius: 20px;
-  justify-self: right;
-}
-
-html[lang="ar"] .profile-container {
-  justify-self: left;
+  box-sizing: border-box;
 }
 
 .profile-content {
@@ -333,6 +330,6 @@ html[lang="ar"] .profile-container {
 
 @media (max-width: 900px) {
   .profile-container {
-    max-width: 100%;
+    width: 100%;
   }
 }

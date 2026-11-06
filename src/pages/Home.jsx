@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
+import AppLayout from "../components/layout/AppLayout";
 import Content from '../components/layout/Content';
 import cookie from "../utils/cookies";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
@@ -39,17 +40,13 @@ export const HomePage = () => {
       });
   }, [navigate]);
 
+  // AppLayout owns the chrome + workspace + ad rail; the homepage composes
+  // its own content (Spotlight hero + Feed) inside the shared column.
   return (
-    <div>
-      {/* الـ Sidebar يُعرض مرة واحدة فقط داخل Content → Feed
-          — أي Sidebar ثانٍ هنا كان يسبب padding-inline-start مكرر
-          ويلتصق به الـ Feed في RTL وينحرف في LTR */}
-      <div className="homepage">
-        <Content />
-      </div>
-    </div>
+    <AppLayout>
+      <Content />
+    </AppLayout>
   );
 };
 
 export default React.memo(HomePage);
-

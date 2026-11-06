@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import Top from "../../../components/layout/Top";
-import Sidebar from "../../../components/layout/Sidebar";
+import AppLayout from "../../../components/layout/AppLayout";
 
 import ProfileHeader from "./ProfileHeader";
 import ProfileInfo from "./ProfileInfo";
@@ -128,10 +127,8 @@ export const Profile = () => {
     navigator.share({ title: item.content || item.title, url: window.location.href });
 
   return (
-    <div className="profile-container">
-      <Top />
-      <Sidebar />
-
+    <AppLayout>
+      <div className="profile-container">
       <div className="profile-content">
         <ProfileHeader
           imageUrl={imageUrl}
@@ -186,6 +183,7 @@ export const Profile = () => {
           />
         </div>
       </div>
+      </div>
 
       {cropMode && (
         <ProfileEditModal
@@ -199,7 +197,7 @@ export const Profile = () => {
           onCancel={() => setCropMode(false)}
         />
       )}
-    </div>
+    </AppLayout>
   );
 };
 

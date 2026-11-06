@@ -6,12 +6,14 @@
 
 .spotlight {
   position: relative;
-  width: min(820px, 95%);
+  /* fills the shared .app-content column — the width token lives there */
+  width: 100%;
   min-height: 190px;
   /* التمركز داخل المساحة المتاحة فعليًا — نفس منطق feed-main:
-     لا يلتصق بالسايدبار ولا يتغير مركزه مع RTL/LTR */
+     لا يلتصق بالسايدبار ولا يتغير مركزه مع RTL/LTR.
+     إزاحة الهيدر الثابت مملوكة لـ .app-workspace — بلا margin-top هنا */
   margin-inline: auto;
-  margin-top: 70px;
+  margin-top: 0;
   margin-bottom: 18px;
   padding: 26px 34px 52px;
   border-radius: 18px;

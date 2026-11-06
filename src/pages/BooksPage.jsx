@@ -7,14 +7,10 @@
  * DOAB/OAPEN) — normalized and deduped server-side. No mock data.
  */
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Top from "../components/layout/Top";
-import Sidebar from "../components/layout/Sidebar";
-import InterestsPopup from "../components/common/InterestsModal";
+import AppLayout from "../components/layout/AppLayout";
 import { useTranslation } from "../i18n/useTranslation";
-import { useSettings } from "../contexts/SettingsContext";
 import { searchBooks } from "../features/books/services/books.service";
 import { BookCard, BookSkeleton } from "../features/books/components/BookCard";
-import AdSidebar from "../features/ads/AdSidebar";
 import "../features/books/components/books.css";
 import "../features/feed/styles/feed.css"; // .feed-container/.feed-main live here
 
@@ -41,7 +37,6 @@ const SOURCES = [
 
 export const BooksPage = () => {
     const { t } = useTranslation();
-    const { language } = useSettings();
     const [raw, setRaw] = useState("");
     const [query, setQuery] = useState("");
     const [lang, setLang] = useState("");
@@ -107,16 +102,10 @@ export const BooksPage = () => {
         load(query, p, true);
     };
 
-    const isArabic = language === "ar";
-
     return (
-        <div className="feed-container" dir={isArabic ? "rtl" : "ltr"}>
-            <Top />
-            <Sidebar />
-            <InterestsPopup />
-            <AdSidebar />
+        <AppLayout>
             <div className="feed-main">
-                <header className="books-head">
+                    <header className="books-head">
                     <h1>{t("books.title")}</h1>
                     <p>{t("books.subtitle")}</p>
                 </header>
@@ -190,7 +179,7 @@ export const BooksPage = () => {
                     </>
                 )}
             </div>
-        </div>
+        </AppLayout>
     );
 };
 

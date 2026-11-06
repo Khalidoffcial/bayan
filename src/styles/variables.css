@@ -32,7 +32,15 @@
   /* Layout Sizes */
   --sidebar-w: 260px;
   --header-height: 50px;
+
+  /* ── Unified content width system ─────────────────────────────────
+     The ONE width for every primary content box app-wide: feed post
+     cards, article/novel cards, book cards, exam boxes, composer,
+     writer editor, spotlight, feed containers, reading columns.
+     Components must never invent their own width — use the token, or
+     the shared container (see utilities.css: .app-content-width). */
   --max-content-w: 820px;
+  --content-max-width: 820px; /* alias for clarity in new code */
 
   /* Typography */
   --font-primary: "Inter", sans-serif;

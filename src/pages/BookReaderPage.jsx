@@ -9,17 +9,14 @@
  */
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import Top from "../components/layout/Top";
-import Sidebar from "../components/layout/Sidebar";
+import AppLayout from "../components/layout/AppLayout";
 import { useTranslation } from "../i18n/useTranslation";
-import { useSettings } from "../contexts/SettingsContext";
 import useAuth from "../hooks/useAuth";
 import { useToast } from "../components/ui/Toast";
 import { getBook, getBookPdfUrl } from "../features/books/services/books.service";
 import { useBookProgress } from "../features/books/hooks/useBookProgress";
 import { ReadingEngine } from "../features/books/readingEngine";
 import { toggleReadLater, getSavedStatus } from "../features/focus-space/services/savedContent.service";
-import AdSidebar from "../features/ads/AdSidebar";
 import { DownloadIcon, ExternalLinkIcon } from "../features/focus-space/constants/focusIcons";
 import "../features/books/components/books.css";
 import "../features/books/readingEngine.css";
@@ -32,7 +29,6 @@ export const BookReaderPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const { language } = useSettings();
     const { user } = useAuth();
     const toast = useToast();
 
@@ -94,15 +90,11 @@ export const BookReaderPage = () => {
         if (r?.ok) toast.success(t("readLater.markedCompleted"));
     };
 
-    const isArabic = language === "ar";
     const pdfSource = sources?.find((s) => s.kind === "pdf");
     const hasProgress = (initialProgress?.progressPercent || 0) > 0 && (initialProgress?.progressPercent || 0) < 100;
 
     return (
-        <div className="feed-container" dir={isArabic ? "rtl" : "ltr"}>
-            <Top />
-            <Sidebar />
-            <AdSidebar />
+        <AppLayout>
             <div className="feed-main br-page">
                 {status === "loading" && <div className="books-state"><span className="mini-spinner" /> {t("books.loading")}</div>}
                 {status === "error" && (
@@ -163,7 +155,7 @@ export const BookReaderPage = () => {
                     </>
                 )}
             </div>
-        </div>
+        </AppLayout>
     );
 };
 

@@ -1,27 +1,31 @@
 /**
- * AdSidebar — the reserved right rail (LTR) / left rail (RTL).
+ * AdSidebar — the reserved sidebar region for the AdSense display unit.
  *
- * Layout: the page containers are already centered (margin-inline auto), so
- * the rail floats in the leftover space on the opposite side of the main
- * sidebar using position:fixed — it never pushes or squeezes content, and it
- * hides below 1200px where no comfortable rail exists.
+ * Rendered by AppLayout as a sibling of .app-content inside .app-workspace.
+ * Eligibility is decided ONLY by the centralized AdPolicy allowlist (plus
+ * the guest rule here, since auth state already exists in this component).
+ * The rail is a normal element in the page flow (static, flex item of the
+ * workspace): right side in LTR, left side in RTL — never fixed, sticky,
+ * floating or overlaying. It renders nothing and reserves zero space when
+ * ineligible or when there is no sidebar region (narrow screens).
  */
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { resolveAdContext } from "./adsConfig";
-import { AdSlot } from "./AdSlot";
+import { canShowSidebarAd } from "./AdPolicy";
+import { AdSenseSidebar } from "./AdSenseSidebar";
 import useAuth from "../../hooks/useAuth";
 
 export const AdSidebar = () => {
     const location = useLocation();
     const { user } = useAuth();
-    const verdict = resolveAdContext(location.pathname);
-    // landing/guest experience stays ad-free entirely
-    if (!user?.id || !verdict.allowed) return null;
+    // guests (landing experience) stay ad-free entirely
+    if (!user?.id) return null;
+    // Single source of truth — the centralized AdPolicy allowlist.
+    if (!canShowSidebarAd(location.pathname, { visibility: "public" })) return null;
     return (
-        <div className="ad-rail" data-ad-context={verdict.context}>
-            <AdSlot zoneKey={verdict.zoneKey} />
-        </div>
+        <aside className="ad-rail" aria-label="Sponsored">
+            <AdSenseSidebar />
+        </aside>
     );
 };
 

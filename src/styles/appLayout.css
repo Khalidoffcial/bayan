@@ -1,0 +1,57 @@
+/* ============================================================
+   APP LAYOUT — the single structural foundation for every page.
+   Owns: shell, workspace, content column, ad-rail placement.
+   Pages contribute only their content composition inside
+   .app-content. Direction handled with logical properties only.
+   ============================================================ */
+
+/* The shell wraps chrome + workspace on all workspace pages. */
+.app-shell {
+  min-height: 100vh;
+  /* room for the fixed nav sidebar (inline-start) — logical, mirrors RTL */
+  padding-inline-start: var(--sidebar-w, 260px);
+  box-sizing: border-box;
+}
+
+/* The workspace is the main application area between the nav sidebar and
+   the viewport edge. The ad rail, when present, lives INSIDE it as an
+   independent region — never a child of content, hero or feed. */
+.app-workspace {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  /* clear the fixed Top bar exactly once, at the workspace level —
+     inner components must NOT add their own header offsets */
+  padding-top: 70px;
+}
+
+/* The ONE shared content column. Width token lives here — children do
+   not clamp again (no nested clamps). Centered between the nav sidebar
+   and the rail/viewport edge, direction-safe via logical properties. */
+.app-content {
+  width: min(var(--content-max-width, 820px), 100%);
+  margin-inline: auto;
+  padding-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+/* ── responsive: below the rail breakpoint the workspace is a plain
+   single column — same as the previous behavior, but structurally now
+   the same component (no per-page overrides). ── */
+@media (max-width: 1419px) {
+  .app-shell {
+    padding-inline-start: 0;
+    /* mobile/tablet: nav sidebar becomes overlay */
+  }
+}
+
+@media (max-width: 900px) {
+  .app-workspace {
+    padding-top: 0;
+    /* mobile header behaves differently (existing rule) */
+  }
+}

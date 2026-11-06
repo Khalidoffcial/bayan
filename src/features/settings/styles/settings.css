@@ -3,11 +3,10 @@
    يترتب على حسب اتجاه الكتابة). row-reverse كان يعكس الترتيب مرتين. */
 .settings-layout {
   display: flex;
-  min-height: 100vh;
-  max-width: 100%;
-  margin: 0 auto;
+  /* fills the shared .app-content column (width) — AppLayout owns the
+     fixed-header clearance, so no padding-top here */
+  width: 100%;
   gap: 0;
-  padding-top: var(--header-height, 50px);
 }
 
 /* Sidebar */
@@ -84,7 +83,9 @@
 .settings-content {
   flex: 1;
   padding: 32px 40px;
-  max-width: 800px;
+  /* fills the shared column; no own clamp token */
+  max-width: 100%;
+  min-width: 0;
 }
 
 .section-header {

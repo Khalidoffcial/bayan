@@ -13,10 +13,6 @@ import { FEED_PREFETCH_THRESHOLD_PX } from "../../../constants/feedConfig";
 import { feedStore } from "../services/feedStore";
 
 // Shared Layout & UI Components
-import Top from "../../../components/layout/Top";
-import Sidebar from "../../../components/layout/Sidebar";
-import InterestsPopup from "../../../components/common/InterestsModal";
-import AdSidebar from "../../ads/AdSidebar";
 import Loader from "../../../components/ui/Loader";
 
 // Feature Components
@@ -181,11 +177,8 @@ const handleLike = useCallback(
 
   return (
     <div className="feed-container">
-      <Top />
-      <Sidebar />
-      <InterestsPopup />
-      <AdSidebar />
-
+      {/* Chrome (Top/Sidebar/InterestsPopup) and the ad rail belong to
+          AppLayout — the Feed is pure content composition. */}
       <div className="feed-main">
         <Writer />
 

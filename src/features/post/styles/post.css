@@ -1,15 +1,12 @@
 .post-reading-container {
   width: 100%;
-  min-height: 100vh;
-  padding-top: 70px;
-  /* مساحة المحتوى بعد السايدبار الثابت — تتبع الاتجاه تلقائيًا */
-  padding-inline-start: var(--sidebar-w, 260px);
   box-sizing: border-box;
+  /* chrome + header clearance now owned by AppLayout (.app-workspace) */
 }
 
 .post-reading-content {
-  width: min(760px, 95%);
-  margin-inline: auto;
+  /* reading column inherits the shared .app-content boundary; no own clamp */
+  width: 100%;
   padding: 0 16px;
 }
 

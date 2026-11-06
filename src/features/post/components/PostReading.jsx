@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import Top from "../../../components/layout/Top";
-import Sidebar from "../../../components/layout/Sidebar";
 import InlineComments from "../../../components/common/InlineComments";
 import Loader from "../../../components/ui/Loader";
 import DropdownMenu from "../../../components/ui/DropdownMenu";
@@ -46,8 +44,6 @@ export const PostReading = () => {
   if (loading) {
     return (
       <div className="post-reading-container">
-        <Top />
-        <Sidebar />
         <div className="loading"><Loader /></div>
       </div>
     );
@@ -56,8 +52,6 @@ export const PostReading = () => {
   if (!dataPost) {
     return (
       <div className="post-reading-container">
-        <Top />
-        <Sidebar />
         <div className="loading"><h1>{t("post.notFound")}</h1></div>
       </div>
     );
@@ -90,9 +84,6 @@ export const PostReading = () => {
 
   return (
     <div className="post-reading-container">
-      <Top />
-      <Sidebar />
-
       <div className="post-reading-content">
         <div className="article-meta-row">
           <button className="back-btn" onClick={() => navigate(-1)}>

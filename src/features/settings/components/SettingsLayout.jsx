@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSettings } from "../../../contexts/SettingsContext";
 import { useTranslation } from "../../../i18n/useTranslation";
-import Top from "../../../components/layout/Top";
+import AppLayout from "../../../components/layout/AppLayout";
 
 import AppearanceSettings from "./AppearanceSettings";
 import NotificationsSettings from "./NotificationsSettings";
@@ -43,8 +43,7 @@ export const SettingsLayout = () => {
   const Panel = PANELS[active] || AppearanceSettings;
 
   return (
-    <>
-      <Top />
+    <AppLayout>
       <div className="settings-layout">
         <aside className="settings-sidebar">
           <div className="sidebar-section-label">{t("settings.preferences")}</div>
@@ -107,7 +106,7 @@ export const SettingsLayout = () => {
           </div>
         )}
       </div>
-    </>
+    </AppLayout>
   );
 };
 

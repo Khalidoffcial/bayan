@@ -1,26 +1,6 @@
 
-/* App Global Layout */
-.homepage {
-  width: 100%;
-  min-height: 100vh;
-  /* لا padding-inline-start هنا — .feed-container الداخلي (عبر Feed)
-     يضيفه مرة واحدة فقط. أي padding ثانٍ كان يسبب دفعًا مزدوجًا
-     للـ Feed بعيدًا عن مركز المساحة المتاحة */
-  box-sizing: border-box;
-}
-
-.content {
-  width: min(820px, 95%);
-  /* التمركز داخل المساحة المتاحة فعليًا — لا يتغير مع RTL/LTR */
-  margin-inline: auto;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: auto;
-}
-
-
+/* App Global Layout — structural ownership now lives in styles/appLayout.css
+   (AppLayout component). Only legacy names still referenced elsewhere remain. */
 
 .nameE {
   font-size: 100px;
@@ -55,10 +35,6 @@
 }
 
 @media (max-width: 900px) {
-  .homepage {
-    padding-inline-start: 0;
-    width: 100%;
-  }
   .search-container {
     display: none;
   }
