@@ -1,0 +1,590 @@
+/* ============================================================
+   Bayan Flow — immersive vertical discovery.
+   Uses existing design tokens (styles/variables.css):
+   --bg, --text, --text2, --blue, --radius-lg, --fs-base, …
+   Premium & calm: Apple-inspired restraint, not TikTok identity.
+   Full RTL/LTR via logical properties; dark/light via [data-theme].
+   ============================================================ */
+
+/* ---------- Shell ---------- */
+.flow {
+  /* Own the full viewport inside AppLayout's fullscreen rule (/flow added). */
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  /* Full-screen gesture surface: vertical panning + pinch zoom, no
+     horizontal pan (keeps browser default gesture handling sane). */
+  overscroll-behavior: contain;
+  z-index: 30;
+}
+
+.flow__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 10px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 2;
+}
+
+.flow__brand {
+  font-family: var(--font-heading);
+  font-size: var(--fs-title);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.flow__refresh {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--bg-primary);
+  color: var(--text2);
+  cursor: pointer;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.flow__refresh:hover {
+  color: var(--text);
+}
+
+.flow__refresh:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.flow__refresh .spin {
+  animation: flow-spin 0.9s linear infinite;
+}
+
+@keyframes flow-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Track (the scroll-snap engine) ---------- */
+.flow__track {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  /* iOS momentum + hide scrollbar for immersion; keyboard scroll still works */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  outline-offset: -2px;
+}
+
+.flow__track::-webkit-scrollbar {
+  display: none;
+}
+
+.flow__track:focus-visible {
+  outline: 2px solid var(--blue);
+}
+
+.flow__cell {
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  display: flex;
+}
+
+.flow__placeholder {
+  flex: 1;
+  background: linear-gradient(180deg,
+      var(--bg2) 0%,
+      var(--bg3) 60%,
+      var(--bg2) 100%);
+  border-radius: var(--radius-lg);
+  margin: 8px;
+}
+
+/* ---------- Item ---------- */
+.flow-item {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  /* Center the card column, leave room for the action rail (inline-end). */
+  padding: 8px 12px;
+  gap: 10px;
+}
+
+.flow-item__scroller {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Long content scrolls INSIDE the card; only when at its edge does the
+     swipe continue to the next card (browser-native nested scroll). */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-md) transparent;
+  padding: 4px;
+}
+
+.flow-item__head {
+  flex-shrink: 0;
+}
+
+/* ---------- Text posts ---------- */
+.flow-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* Comfortable reading width — never a wide poster wall. */
+  max-width: 62ch;
+  width: 100%;
+  margin-inline: auto;
+  padding-block: 4vh;
+}
+
+.flow-text__body {
+  font-family: var(--font-primary);
+  font-size: var(--fs-reading, 17px);
+  line-height: var(--lh-reading, 1.85);
+  color: var(--text);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.flow-text__body--clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 12;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.flow-text__toggle {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: var(--surface);
+  color: var(--text2);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: var(--fs-label);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.flow-text__toggle:hover {
+  background: var(--surface-hover);
+}
+
+/* ---------- Media posts ---------- */
+.flow-media {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.flow-media__stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #000;
+}
+
+.flow-media__video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.flow-media__stage--img {
+  background: var(--bg2);
+  padding: 8px;
+}
+
+.flow-media__stage--img .media-gallery {
+  width: 100%;
+  max-height: 100%;
+}
+
+.flow-media__controls {
+  position: absolute;
+  bottom: 12px;
+  inset-inline-start: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.flow-media__ctl {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background var(--transition-fast);
+}
+
+.flow-media__ctl:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.flow-media__caption {
+  flex-shrink: 0;
+}
+
+.flow-media__caption .flow-text {
+  padding-block: 0;
+}
+
+.flow-media__caption .flow-text__body {
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- Articles / novels ---------- */
+.flow-article {
+  margin: auto;
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+}
+
+.flow-article__cover {
+  border: none;
+  padding: 0;
+  background: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  max-height: 40vh;
+}
+
+.flow-article__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.flow-article__spine {
+  align-self: center;
+  writing-mode: vertical-rl;
+  background: var(--blue-dim);
+  color: var(--blue);
+  border-radius: var(--radius-sm);
+  padding: 18px 10px;
+  font-weight: 700;
+  max-height: 32vh;
+  overflow: hidden;
+  font-family: var(--font-heading);
+}
+
+.flow-article__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-heading);
+  line-height: 1.35;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.flow-article__lede {
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  color: var(--text2);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.flow-article__byline {
+  font-size: var(--fs-meta);
+  color: var(--text2);
+}
+
+.flow-article__byline b {
+  color: var(--text);
+}
+
+.flow-article__cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 10px 18px;
+  background: var(--blue);
+  color: #fff;
+  font-family: inherit;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.flow-article__cta:hover {
+  background: var(--blue-hover, var(--blue));
+  transform: translateY(-1px);
+}
+
+/* ---------- Action rail ---------- */
+.flow-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  flex-shrink: 0;
+  padding-block-end: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  /* In RTL the rail naturally sits inline-start via flex order */
+}
+
+.flow-act {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--fs-small);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  min-width: 44px;
+  /* touch-target */
+  min-height: 44px;
+  justify-content: center;
+}
+
+.flow-act:hover {
+  color: var(--text);
+  transform: scale(1.06);
+}
+
+.flow-act--liked {
+  color: #e0245e;
+}
+
+.flow-act-count {
+  font-size: var(--fs-small);
+  color: inherit;
+}
+
+.flow-act--profile {
+  color: var(--text2);
+}
+
+.flow-follow {
+  border: 1.5px solid var(--blue);
+  background: var(--blue);
+  color: #fff;
+  font-family: inherit;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  min-height: 32px;
+}
+
+.flow-follow--on {
+  background: transparent;
+  color: var(--blue);
+}
+
+.flow-follow:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---------- Inline comments overlay ---------- */
+.flow-comments {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  max-height: 62%;
+  overflow-y: auto;
+  background: var(--glass, var(--bg-primary));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 14px 16px calc(env(safe-area-inset-bottom, 0px) + 14px);
+  z-index: 3;
+  animation: flow-sheet-up 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes flow-sheet-up {
+  from {
+    transform: translateY(30%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ---------- Accessible nav buttons ---------- */
+.flow__navbtns {
+  position: fixed;
+  inset-inline-end: 14px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 4;
+}
+
+.flow__navbtn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-full);
+  background: var(--glass, var(--bg-primary));
+  color: var(--text);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background var(--transition-fast), opacity var(--transition-fast);
+}
+
+.flow__navbtn:hover {
+  background: var(--surface-hover);
+}
+
+.flow__navbtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ---------- States ---------- */
+.flow-skeleton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.flow-tagline {
+  font-family: var(--font-heading);
+  font-size: var(--fs-meta);
+  color: var(--text3);
+  letter-spacing: 0.02em;
+}
+
+.flow-error {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text2);
+  padding: 24px;
+  text-align: center;
+}
+
+.flow-error button {
+  border: 1px solid var(--border-md);
+  background: var(--bg-primary);
+  color: var(--text);
+  border-radius: var(--radius-full);
+  padding: 9px 20px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.flow-error button:hover {
+  background: var(--surface-hover);
+}
+
+.flow-empty {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--text3);
+  font-size: var(--fs-base);
+}
+
+/* ---------- Dark theme polish (uses existing tokens; minimal overrides) ---------- */
+[data-theme="dark"] .flow-media__stage--img {
+  background: var(--bg3);
+}
+
+[data-theme="dark"] .flow-article {
+  box-shadow: none;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .flow-comments { animation: none; }
+  .flow__refresh .spin { animation: none; }
+  .flow-act:hover,
+  .flow-article__cta:hover { transform: none; }
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 700px) {
+  .flow-item { padding: 6px 10px; }
+  .flow-text { max-width: 100%; }
+  .flow__navbtns { display: none; } /* gestures suffice on touch */
+}
+
+/* ---------- Desktop: centered column, larger gutters ---------- */
+@media (min-width: 1024px) {
+  .flow-item { padding: 20px 32px; }
+
+  .flow-item__scroller {
+    max-width: 620px;
+    margin-inline: auto;
+    border-radius: var(--radius-xl);
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    padding: 20px;
+  }
+
+  .flow-text { padding-block: 6vh; }
+}

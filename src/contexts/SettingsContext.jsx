@@ -13,6 +13,7 @@ import { DEFAULT_PRIMARY } from "../constants/primaryColors";
 import { isRtlLanguage, LANGUAGES } from "../constants/settingsConfig";
 import { resolveLanguage } from "../i18n/geoLanguage";
 import { ensureFontLoaded } from "../utils/loadFont";
+import { DEFAULT_FONT, fontStack } from "../constants/fonts";
 
 const SettingsContext = createContext(null);
 
@@ -54,7 +55,7 @@ export const SettingsProvider = ({ children }) => {
 
   const [theme, setTheme] = useState("light");
   const [fontSize, setFontSize] = useState("medium");
-  const [fontFamily, setFontFamily] = useState("Inter");
+  const [fontFamily, setFontFamily] = useState(DEFAULT_FONT);
   // اللغة تبدأ من localStorage (كتبها index.html والسياق عند كل تغيير) —
   // الزائر غير المسجل يحصل على لغته فورًا، والمسجل يستوردها من السيرفر بعدها.
   const [language, setLanguageState] = useState(() => localStorage.getItem("language") || "en");
@@ -131,7 +132,7 @@ export const SettingsProvider = ({ children }) => {
 
       setTheme(data.appearance?.theme || "light");
       setFontSize(data.appearance?.fontSize || "medium");
-      setFontFamily(data.appearance?.fontFamily || "Inter");
+      setFontFamily(data.appearance?.fontFamily || DEFAULT_FONT);
       // السيرفر هو مصدر الحقيقة للمسجل — لكن نحترم قيمة الزائر إن لم توجد في السيرفر
       setLanguageState(data.appearance?.language || localStorage.getItem("language") || "en");
       setPrimaryColor(
@@ -198,16 +199,19 @@ export const SettingsProvider = ({ children }) => {
   useEffect(() => {
     if (loading) return;
 
-    // On-demand font: Cairo/Poppins are only fetched when actually selected
-    // (default Zain/Inter ships in the critical HTML). Also restores fonts
-    // chosen in a previous session.
+    // On-demand font: only the user's chosen family is fetched (default Zain
+    // ships in the critical HTML); restores fonts chosen in a previous session.
     ensureFontLoaded(fontFamily);
 
     document.documentElement.setAttribute("data-theme", theme);
     document.documentElement.setAttribute("data-font-size", fontSize);
     document.documentElement.style.setProperty(
       "--font-primary",
-      `${fontFamily}, sans-serif`
+      fontStack(fontFamily)
+    );
+    document.documentElement.style.setProperty(
+      "--font-heading",
+      fontStack(fontFamily)
     );
     // theme: دعم "system" عبر matchMedia
     const applyTheme = (t) => {

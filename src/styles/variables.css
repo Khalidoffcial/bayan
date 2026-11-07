@@ -42,10 +42,26 @@
   --max-content-w: 820px;
   --content-max-width: 820px; /* alias for clarity in new code */
 
-  /* Typography */
-  --font-primary: "Inter", sans-serif;
-  --font-arabic: "Cairo", "Zain", sans-serif;
-  --font-heading: "Zain", "Inter", sans-serif;
+  /* Typography — centralized scale (X/Threads-inspired compact system).
+     Every component consumes these tokens; no component sets raw sizes
+     for body/meta/label text. --font-primary is set by SettingsContext
+     from the user's chosen font (constants/fonts.js). */
+  --font-primary: "Zain", "Noto Sans Arabic", sans-serif;
+  --font-heading: "Zain", "Noto Sans Arabic", sans-serif;
+
+  /* Core text scale */
+  --fs-base: 15px;        /* body / content text */
+  --fs-title: 17px;       /* post & card titles */
+  --fs-heading: 20px;     /* section headings */
+  --fs-display: 24px;     /* page-level headlines */
+  --fs-meta: 13px;        /* timestamps, counts, usernames */
+  --fs-label: 13px;       /* compact labels, chips */
+  --fs-small: 12px;       /* fine print */
+  --fs-reading: 17px;     /* article/novel long-form body */
+
+  /* Reading rhythm */
+  --lh-body: 1.6;         /* UI body */
+  --lh-reading: 1.85;     /* article/novel long-form (Arabic diacritics) */
 }
 
 /* Light Theme (Default) */
@@ -114,15 +130,37 @@
   --blue-hover: #0866a8;
 }
 
-/* Font Size Scales */
+/* Font Size Scales — medium tracks the X/Threads 15px body default.
+   All scale steps shift together so hierarchy is preserved. */
 [data-font-size="small"] {
-  --fs-base: 13px;
+  --fs-base: 14px;
+  --fs-title: 15.5px;
+  --fs-heading: 18px;
+  --fs-display: 21px;
+  --fs-meta: 12px;
+  --fs-label: 12px;
+  --fs-small: 11px;
+  --fs-reading: 16px;
 }
 
 [data-font-size="medium"] {
   --fs-base: 15px;
+  --fs-title: 17px;
+  --fs-heading: 20px;
+  --fs-display: 24px;
+  --fs-meta: 13px;
+  --fs-label: 13px;
+  --fs-small: 12px;
+  --fs-reading: 17px;
 }
 
 [data-font-size="large"] {
   --fs-base: 17px;
+  --fs-title: 19px;
+  --fs-heading: 22px;
+  --fs-display: 27px;
+  --fs-meta: 14px;
+  --fs-label: 14px;
+  --fs-small: 13px;
+  --fs-reading: 19px;
 }

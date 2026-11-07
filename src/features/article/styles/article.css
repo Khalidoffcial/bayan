@@ -37,7 +37,7 @@
 }
 
 .article-header-ui h1 {
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-size: var(--fs-display, 24px);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.28;
@@ -47,7 +47,7 @@
 }
 
 .article-header-ui .description {
-  font-size: 1.15rem;
+  font-size: var(--fs-title, 17px);
   color: var(--text2, #6b7280);
   line-height: 1.7;
   max-width: 60ch;
@@ -56,9 +56,10 @@
 .article-body {
   margin: 20px 0;
   /* Reading typography — the measure is capped at ~68ch for effortless
-     line tracking; line-height 1.9 suits Arabic diacritics and Latin alike. */
-  font-size: 19px;
-  line-height: 1.9;
+     line tracking; reading scale stays comfortable while UI text is compact
+     (X/Threads-style). line-height 1.85 suits Arabic diacritics and Latin. */
+  font-size: var(--fs-reading, 17px);
+  line-height: var(--lh-reading, 1.85);
   letter-spacing: 0.001em;
   color: var(--text-primary, #1f2328);
   max-width: 68ch;

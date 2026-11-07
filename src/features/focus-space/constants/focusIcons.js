@@ -244,9 +244,10 @@ export const RAIL_ICONS = {
   settings: SlidersHorizontal,
 };
 
-/** Nav channels — one Lucide glyph per sidebar link. */
+  // Nav channels — one Lucide glyph per sidebar link.
 export const NAV_ICONS = {
   all: LayoutDashboard,
+  flow: Waves,
   posts: FileText,
   articles: BookOpen,
   novels: BookOpenCheck,

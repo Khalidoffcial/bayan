@@ -20,7 +20,7 @@
   overflow: hidden;
   isolation: isolate;
   color: #fff;
-  font-family: var(--font-primary, Inter, sans-serif);
+  font-family: var(--font-primary);
   box-shadow: 0 8px 30px rgba(30, 41, 90, 0.14);
   transition: background 0.8s ease, box-shadow 0.4s ease;
 }

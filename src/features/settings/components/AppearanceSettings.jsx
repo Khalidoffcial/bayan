@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useSettings } from "../../../contexts/SettingsContext";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { getTranslation } from "../../../i18n/translations";
 import { PRIMARY_COLORS } from "../../../constants/primaryColors";
-import { THEMES, FONT_SIZES, FONT_FAMILIES } from "../../../constants/settingsConfig";
+import { THEMES, FONT_SIZES } from "../../../constants/settingsConfig";
+import { FONTS, FONT_CATEGORIES, DEFAULT_FONT, fontById } from "../../../constants/fonts";
 import { loadFontFamily } from "../../../utils/loadFont";
+import FontPicker from "./FontPicker";
 
 export const AppearanceSettings = () => {
   const {
@@ -93,24 +95,18 @@ export const AppearanceSettings = () => {
         </div>
       </div>
 
-      <div className="settings-card">
-        <div className="card-title">{t("settings.fontFamily")}</div>
-        <div className="font-cards">
-          {FONT_FAMILIES.map((f) => (
-            <div
-              key={f.id}
-              className={`font-card ${fontFamily === f.id ? "active" : ""}`}
-              onClick={() => { loadFontFamily(f.id); setFontFamily(f.id); triggerSave(); }}
-              style={{ fontFamily: f.id }}
-            >
-              <div className="font-card-sample">{f.sample}</div>
-              <div className="option-card-label" style={{ fontFamily: f.id }}>
-                {f.id}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <FontPicker
+        value={fontFamily}
+        onChange={(id) => {
+          loadFontFamily(id);
+          setFontFamily(id);
+          triggerSave();
+        }}
+        onReset={() => {
+          setFontFamily(DEFAULT_FONT);
+          triggerSave();
+        }}
+      />
 
       <div className="settings-card">
         <div className="card-title">{t("settings.preview")}</div>
@@ -120,8 +116,8 @@ export const AppearanceSettings = () => {
             className="preview-text"
             dir={language === "ar" ? "rtl" : "ltr"}
             style={{
-              fontFamily: `${fontFamily}, sans-serif`,
-              fontSize: fontSize === "small" ? 13 : fontSize === "large" ? 17 : 15,
+              /* inherits the live --font-primary variable — no hardcoded stack */
+              fontSize: fontSize === "small" ? 14 : fontSize === "large" ? 17 : 15,
             }}
           >
             {language === "ar"

@@ -6,13 +6,31 @@
 const ar = {
   // ---------- Navigation / Sidebar ----------
   "nav.all": "الكل",
+  "nav.flow": "التدفق",
   "nav.posts": "منشورات",
   "nav.articles": "مقالات",
   "nav.novels": "روايات",
   "nav.exams": "امتحانات",
   "nav.settings": "الإعدادات",
 
-  // ---------- Feed ----------
+  // ---------- Feed ----------  "flow.title": "التدفق",
+  "flow.tagline": "طريقة جديدة للاكتشاف",
+  "flow.refresh": "تحديث الاكتشاف",
+  "flow.prev": "العنصر السابق",
+  "flow.next": "العنصر التالي",
+  "flow.actions": "إجراءات المحتوى",
+  "flow.follow": "متابعة",
+  "flow.following": "تتم المتابعة",
+  "flow.viewProfile": "عرض ملف الكاتب",
+  "flow.continueReading": "متابعة القراءة",
+  "flow.empty": "لا يوجد شيء للاكتشاف بعد",
+  "flow.play": "تشغيل",
+  "flow.pause": "إيقاف",
+  "flow.mute": "كتم",
+  "flow.unmute": "تشغيل الصوت",
+
+  // ---------- Bayan Flow ----------
+
   "feed.retry": "حاول تاني",
   "feed.error": "حصلت مشكلة في تحميل المحتوى",
   "feed.loading": "جاري التحميل...",
@@ -296,6 +314,14 @@ const ar = {
   "settings.font.medium": "متوسط",
   "settings.font.large": "كبير",
   "settings.fontFamily": "نوع الخط",
+  "settings.fonts.title": "الخطوط",
+  "settings.fonts.search": "ابحث عن خط…",
+  "settings.fonts.cat.all": "الكل",
+  "settings.fonts.cat.arabic": "عربي",
+  "settings.fonts.cat.latin": "لاتيني",
+  "settings.fonts.cat.multi": "متعدد اللغات",
+  "settings.fonts.reset": "إرجاع الافتراضي",
+  "settings.fonts.empty": "لا توجد خطوط مطابقة للبحث",
   "settings.font.inter.desc": "حديث ومرتب",
   "settings.font.poppins.desc": "دائري وودود",
   "settings.font.cairo.desc": "مناسب للعربي",

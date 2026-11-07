@@ -4,13 +4,31 @@
 const ru = {
   // ---------- Navigation / Sidebar ----------
   "nav.all": "Всё",
+  "nav.flow": "Поток",
   "nav.posts": "Публикации",
   "nav.articles": "Статьи",
   "nav.novels": "Романы",
   "nav.exams": "Экзамены",
   "nav.settings": "Настройки",
 
-  // ---------- Feed ----------
+  // ---------- Feed ----------  "flow.title": "Поток",
+  "flow.tagline": "Новый способ открывать новое",
+  "flow.refresh": "Обновить подборку",
+  "flow.prev": "Предыдущее",
+  "flow.next": "Следующее",
+  "flow.actions": "Действия с контентом",
+  "flow.follow": "Подписаться",
+  "flow.following": "Вы подписаны",
+  "flow.viewProfile": "Открыть профиль автора",
+  "flow.continueReading": "Продолжить чтение",
+  "flow.empty": "Пока нечего открывать",
+  "flow.play": "Воспроизвести",
+  "flow.pause": "Пауза",
+  "flow.mute": "Отключить звук",
+  "flow.unmute": "Включить звук",
+
+  // ---------- Bayan Flow ----------
+
   "feed.retry": "Повторить",
   "feed.error": "Произошла ошибка при загрузке ленты",
   "feed.loading": "Загрузка...",
@@ -243,6 +261,14 @@ const ru = {
   "settings.font.medium": "Средний",
   "settings.font.large": "Большой",
   "settings.fontFamily": "Шрифт",
+  "settings.fonts.title": "Типографика",
+  "settings.fonts.search": "Найти шрифты…",
+  "settings.fonts.cat.all": "Все",
+  "settings.fonts.cat.arabic": "Арабские",
+  "settings.fonts.cat.latin": "Латинские",
+  "settings.fonts.cat.multi": "Многоязычные",
+  "settings.fonts.reset": "Сбросить",
+  "settings.fonts.empty": "Шрифты не найдены",
   "settings.font.inter.desc": "Современный и аккуратный",
   "settings.font.poppins.desc": "Округлый и дружелюбный",
   "settings.font.cairo.desc": "Поддержка арабского",

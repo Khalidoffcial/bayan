@@ -4,13 +4,31 @@
 const zh = {
   // ---------- Navigation / Sidebar ----------
   "nav.all": "全部",
+  "nav.flow": "流",
   "nav.posts": "帖子",
   "nav.articles": "文章",
   "nav.novels": "小说",
   "nav.exams": "考试",
   "nav.settings": "设置",
 
-  // ---------- Feed ----------
+  // ---------- Feed ----------  "flow.title": "流",
+  "flow.tagline": "全新的发现方式",
+  "flow.refresh": "刷新发现",
+  "flow.prev": "上一条",
+  "flow.next": "下一条",
+  "flow.actions": "内容操作",
+  "flow.follow": "关注",
+  "flow.following": "已关注",
+  "flow.viewProfile": "查看作者主页",
+  "flow.continueReading": "继续阅读",
+  "flow.empty": "暂无可发现的内容",
+  "flow.play": "播放",
+  "flow.pause": "暂停",
+  "flow.mute": "静音",
+  "flow.unmute": "取消静音",
+
+  // ---------- Bayan Flow ----------
+
   "feed.retry": "重试",
   "feed.error": "加载动态时出错",
   "feed.loading": "加载中...",
@@ -243,6 +261,14 @@ const zh = {
   "settings.font.medium": "中",
   "settings.font.large": "大",
   "settings.fontFamily": "字体",
+  "settings.fonts.title": "字体排版",
+  "settings.fonts.search": "搜索字体…",
+  "settings.fonts.cat.all": "全部",
+  "settings.fonts.cat.arabic": "阿拉伯文",
+  "settings.fonts.cat.latin": "拉丁文",
+  "settings.fonts.cat.multi": "多语言",
+  "settings.fonts.reset": "恢复默认",
+  "settings.fonts.empty": "未找到匹配的字体",
   "settings.font.inter.desc": "现代简洁",
   "settings.font.poppins.desc": "圆润友好",
   "settings.font.cairo.desc": "支持阿拉伯语",

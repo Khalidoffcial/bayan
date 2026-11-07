@@ -16,6 +16,7 @@ const PrivacyPage = lazy(() => import("../pages/LegalPages").then(m => ({ defaul
 const TermsPage = lazy(() => import("../pages/LegalPages").then(m => ({ default: m.TermsPage })));
 const CookiesPage = lazy(() => import("../pages/LegalPages").then(m => ({ default: m.CookiesPage })));
 const FocusSpacePage = lazy(() => import("../features/focus-space/FocusSpacePage"));
+const FlowPage = lazy(() => import("../features/flow/FlowPage"));
 const ExamsPage = lazy(() => import("../pages/ExamsPage"));
 const BooksPage = lazy(() => import("../pages/BooksPage"));
 const BookReaderPage = lazy(() => import("../pages/BookReaderPage"));
@@ -49,6 +50,8 @@ export const AppRoutes = () => {
         <Route path="/exams" element={<ExamsPage />} />
         {/* Focus Space — مساحة الدراسة الغامرة (full-screen) */}
         <Route path="/focus" element={<FocusSpacePage />} />
+        {/* Bayan Flow — اكتشاف عمودي غامر (full-screen) */}
+        <Route path="/flow" element={<FlowPage />} />
         <Route path="/p/:idOtherUser" element={<ProfilePage />} />
         <Route path="/:typeArticle" element={<FeedPage />} />
         <Route path="/r/:articleId" element={<ArticlePage />} />

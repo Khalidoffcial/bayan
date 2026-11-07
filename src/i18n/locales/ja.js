@@ -4,13 +4,31 @@
 const ja = {
   // ---------- Navigation / Sidebar ----------
   "nav.all": "すべて",
+  "nav.flow": "フロー",
   "nav.posts": "投稿",
   "nav.articles": "記事",
   "nav.novels": "小説",
   "nav.exams": "試験",
   "nav.settings": "設定",
 
-  // ---------- Feed ----------
+  // ---------- Feed ----------  "flow.title": "フロー",
+  "flow.tagline": "新しい発見のかたち",
+  "flow.refresh": "発見を更新",
+  "flow.prev": "前のアイテム",
+  "flow.next": "次のアイテム",
+  "flow.actions": "コンテンツ操作",
+  "flow.follow": "フォロー",
+  "flow.following": "フォロー中",
+  "flow.viewProfile": "作者のプロフィールを見る",
+  "flow.continueReading": "続きを読む",
+  "flow.empty": "まだ発見するものがありません",
+  "flow.play": "再生",
+  "flow.pause": "一時停止",
+  "flow.mute": "ミュート",
+  "flow.unmute": "ミュート解除",
+
+  // ---------- Bayan Flow ----------
+
   "feed.retry": "再試行",
   "feed.error": "フィードの読み込み中に問題が発生しました",
   "feed.loading": "読み込み中...",
@@ -243,6 +261,14 @@ const ja = {
   "settings.font.medium": "中",
   "settings.font.large": "大",
   "settings.fontFamily": "フォント",
+  "settings.fonts.title": "タイポグラフィ",
+  "settings.fonts.search": "フォントを検索…",
+  "settings.fonts.cat.all": "すべて",
+  "settings.fonts.cat.arabic": "アラビア文字",
+  "settings.fonts.cat.latin": "ラテン文字",
+  "settings.fonts.cat.multi": "多言語",
+  "settings.fonts.reset": "リセット",
+  "settings.fonts.empty": "一致するフォントがありません",
   "settings.font.inter.desc": "モダンで美しい",
   "settings.font.poppins.desc": "丸みのある親しみやすい",
   "settings.font.cairo.desc": "アラビア語対応",

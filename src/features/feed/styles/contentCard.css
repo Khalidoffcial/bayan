@@ -108,7 +108,7 @@
 
 .bcard-name {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--fs-base, 15px);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--text-primary, #171717);
@@ -119,7 +119,7 @@
 
 .bcard-username {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--fs-meta, 13px);
   color: var(--text3, #9ca3af);
   white-space: nowrap;
   overflow: hidden;
@@ -132,8 +132,9 @@
 
 .bcard-body {
   padding: 14px var(--card-pad) 4px;
-  font-size: 16.5px;
-  line-height: 1.75;
+  /* X/Threads conversational measure — 15px body, tight but airy leading */
+  font-size: var(--fs-base, 15px);
+  line-height: 1.55;
   color: var(--text-primary, #1f2328);
   word-break: break-word;
   overflow-wrap: anywhere;
@@ -220,7 +221,7 @@
 
 .bcard-title {
   margin: 14px var(--card-pad) 0;
-  font-size: 21px;
+  font-size: var(--fs-title, 17px);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.35;
@@ -234,15 +235,15 @@
 
 /* Novel titles get the book treatment: slightly larger, calmer tracking */
 .bayan-card--novel .bcard-title {
-  font-size: 23px;
+  font-size: calc(var(--fs-title, 17px) + 2px);
   letter-spacing: -0.01em;
   line-height: 1.3;
 }
 
 .bcard-lede {
   margin: 8px var(--card-pad) 0;
-  font-size: 15.5px;
-  line-height: 1.7;
+  font-size: var(--fs-base, 15px);
+  line-height: 1.6;
   color: var(--text2, #4b5563);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -252,7 +253,7 @@
 
 .bcard-byline {
   margin: 14px var(--card-pad) 0;
-  font-size: 13px;
+  font-size: var(--fs-meta, 13px);
   color: var(--text3, #9ca3af);
 }
 
@@ -278,7 +279,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  font-size: 13px;
+  font-size: var(--fs-meta, 13px);
   color: var(--text3, #9ca3af);
   min-width: 0;
 }
@@ -340,7 +341,7 @@
 .bcard-act--liked:hover { color: #e0245e; }
 
 .bcard-act-count {
-  font-size: 13px;
+  font-size: var(--fs-meta, 13px);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
@@ -357,7 +358,7 @@
 .bcard-reply {
   margin: 10px var(--card-pad) 0;
   padding-inline-start: calc(44px + 12px);
-  font-size: 12.5px;
+  font-size: var(--fs-label, 13px);
   color: var(--text3, #9ca3af);
 }
 
@@ -381,10 +382,10 @@
 
   .bcard-avatar { width: 40px; height: 40px; }
 
-  .bcard-title { font-size: 19px; }
-  .bayan-card--novel .bcard-title { font-size: 21px; }
+  .bcard-title { font-size: var(--fs-title, 17px); }
+  .bayan-card--novel .bcard-title { font-size: calc(var(--fs-title, 17px) + 2px); }
 
-  .bcard-body { font-size: 16px; }
+  .bcard-body { font-size: var(--fs-base, 15px); }
 
   .bcard-foot { flex-wrap: wrap; }
 }

@@ -36,8 +36,8 @@ export const PageContent = ({ children, className = "" }) => (
     <div className={`app-content ${className}`}>{children}</div>
 );
 
-/* Full-screen experiences (Focus Space) get no workspace chrome at all. */
-const FULLSCREEN_PATHS = [/^\/focus/];
+/* Full-screen experiences (Focus Space, Bayan Flow) get no workspace chrome. */
+const FULLSCREEN_PATHS = [/^\/focus/, /^\/flow/];
 
 export const AppLayout = ({ children }) => {
     const location = useLocation();

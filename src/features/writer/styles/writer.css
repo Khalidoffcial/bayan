@@ -34,7 +34,7 @@
   border: none;
   cursor: text;
   text-align: start;
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-primary);
 }
 
 .composer-collapsed:focus-visible {
@@ -343,8 +343,8 @@
   border-radius: 10px;
   resize: vertical;
   outline: none;
-  font-size: 15px;
-  font-family: "Inter", sans-serif;
+  font-size: var(--fs-base, 15px);
+  font-family: var(--font-primary);
   line-height: 1.6;
   transition: all 0.2s ease;
   overflow-y: auto;
@@ -360,8 +360,8 @@
   border: 1px solid #333333;
   border-radius: 10px;
   outline: none;
-  font-size: 15px;
-  font-family: "Inter", sans-serif;
+  font-size: var(--fs-base, 15px);
+  font-family: var(--font-primary);
   margin-bottom: 12px;
 }
 
@@ -565,7 +565,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-primary);
   /* الاتجاه يتبع لغة الواجهة — لا قيمة ثابتة */
 }
 

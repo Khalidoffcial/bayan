@@ -31,22 +31,22 @@
 }
 
 .post-name {
-  font-size: 17px;
+  font-size: var(--fs-base, 15px);
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary, #111827);
   margin: 0;
 }
 
 .post-username {
-  font-size: 14px;
-  color: #6b7280;
+  font-size: var(--fs-meta, 13px);
+  color: var(--text2, #6b7280);
   margin: 0;
 }
 
 .post-body {
   margin: 20px 0;
-  font-size: 18px;
-  line-height: 1.9;
+  font-size: var(--fs-base, 15px);
+  line-height: 1.65;
   color: var(--text-primary, #222222);
   max-width: 68ch;
 }

@@ -31,7 +31,7 @@
   width: min(92vw, 380px);
   padding: 24px 20px 20px;
   text-align: center;
-  font-family: var(--font-primary, "Inter", sans-serif);
+  font-family: var(--font-primary, "Zain", sans-serif);
   animation: confirm-pop 0.15s ease-out;
 }
 

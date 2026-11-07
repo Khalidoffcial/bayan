@@ -61,7 +61,7 @@
   border-radius: var(--radius-xs, 4px);
   background: transparent;
   color: var(--text, #1a1b22);
-  font-family: var(--font-primary, "Inter", sans-serif);
+  font-family: var(--font-primary, "Zain", sans-serif);
   font-size: 0.88rem;
   cursor: pointer;
   text-align: start;

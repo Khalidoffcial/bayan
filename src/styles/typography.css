@@ -4,12 +4,13 @@
    from the critical path. */
 
 body {
-  font-family: var(--font-primary), "Zain", sans-serif;
-  font-size: var(--fs-base, 15px);
-  line-height: 1.6;
+  font-family: var(--font-primary);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 h1,
@@ -18,12 +19,19 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-heading), "Zain", sans-serif;
+  font-family: var(--font-heading);
   font-weight: 700;
   line-height: 1.3;
   color: var(--text);
   margin: 0;
 }
+
+/* Semantic scale hooks — components may use these instead of raw px.
+   h1/h2 sizes are set locally by pages that own display headlines; the
+   default here keeps unclassified headings calm. */
+h1 { font-size: var(--fs-display); }
+h2 { font-size: var(--fs-heading); }
+h3 { font-size: var(--fs-title); }
 
 p {
   margin: 0;

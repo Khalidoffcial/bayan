@@ -1,0 +1,189 @@
+/* FontPicker — compact, elegant selector consistent with the settings panel.
+   Row list scrolls internally (~320px) so 27 families never dominate the page. */
+
+.font-picker__controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.font-picker__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-sm, 8px);
+  background: var(--input-bg, rgba(0, 0, 0, 0.04));
+  color: var(--text3, #9499aa);
+}
+
+.font-picker__search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: var(--fs-label, 13px);
+  color: var(--text, #111827);
+}
+
+.font-picker__cats {
+  display: flex;
+  gap: 4px;
+  background: var(--input-bg, rgba(0, 0, 0, 0.04));
+  border-radius: var(--radius-sm, 8px);
+  padding: 3px;
+}
+
+.font-picker__cat {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: var(--fs-label, 13px);
+  font-weight: 500;
+  color: var(--text2, #5c5f70);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.font-picker__cat--active {
+  background: var(--bg-primary, #fff);
+  color: var(--text, #111827);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.04));
+}
+
+.font-picker__list {
+  max-height: 340px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-sm, 8px);
+  padding: 4px;
+  scrollbar-width: thin;
+}
+
+.font-picker__group-label {
+  font-size: var(--fs-small, 12px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text3, #9499aa);
+  padding: 10px 10px 4px;
+}
+
+.font-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm, 8px);
+  cursor: pointer;
+  text-align: start;
+  transition: background 0.15s ease;
+}
+
+.font-option:hover {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.05));
+}
+
+.font-option--selected {
+  background: var(--teal-dim, rgba(39, 173, 226, 0.1));
+}
+
+/* The preview text is rendered IN the candidate font — that's the point.
+   line-height fixed so rows stay equal height regardless of the family. */
+.font-option__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+.font-option__sample-ar {
+  font-size: 14px;
+  color: var(--text, #111827);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.font-option__sample-en {
+  font-size: 12px;
+  color: var(--text2, #5c5f70);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.font-option__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: var(--teal, #27ade2);
+}
+
+.font-option__name {
+  font-size: var(--fs-small, 12px);
+  color: var(--text3, #9499aa);
+}
+
+.font-option--selected .font-option__name {
+  color: var(--teal, #27ade2);
+  font-weight: 600;
+}
+
+.font-picker__empty {
+  padding: 24px;
+  text-align: center;
+  font-size: var(--fs-label, 13px);
+  color: var(--text3, #9499aa);
+}
+
+.font-picker__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 14px;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--fs-label, 13px);
+  font-weight: 500;
+  color: var(--text2, #5c5f70);
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.font-picker__reset:hover:not(:disabled) {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.05));
+}
+
+.font-picker__reset:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Mobile: the segmented category control wraps under the search field */
+@media (max-width: 560px) {
+  .font-picker__list {
+    max-height: 300px;
+  }
+}

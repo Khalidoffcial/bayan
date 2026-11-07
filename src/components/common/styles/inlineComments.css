@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-primary);
 }
 
 /* ---------- Heading ---------- */
@@ -79,8 +79,8 @@
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 9px 13px;
-  font-size: 14px;
-  font-family: "Inter", sans-serif;
+  font-size: var(--fs-base, 15px);
+  font-family: inherit;
   line-height: 1.5;
   resize: none;
   outline: none;
@@ -202,7 +202,7 @@
 
 .inline-comments-text {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--fs-base, 15px);
   line-height: 1.55;
   color: #1f2937;
   word-break: break-word;

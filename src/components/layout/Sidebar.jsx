@@ -19,6 +19,8 @@ const Sidebar = () => {
 
   const channels = [
     { key: "nav.all", icon: NAV_ICONS.all, path: "/", match: (p) => p === "/" || p === "/all" },
+    // Bayan Flow — immersive vertical discovery (full-screen, after All)
+    { key: "nav.flow", icon: NAV_ICONS.flow, path: "/flow", match: (p) => p === "/flow" },
     { key: "nav.posts", icon: NAV_ICONS.posts, path: "/posts", match: (p) => p === "/posts" },
     { key: "nav.articles", icon: NAV_ICONS.articles, path: "/articles", match: (p) => p === "/articles" },
     { key: "nav.novels", icon: NAV_ICONS.novels, path: "/novels", match: (p) => p === "/novels" },
