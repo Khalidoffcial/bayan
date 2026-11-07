@@ -3,25 +3,28 @@ import { useNavigate } from "react-router-dom";
 import defaultImg from "../../../assets/icons/user_10374408.png";
 import { ViewableAvatar } from "../../../components/common/ProfileImageViewer";
 
-export const FeedUser = ({ userData }) => {
+/**
+ * FeedUser — the author identity row.
+ * variant "card": compact inline head used by the new content cards.
+ * (Default variant preserved for other callers.)
+ */
+export const FeedUser = ({ userData, variant }) => {
   const navigate = useNavigate();
 
   return (
     <div
-      className="account"
+      className={`account ${variant === "card" ? "bcard-author" : ""}`}
       onClick={() => userData?.Id_user && navigate(`/p/${userData.Id_user}`)}
     >
-      {/* Avatar click opens the image viewer only — stopPropagation inside
-          ViewableAvatar prevents bubbling into the profile navigation. */}
       <ViewableAvatar
         src={userData?.imgProfile || ""}
         fallback={defaultImg}
-        className="profile-pic-Posts"
+        className={variant === "card" ? "bcard-avatar" : "profile-pic-Posts"}
         alt={userData?.F_user || "User"}
       />
-      <div className="names">
-        <h2 className="nameacc">{userData?.F_user}</h2>
-        <p className="usernameacc">{userData?.S_user}</p>
+      <div className={variant === "card" ? "bcard-names" : "names"}>
+        <h2 className={variant === "card" ? "bcard-name" : "nameacc"}>{userData?.F_user}</h2>
+        <p className={variant === "card" ? "bcard-username" : "usernameacc"}>{userData?.S_user}</p>
       </div>
     </div>
   );

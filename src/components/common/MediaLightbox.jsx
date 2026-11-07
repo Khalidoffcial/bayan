@@ -2,6 +2,7 @@ import React, { useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useTranslation } from "../../i18n/useTranslation";
 import "./mediaLightbox.css";
 
 /**
@@ -22,6 +23,7 @@ export const MediaLightbox = ({ images = [], startIndex = 0, onClose }) => {
     () => setIndex((i) => (i < images.length - 1 ? i + 1 : i)),
     [images.length]
   );
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!images.length) return;
@@ -52,7 +54,7 @@ export const MediaLightbox = ({ images = [], startIndex = 0, onClose }) => {
         onClick={onClose}
         role="dialog"
         aria-modal="true"
-        aria-label="عرض الصورة"
+        aria-label={t("viewer.viewImage")}
       >
         <motion.div
           className="mlb-stage"
@@ -62,7 +64,7 @@ export const MediaLightbox = ({ images = [], startIndex = 0, onClose }) => {
           transition={{ duration: 0.18 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <button className="mlb-close" onClick={onClose} aria-label="إغلاق" type="button">
+          <button className="mlb-close" onClick={onClose} aria-label={t("viewer.close")} type="button">
             <FaTimes />
           </button>
 
@@ -72,7 +74,7 @@ export const MediaLightbox = ({ images = [], startIndex = 0, onClose }) => {
                 className="mlb-nav mlb-nav--prev"
                 onClick={prev}
                 disabled={index === 0}
-                aria-label="السابق"
+                aria-label={t("viewer.prev")}
                 type="button"
               >
                 <FaChevronLeft />
@@ -81,7 +83,7 @@ export const MediaLightbox = ({ images = [], startIndex = 0, onClose }) => {
                 className="mlb-nav mlb-nav--next"
                 onClick={next}
                 disabled={index === images.length - 1}
-                aria-label="التالي"
+                aria-label={t("viewer.next")}
                 type="button"
               >
                 <FaChevronRight />

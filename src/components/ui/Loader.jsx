@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import logoLight from "../../assets/icons/logo.png";
+import logo from "../../assets/icons/logo.webp";
+import { useTranslation } from "../../i18n/useTranslation";
 import "./Loader.css";
 
 /**
@@ -10,6 +11,7 @@ import "./Loader.css";
  */
 const Loader = () => {
   const [leaving, setLeaving] = useState(false);
+  const { t } = useTranslation();
 
   // خروج fade ناعم قبل إزالة العنصر من الـ DOM
   useEffect(() => {
@@ -22,10 +24,10 @@ const Loader = () => {
     <div
       className={`bayan-loader ${leaving ? "bayan-loader--leave" : ""}`}
       role="status"
-      aria-label="Loading"
+      aria-label={t("aria.loading")}
     >
       <div className="bayan-loader__mark">
-        <img src={logoLight} alt="" className="bayan-loader__logo" draggable="false" />
+        <img src={logo} alt="" className="bayan-loader__logo" draggable="false" />
         <span className="bayan-loader__bar" aria-hidden="true" />
       </div>
     </div>

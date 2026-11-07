@@ -1,6 +1,7 @@
 import React from "react";
 import { FaPen, FaCheck, FaUserPlus } from "react-icons/fa";
 import { SlUserFollow } from "react-icons/sl";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const ProfileInfo = ({
   name,
@@ -21,6 +22,7 @@ export const ProfileInfo = ({
 }) => {
   const savingBio = savingField === "bio";
   const savingName = savingField === "name";
+  const { t } = useTranslation();
   return (
     <div className="profile-info">
       <div className="name-section">
@@ -35,7 +37,7 @@ export const ProfileInfo = ({
             <button
               onClick={onSaveName}
               className="save-btn"
-              aria-label="Save name"
+              aria-label={t("profile.saveName")}
               disabled={savingName}
             >
               {savingName ? "..." : <FaCheck />}
@@ -43,9 +45,9 @@ export const ProfileInfo = ({
           </div>
         ) : (
           <div className="display-wrapper">
-            <h1>{name || "User Name"}</h1>
+            <h1>{name || t("profile.defaultName")}</h1>
             {editable && (
-              <button onClick={onEditName} className="edit-btn" aria-label="Edit name">
+              <button onClick={onEditName} className="edit-btn" aria-label={t("profile.editName")}>
                 <FaPen />
               </button>
             )}
@@ -65,7 +67,7 @@ export const ProfileInfo = ({
             <button
               onClick={onSaveBio}
               className="save-btn"
-              aria-label="Save bio"
+              aria-label={t("profile.saveBio")}
               disabled={savingBio}
             >
               {savingBio ? "..." : <FaCheck />}
@@ -73,9 +75,9 @@ export const ProfileInfo = ({
           </div>
         ) : (
           <div className="display-wrapper">
-            <p>{bio || "No bio yet."}</p>
+            <p>{bio || t("profile.noBio")}</p>
             {editable && (
-              <button onClick={onEditBio} className="edit-btn" aria-label="Edit bio">
+              <button onClick={onEditBio} className="edit-btn" aria-label={t("profile.editBio")}>
                 <FaPen />
               </button>
             )}
@@ -87,11 +89,11 @@ export const ProfileInfo = ({
         <div className="follow-section">
           {followMode ? (
             <button className="follow-btn" onClick={onFollow}>
-              <FaUserPlus /> Follow
+              <FaUserPlus /> {t("profile.follow")}
             </button>
           ) : (
             <button className="unfollow-btn" onClick={onUnfollow}>
-              <SlUserFollow /> Unfollow
+              <SlUserFollow /> {t("profile.unfollow")}
             </button>
           )}
         </div>

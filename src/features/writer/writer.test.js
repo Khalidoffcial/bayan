@@ -1,11 +1,12 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { renderWithSettings } from '../../test/testUtils';
 import { WriterToolbar, WriterActions, WriterImages } from './index';
 
 describe('Writer Feature Components', () => {
   test('renders WriterToolbar with content types and handles selection', () => {
     const handleTypeChange = jest.fn();
-    render(<WriterToolbar activeType="post" onTypeChange={handleTypeChange} />);
+    renderWithSettings(<WriterToolbar activeType="post" onTypeChange={handleTypeChange} />);
 
     expect(screen.getByText('Post')).toBeInTheDocument();
     expect(screen.getByText('Article')).toBeInTheDocument();
@@ -19,7 +20,7 @@ describe('Writer Feature Components', () => {
     const handlePublish = jest.fn();
     const handleCancel = jest.fn();
 
-    render(
+    renderWithSettings(
       <WriterActions
         onPublish={handlePublish}
         onCancel={handleCancel}
@@ -38,7 +39,7 @@ describe('Writer Feature Components', () => {
   });
 
   test('renders WriterImages upload card', () => {
-    render(
+    renderWithSettings(
       <WriterImages
         imagesPreview={[]}
         onImageChange={jest.fn()}

@@ -4,7 +4,7 @@
  *  - AdSenseInArticle: renders only on reading context, exact ids, single push
  */
 import React from "react";
-import { render } from "@testing-library/react";
+import { renderWithSettings } from "../../test/testUtils";
 import { MemoryRouter } from "react-router-dom";
 import {
     AdSenseInArticle,
@@ -58,7 +58,7 @@ describe("AdSenseInArticle", () => {
     });
 
     test("renders nothing outside the reading context", () => {
-        const { container } = render(
+        const { container } = renderWithSettings(
             <MemoryRouter initialEntries={["/settings"]}>
                 <AdSenseInArticle />
             </MemoryRouter>
@@ -67,7 +67,7 @@ describe("AdSenseInArticle", () => {
     });
 
     test("renders on /r/:id with exact publisher + slot ids", () => {
-        render(
+        renderWithSettings(
             <MemoryRouter initialEntries={["/r/abc123"]}>
                 <AdSenseInArticle />
             </MemoryRouter>
@@ -81,7 +81,7 @@ describe("AdSenseInArticle", () => {
     });
 
     test("pushes exactly once under React.StrictMode (same instance)", () => {
-        render(
+        renderWithSettings(
             <React.StrictMode>
                 <MemoryRouter initialEntries={["/r/abc123"]}>
                     <AdSenseInArticle />
@@ -93,7 +93,7 @@ describe("AdSenseInArticle", () => {
     });
 
     test("re-renders of the same instance never re-push", () => {
-        const { rerender } = render(
+        const { rerenderWithSettings: rerender } = renderWithSettings(
             <MemoryRouter initialEntries={["/r/abc123"]}>
                 <AdSenseInArticle />
             </MemoryRouter>
@@ -112,7 +112,7 @@ describe("AdSenseInArticle", () => {
     });
 
     test("two separate instances on one page push separately (2 ad positions)", () => {
-        render(
+        renderWithSettings(
             <MemoryRouter initialEntries={["/r/abc123"]}>
                 <AdSenseInArticle />
                 <AdSenseInArticle />
@@ -124,7 +124,7 @@ describe("AdSenseInArticle", () => {
 
     test("no library → silent, no push, no crash", () => {
         delete window.adsbygoogle;
-        render(
+        renderWithSettings(
             <MemoryRouter initialEntries={["/r/abc123"]}>
                 <AdSenseInArticle />
             </MemoryRouter>
@@ -133,3 +133,4 @@ describe("AdSenseInArticle", () => {
         expect(push).not.toHaveBeenCalled();
     });
 });
+

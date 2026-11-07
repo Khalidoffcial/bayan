@@ -97,9 +97,9 @@ export const FocusSettingsPanel = ({ data, update }) => {
           <span>{t("focus.settings.timerSound")}</span>
           <select className="fc-select" value={data.timerSound ?? "chime"}
             onChange={(e) => set({ timerSound: e.target.value })}>
-            <option value="chime">Chime</option>
-            <option value="bell">Bell</option>
-            <option value="soft">Soft</option>
+            <option value="chime">{t("focus.settings.sound.chime")}</option>
+            <option value="bell">{t("focus.settings.sound.bell")}</option>
+            <option value="soft">{t("focus.settings.sound.soft")}</option>
             <option value="none">—</option>
           </select>
         </label>

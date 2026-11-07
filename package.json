@@ -51,7 +51,9 @@
     ]
   },
   "devDependencies": {
-    "csso": "^5.0.5"
+    "csso": "^5.0.5",
+    "lighthouse": "^13.6.0",
+    "sharp": "^0.35.5"
   },
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "index.js",

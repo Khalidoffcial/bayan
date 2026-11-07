@@ -9,6 +9,7 @@ import { useToast } from "../../../components/ui/Toast";
 import PostHeader from "./PostHeader";
 import PostBody from "./PostBody";
 import PostActions from "./PostActions";
+import ShareSheet from "../../feed/components/ShareSheet";
 import ViewCounter from "../../../components/common/ViewCounter";
 import usePost from "../hooks/usePost";
 import { deletePost } from "../services/post.service";
@@ -40,6 +41,7 @@ export const PostReading = () => {
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   if (loading) {
     return (
@@ -87,7 +89,7 @@ export const PostReading = () => {
       <div className="post-reading-content">
         <div className="article-meta-row">
           <button className="back-btn" onClick={() => navigate(-1)}>
-            ← {t("feed.back")}
+            <span aria-hidden>←</span> {t("feed.back")}
           </button>
           {/* تسجيل المشاهدة يحدث هنا — صفحة التفاصيل (Content ID حقيقي) */}
           <ViewCounter contentId={dataPost.id} contentType="posts" initialViews={dataPost.views} />
@@ -129,9 +131,15 @@ export const PostReading = () => {
           likesCount={likesCount}
           onLike={handleLike}
           onComment={() => setCommented((prev) => !prev)}
-          onShare={handleShare}
+          onShare={() => setShareOpen(true)}
           post={dataPost}
           extraStats={<ViewCounter contentId={dataPost.id} contentType="posts" initialViews={dataPost.views} />}
+        />
+
+        <ShareSheet
+          open={shareOpen}
+          item={dataPost}
+          onClose={() => setShareOpen(false)}
         />
 
         {true && (

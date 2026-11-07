@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from '../../i18n/useTranslation';
 
 export const Modal = ({
   isOpen,
@@ -9,6 +10,7 @@ export const Modal = ({
   maxWidth = "600px",
   className = "",
 }) => {
+  const { t } = useTranslation();
   return (
     <AnimatePresence>
       {isOpen && (
@@ -35,7 +37,7 @@ export const Modal = ({
                   <button
                     className="modal-close-btn"
                     onClick={onClose}
-                    aria-label="Close"
+                    aria-label={t("common.close")}
                   >
                     ✖
                   </button>

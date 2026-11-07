@@ -157,7 +157,7 @@ export const FocusSavedReader = ({ item, onBack }) => {
             <button key={th} className={`fsr__chip fsr__chip--bg ${theme === th ? "active" : ""}`} onClick={() => setBg(th)} aria-label={th} />
           ))}
         </div>
-        <button className="fsr__close" onClick={onBack} aria-label="Close"><CloseIcon size={15} strokeWidth={2} aria-hidden /></button>
+        <button className="fsr__close" onClick={onBack} aria-label={t("common.close")}><CloseIcon size={15} strokeWidth={2} aria-hidden /></button>
       </div>
 
       <div className="fsr__body" ref={bodyRef}>

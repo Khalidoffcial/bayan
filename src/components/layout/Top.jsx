@@ -2,11 +2,13 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import useAuth from '../../hooks/useAuth';
 import defaultUserIcon from "../../assets/icons/user_10374408.png";
+import { useTranslation } from '../../i18n/useTranslation';
 import "./styles/top.css";
 
 const Top = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const handleProfileClick = () => {
     if (user?.id) {
@@ -26,7 +28,7 @@ const Top = () => {
         onClick={() => navigate('/')}
         role="button"
         tabIndex={0}
-        aria-label="Bayan Space — Home"
+        aria-label={t("aria.bayanHome")}
       >
       <div className="top-header__spacer" aria-hidden="true" />
 

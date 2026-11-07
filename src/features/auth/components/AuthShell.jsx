@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { useTranslation } from "../../../i18n/useTranslation";
 import LanguageSwitcher from "../../../components/ui/LanguageSwitcher";
-import logo from "../../../assets/icons/logo.png";
-import workspaceImg from "../../../assets/images/Bayan Space Modern Workspace.png";
+import logo from "../../../assets/icons/logo.webp";
+import workspaceImg from "../../../assets/images/Bayan Space Modern Workspace.webp";
 import "./authShell.css";
 
 /**
@@ -31,7 +31,7 @@ const AuthShell = ({ titleKey, subtitleKey, children }) => {
       {/* جانب الفورم */}
       <main className="auth-shell__formside">
         <header className="auth-shell__top">
-          <Link to="/welcome" className="auth-shell__brand" aria-label="Bayan Space">
+          <Link to="/welcome" className="auth-shell__brand" aria-label={t("aria.bayanBrand")}>
             <img src={logo} alt="Bayan Space" className="auth-shell__brand-logo" />
           </Link>
           <LanguageSwitcher variant="nav" />

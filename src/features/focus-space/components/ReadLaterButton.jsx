@@ -18,7 +18,7 @@ import { useTranslation } from "../../../i18n/useTranslation";
 import { toggleReadLater, getSavedStatus } from "../services/savedContent.service";
 import "./readLater.css";
 
-export const ReadLaterButton = ({ contentId, contentType, title, image, compact = false }) => {
+export const ReadLaterButton = ({ contentId, contentType, title, image, compact = false, className = "" }) => {
   const { user } = useAuth();
   const toast = useToast();
   const { t, language } = useTranslation();
@@ -60,7 +60,7 @@ export const ReadLaterButton = ({ contentId, contentType, title, image, compact 
   return (
     <button
       type="button"
-      className={`read-later-btn ${saved ? "is-saved" : ""} ${compact ? "is-compact" : ""}`}
+      className={`read-later-btn ${saved ? "is-saved" : ""} ${compact ? "is-compact" : ""} ${className}`}
       onClick={handleClick}
       title={label}
       aria-label={label}

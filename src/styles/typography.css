@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Zain:wght@200;300;400;700;800;900&display=swap');
+/* Font strategy: the heavy families (Cairo/Poppins) are loaded ON DEMAND
+   via loadFont.js when the user selects them in settings; the default UI
+   ships with Zain (Arabic+Latin) + Inter weights only. Cuts ~20 font files
+   from the critical path. */
 
 body {
   font-family: var(--font-primary), "Zain", sans-serif;

@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
+import { renderWithSettings } from '../../test/testUtils';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { SettingsProvider } from '../../contexts/SettingsContext';
@@ -14,7 +15,7 @@ describe('Post Feature Components', () => {
   };
 
   test('renders PostHeader with user information', () => {
-    render(
+    renderWithSettings(
       <HelmetProvider>
         <PostHeader userData={mockUser} imageUrl="https://example.com/post.jpg" />
       </HelmetProvider>
@@ -25,7 +26,7 @@ describe('Post Feature Components', () => {
   });
 
   test('renders PostBody with content', () => {
-    render(
+    renderWithSettings(
       <SettingsProvider>
         <PostBody
           content="<p>Insightful post content</p>"
@@ -46,7 +47,7 @@ describe('Post Feature Components', () => {
     const handleComment = jest.fn();
     const handleShare = jest.fn();
 
-    render(
+    renderWithSettings(
       <PostActions
         liked={true}
         likesCount={9}
@@ -65,7 +66,7 @@ describe('Post Feature Components', () => {
   });
 
   test('renders PostReading fallback when no post state is present', () => {
-    render(
+    renderWithSettings(
       <SettingsProvider>
         <BrowserRouter>
           <HelmetProvider>

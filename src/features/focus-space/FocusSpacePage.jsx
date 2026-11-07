@@ -268,10 +268,9 @@ export const FocusSpacePage = () => {
     if (unread.length === 0) return;
     readLaterNudgedRef.current = true;
     sessionStorage.setItem("ayaReadLaterNudged", "1");
-    const kinds = unread[0].contentType === "article" ? "مقالات" : unread[0].contentType === "novel" ? "روايات" : "منشورات";
     aya.nudge("readLater", { custom: unread.length > 1
-      ? `عندك ${unread.length} ${kinds} حفظتهم قبل كده 📚 تحب تبدأ بواحد منهم؟`
-      : "عندك مقال/محتوى محفوظ في اقرأها لاحقًا 📚 تحب تخليه هدف الجلسة دي؟" });
+      ? t("aya.nudge.readLaterMulti", { n: unread.length })
+      : t("aya.nudge.readLaterSingle") });
   }, [aya, saved.loading, saved.error, saved.items]);
 
   // Aya welcome — show once per tab session; “Start with Aya” → setup stage.
@@ -461,7 +460,6 @@ export const FocusSpacePage = () => {
           defaultMinutes={data.defaultSessionDuration || 25}
           onStart={onAyaSessionStart}
           onClose={deferAya}
-          t={t}
         />
       )}
       {ayaStage === "idle" && (aya.session || aya.message) && (

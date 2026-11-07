@@ -5,14 +5,18 @@ import Loader from "../../../components/ui/Loader";
 import ArticleHeader from "./ArticleHeader";
 import ArticleBody from "./ArticleBody";
 import ArticleActions from "./ArticleActions";
+import ShareSheet from "../../feed/components/ShareSheet";
 import useArticle from "../hooks/useArticle";
 import useAuth from "../../../hooks/useAuth";
 import { getDirection } from "../../../utils/helpers";
+import { useTranslation } from "../../../i18n/useTranslation";
 import "../styles/article.css";
 
 export const ArticleReading = () => {
   const navigate = useNavigate();
+  const { t, dir } = useTranslation();
   const { user } = useAuth();
+  const [shareOpen, setShareOpen] = React.useState(false);
   const {
     dataArticle,
     imageUrl,
@@ -38,7 +42,7 @@ export const ArticleReading = () => {
   if (!dataArticle) {
     return (
       <div className="article-reading-container">
-        <div className="loading"><h1>Article not found</h1></div>
+        <div className="loading"><h1>{t("article.notFound")}</h1></div>
       </div>
     );
   }
@@ -47,7 +51,7 @@ export const ArticleReading = () => {
     <div className="article-reading-container">
       <div className="article-reading-content">
         <button className="back-btn" onClick={() => navigate(-1)}>
-          ← Back
+          <span aria-hidden>{dir === "rtl" ? "→" : "←"}</span> {t("common.back")}
         </button>
 
         <ArticleHeader
@@ -74,9 +78,15 @@ export const ArticleReading = () => {
           likesCount={likesCount}
           onLike={handleLike}
           onComment={() => setCommented((prev) => !prev)}
-          onShare={handleShare}
+          onShare={() => setShareOpen(true)}
           onDownloadPDF={handleDownloadPDF}
           article={dataArticle}
+        />
+
+        <ShareSheet
+          open={shareOpen}
+          item={dataArticle}
+          onClose={() => setShareOpen(false)}
         />
 
         {commented && <InlineComments userData={user} commentOnId={dataArticle.id} contentType="articles" />}

@@ -90,9 +90,13 @@ describe("CSS — no hardcoded direction on layout containers", () => {
   walk(SRC_ROOT);
 
   const offenders = [];
+  // أرقام الساعة الرقمية يجب أن تبقى LTR حتى داخل واجهة RTL (١٢:٤٥ تُقرأ
+  // بنفس الترتيب في كلتا الحالتين) — استثناء موثّق لعناصر .fclk فقط.
+  const CLOCK_EXCEPTION = /focusClock\.css/;
   for (const file of cssFiles) {
     const css = fs.readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
     const rel = path.relative(SRC_ROOT, file);
+    if (CLOCK_EXCEPTION.test(rel)) continue;
     for (const rule of css.split("}")) {
       if (!/direction\s*:\s*(rtl|ltr)/.test(rule)) continue;
       const selectors = rule.split("{")[0].trim();

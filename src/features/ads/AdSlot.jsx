@@ -19,7 +19,7 @@ import "./ads.css";
 
 export const AdSlot = ({ zoneKey = "sidebar" }) => {
     const location = useLocation();
-    const { language } = useTranslation();
+    const { language, t } = useTranslation();
     const [verdict, setVerdict] = useState(() => resolveAdContext(location.pathname));
     const [loaded, setLoaded] = useState(false);
     const hostRef = useRef(null);
@@ -57,10 +57,10 @@ export const AdSlot = ({ zoneKey = "sidebar" }) => {
             ref={hostRef}
             className={`ad-slot ad-slot--${side} ${loaded ? "ad-slot--filled" : "ad-slot--pending"}`}
             data-ad-context={verdict.context}
-            aria-label="Sponsored"
+            aria-label={t("aria.sponsored")}
             aria-hidden="false"
         >
-            <span className="ad-slot__label">{language === "ar" ? "إعلان" : "Sponsored"}</span>
+            <span className="ad-slot__label">{t("aria.sponsored")}</span>
             {/* zone content is injected here by the ad network */}
         </aside>
     );

@@ -1,8 +1,10 @@
 import React from "react";
 import { useSettings } from "../../../contexts/SettingsContext";
 import { useTranslation } from "../../../i18n/useTranslation";
-import { THEMES, FONT_SIZES, FONT_FAMILIES } from "../../../constants/settingsConfig";
+import { getTranslation } from "../../../i18n/translations";
 import { PRIMARY_COLORS } from "../../../constants/primaryColors";
+import { THEMES, FONT_SIZES, FONT_FAMILIES } from "../../../constants/settingsConfig";
+import { loadFontFamily } from "../../../utils/loadFont";
 
 export const AppearanceSettings = () => {
   const {
@@ -16,7 +18,7 @@ export const AppearanceSettings = () => {
     setPrimaryColor,
     triggerSave,
   } = useSettings();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const pickColor = (value) => {
     setPrimaryColor(value);
@@ -98,7 +100,7 @@ export const AppearanceSettings = () => {
             <div
               key={f.id}
               className={`font-card ${fontFamily === f.id ? "active" : ""}`}
-              onClick={() => { setFontFamily(f.id); triggerSave(); }}
+              onClick={() => { loadFontFamily(f.id); setFontFamily(f.id); triggerSave(); }}
               style={{ fontFamily: f.id }}
             >
               <div className="font-card-sample">{f.sample}</div>
@@ -116,13 +118,15 @@ export const AppearanceSettings = () => {
           <div className="preview-box-label">{t("settings.preview")}</div>
           <p
             className="preview-text"
+            dir={language === "ar" ? "rtl" : "ltr"}
             style={{
               fontFamily: `${fontFamily}, sans-serif`,
               fontSize: fontSize === "small" ? 13 : fontSize === "large" ? 17 : 15,
             }}
           >
-            بيان — مساحة للتفكير العميق والمعرفة. كده هتقرأ كل المقالات والأفكار
-            والروايات بنفس الشكل اللي هيتطبق في كل صفحات الموقع.
+            {language === "ar"
+              ? "بيان — مساحة للتفكير العميق والمعرفة. كده هتقرأ كل المقالات والأفكار والروايات بنفس الشكل اللي هيتطبق في كل صفحات الموقع."
+              : getTranslation(language, "settings.previewText", null, "")}
           </p>
         </div>
       </div>

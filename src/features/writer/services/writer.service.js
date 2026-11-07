@@ -1,7 +1,13 @@
 import axios from "axios";
-import { uploadImages } from "../../../services/storage.service";
 import { API_ENDPOINTS } from "../../../constants/apiEndpoints";
 import cookie from "../../../utils/cookies";
+
+// Firebase Storage (~120KB) is only needed when images are actually uploaded
+// — loaded on demand so it stays out of the initial bundle.
+const uploadImagesLazy = async (images) => {
+  const { uploadImages } = await import("../../../services/storage.service");
+  return uploadImages(images);
+};
 
 export const saveArticleOrNovel = async (payload) => {
   const token = cookie("get") || localStorage.getItem("token");
@@ -28,7 +34,7 @@ export const saveIdeaPost = async (payload) => {
 };
 
 export const uploadWriterImages = async (images) => {
-  return await uploadImages(images);
+  return await uploadImagesLazy(images);
 };
 
 

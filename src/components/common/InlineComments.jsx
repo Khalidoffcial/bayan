@@ -163,12 +163,12 @@ export const InlineComments = ({ userData, commentOnId, contentType = "posts", o
           }}
           onKeyDown={handleKeyDown}
           disabled={isSubmitting}
-          aria-label="Write a reply"
+          aria-label={t("comments.writeReply")}
         />
         <button
           type="button"
           className="inline-comments-send"
-          aria-label="Send reply"
+          aria-label={t("comments.sendReply")}
           onClick={() => handleSubmit(user?.id)}
           disabled={!canSubmit}
         >

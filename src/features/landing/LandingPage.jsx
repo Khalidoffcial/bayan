@@ -7,7 +7,7 @@ import { HERO_COPY } from "./landingContent";
 import { useTranslation } from "../../i18n/useTranslation";
 import cookie from "../../utils/cookies";
 import LanguageSwitcher from "../../components/ui/LanguageSwitcher";
-import logo from "../../assets/icons/logo.png";
+import logo from "../../assets/icons/logo.webp";
 import "./landing.css";
 
 /**
@@ -58,10 +58,10 @@ const LandingPage = () => {
       </Helmet>
 
       <header className="lp-nav">
-        <a href="#top" className="lp-nav__brand" aria-label="Bayan Space">
+        <a href="#top" className="lp-nav__brand" aria-label={t("aria.bayanBrand")}>
           <img src={logo} alt="Bayan Space" className="lp-nav__brand-img" />
         </a>
-        <nav className="lp-nav__links" aria-label="Main">
+        <nav className="lp-nav__links" aria-label={t("aria.main")}>
           <a href="#modes" className="lp-nav__link">{t("landing.nav.modes")}</a>
           <a href="#features" className="lp-nav__link">{t("landing.nav.features")}</a>
           <LanguageSwitcher variant="nav" />

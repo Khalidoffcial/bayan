@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import useSocket from "../../hooks/useSocket";
 import useAuth from "../../hooks/useAuth";
 import { CATEGORIES } from "../../constants/categories";
+import { useTranslation } from "../../i18n/useTranslation";
 import "./styles/interestsModal.css";
 
 export default function InterestsPopup() {
@@ -9,6 +10,7 @@ export default function InterestsPopup() {
   const socketRef = useSocket();
   const [showModal, setShowModal] = useState(false);
   const [selected, setSelected] = useState({ articles: [], novels: [] });
+  const { t } = useTranslation();
 
   useEffect(() => {
     const saved = localStorage.getItem("userInterests");
@@ -44,10 +46,10 @@ export default function InterestsPopup() {
   return (
     <div className="popup-overlay">
       <div className="popup-container">
-        <h2 className="popup-title">Choose your interests</h2>
+        <h2 className="popup-title">{t("interests.title")}</h2>
 
         <div className="popup-section">
-          <h3>Articles</h3>
+          <h3>{t("interests.articles")}</h3>
           <div className="popup-options">
             {CATEGORIES.articles.map((item) => (
               <button
@@ -62,7 +64,7 @@ export default function InterestsPopup() {
         </div>
 
         <div className="popup-section">
-          <h3>Novels</h3>
+          <h3>{t("interests.novels")}</h3>
           <div className="popup-options">
             {CATEGORIES.novels.map((item) => (
               <button
@@ -77,7 +79,7 @@ export default function InterestsPopup() {
         </div>
 
         <button className="popup-submit" onClick={handleSubmit}>
-          OK
+          {t("common.ok")}
         </button>
       </div>
     </div>

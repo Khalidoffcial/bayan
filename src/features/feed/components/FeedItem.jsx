@@ -1,12 +1,6 @@
 import React from "react";
-import { motion } from "framer-motion";
 import PostCard from "./PostCard";
 import ArticleCard from "./ArticleCard";
-
-const KIND_LABELS = {
-  article: "مقال",
-  novel: "رواية",
-};
 
 /**
  * Resolves an item's display kind defensively — legacy records may carry
@@ -37,15 +31,8 @@ export const FeedItem = ({
   const commentsCount = Number(item.commentsCount ?? item.comments ?? item.comments_count ?? 0) || 0;
 
   return (
-    <motion.div
-      key={item.id}
-      className={isPost ? "BottomBox" : "box"}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      {isPost && (
+    <div className={isPost ? "bayan-card bayan-card--post" : ""}>
+      {isPost ? (
         <PostCard
           item={item}
           liked={liked}
@@ -58,10 +45,10 @@ export const FeedItem = ({
           getDirection={getDirection}
           onDeleted={onDeleted}
         />
+      ) : (
+        <ArticleCard item={item} kind={kind} onShare={onShare} />
       )}
-
-      {!isPost && <ArticleCard item={item} kind={kind} />}
-    </motion.div>
+    </div>
   );
 };
 

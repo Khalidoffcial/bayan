@@ -72,8 +72,8 @@
 
 .sidebar-item:hover {
   /* انزلاق نحو داخل السايدبار في كلا الاتجاهين */
-  /*background: var(--surface-hover, rgba(0,0,0,.05));
-  transform: translateX(calc(4px * var(--dir-factor, 1)));*/
+  background: var(--surface-hover, rgba(0,0,0,.05));
+  transform: translateX(calc(4px * var(--dir-factor, 1)));
 }
 
 html[dir="rtl"] .sidebar-item:hover {

@@ -12,6 +12,7 @@ import cookie from "../utils/cookies";
 import { DEFAULT_PRIMARY } from "../constants/primaryColors";
 import { isRtlLanguage, LANGUAGES } from "../constants/settingsConfig";
 import { resolveLanguage } from "../i18n/geoLanguage";
+import { ensureFontLoaded } from "../utils/loadFont";
 
 const SettingsContext = createContext(null);
 
@@ -196,6 +197,11 @@ export const SettingsProvider = ({ children }) => {
 
   useEffect(() => {
     if (loading) return;
+
+    // On-demand font: Cairo/Poppins are only fetched when actually selected
+    // (default Zain/Inter ships in the critical HTML). Also restores fonts
+    // chosen in a previous session.
+    ensureFontLoaded(fontFamily);
 
     document.documentElement.setAttribute("data-theme", theme);
     document.documentElement.setAttribute("data-font-size", fontSize);

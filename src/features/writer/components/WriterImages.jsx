@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaImage, FaTimes } from "react-icons/fa";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const WriterImages = ({
   imagesPreview,
@@ -8,9 +9,10 @@ export const WriterImages = ({
   onRemoveImage,
   onImageClick,
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="upload-container">
-      <div className="image-gallery">
+    <div className="image-gallery">
         <AnimatePresence>
           {imagesPreview.map((img, i) => (
             <motion.div
@@ -23,7 +25,7 @@ export const WriterImages = ({
               <button
                 className="remove-btn"
                 onClick={() => onRemoveImage(img)}
-                aria-label="Remove image"
+                aria-label={t("writer.removeImage")}
               >
                 <FaTimes />
               </button>
@@ -37,7 +39,7 @@ export const WriterImages = ({
 
           <label htmlFor="upload-image-input" className="upload-card">
             <FaImage size={36} />
-            <p>Upload Image(s)</p>
+            <p>{t("writer.uploadImages")}</p>
             <input
               id="upload-image-input"
               type="file"

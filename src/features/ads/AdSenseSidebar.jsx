@@ -30,7 +30,7 @@ export const ADSENSE_SIDEBAR_SLOT = "8671904268";
 
 export const AdSenseSidebar = () => {
     const location = useLocation();
-    const { language, dir } = useTranslation();
+    const { language, dir, t } = useTranslation();
     const insRef = useRef(null);
 
     // Single source of truth — the centralized AdPolicy allowlist.
@@ -47,38 +47,21 @@ export const AdSenseSidebar = () => {
 
     useAdSensePush(insRef, position.allowed);
 
-    // If the ad request hangs (blocked network, no inventory answer), the
-    // unit would otherwise reserve a tall empty column. After a grace period
-    // without a fill, collapse the reserved space. If Google fills the ad
-    // later, the class is removed and the space is restored.
-    const [idle, setIdle] = React.useState(false);
-    React.useEffect(() => {
-        if (!position.allowed) return;
-        const timer = setTimeout(() => {
-            const ins = insRef.current;
-            // Only Google's own fill signal counts — an aborted/hung request
-            // leaves the unit empty, and helper iframes (sodar etc.) are not ads.
-            const filled = ins && ins.getAttribute("data-ad-status") === "fill";
-            if (!filled) setIdle(true);
-        }, 5000);
-        return () => clearTimeout(timer);
-    }, [position.allowed]);
-
+    // The rail's LAYOUT EXISTENCE is separate from the ad-fill state: even
+    // when Google returns no fill (blocked network, no inventory), the
+    // reserved region stays in place — only the <ins> itself collapses via
+    // CSS ([data-ad-status="unfilled"] / :empty). No fake ad is ever shown.
     if (!position.allowed) return null;
-    // Grace period elapsed without a Google fill → remove the unit from the
-    // flow entirely (an inline height on the <ins> would defeat a CSS-only
-    // collapse). If a fill arrives after a later remount, it renders again.
-    if (idle) return null;
 
     return (
         <div
-            className={`adsense-sidebar${idle ? " adsense-sidebar--idle" : ""}`}
+            className="adsense-sidebar"
             data-ad-context={language === "ar" ? "rtl" : "ltr"}
             dir={dir} /* mirrors the real page direction */
-            aria-label="Sponsored"
+            aria-label={t("aria.sponsored")}
         >
             <span className="adsense-sidebar__label">
-                {language === "ar" ? "إعلان" : "Sponsored"}
+                {t("aria.sponsored")}
             </span>
             <ins
                 ref={insRef}

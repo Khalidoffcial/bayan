@@ -39,17 +39,35 @@
     }
     </script>
 
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3131941819638704"
-     crossorigin="anonymous"></script>
+    <!-- AdSense: NOT loaded eagerly. The deferred loader below only runs
+         when an approved ad unit mounts (AdPolicy default-deny decides
+         eligibility via useAdSensePush → window.__loadAdsense).
+         Pages where advertising is prohibited never fetch the library. -->
+    <script id="adsense-loader">
+      (function () {
+        var pub = "ca-pub-3131941819638704";
+        var loaded = false;
+        window.__loadAdsense = function () {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement("script");
+          s.async = true;
+          s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + pub;
+          s.crossOrigin = "anonymous";
+          document.head.appendChild(s);
+        };
+      })();
+    </script>
 
     <!-- 🟢 Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Zain:wght@200;300;400;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Zain:wght@300;400;700;800&display=swap" rel="stylesheet" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- html2pdf is only used by the article "Export PDF" action —
+         lazy-loaded on demand (see article.service.js). -->
 
     <title>bayan | مقالات، روايات وبوستات</title>
   </head>

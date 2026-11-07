@@ -60,7 +60,7 @@ export const Writer = () => {
   };
 
   return (
-    <div className="InlineComposer" role="region" aria-label="Content composer">
+    <div className="InlineComposer" role="region" aria-label={t("aria.composer")}>
       <AnimatePresence>
         {successMessage && (
           <motion.div
@@ -84,7 +84,7 @@ export const Writer = () => {
           <button
             className="composer-collapsed"
             onClick={() => setActive(true)}
-            aria-label="Open composer to write a post, article or novel"
+            aria-label={t("aria.composerOpen")}
           >
             <img
               className="composer-avatar"
@@ -92,7 +92,7 @@ export const Writer = () => {
               alt=""
             />
             <span className="composer-placeholder">
-              What's on your mind? Share an idea...
+              {t("feed.writePlaceholder")}
             </span>
             <span className="composer-image-hint" aria-hidden="true">
               <FaImage />
@@ -112,14 +112,14 @@ export const Writer = () => {
                   {userData?.name || userData?.F_user || "You"}
                 </span>
                 <span className="composer-visibility">
-                  <FaGlobeAsia size={12} /> Public
+                  <FaGlobeAsia size={12} /> {t("writer.visibility.public")}
                 </span>
               </div>
               <button
                 className="composer-close"
                 onClick={handleCancelClick}
-                aria-label="Close composer"
-                title="Close"
+                aria-label={t("aria.composerClose")}
+                title={t("common.close")}
               >
                 <FaTimes />
               </button>
@@ -161,7 +161,7 @@ export const Writer = () => {
                 className="image-modal"
                 onClick={() => setShowImage(false)}
                 role="dialog"
-                aria-label="Image full view"
+                aria-label={t("writer.imageFullView")}
               >
                 <img
                   src={imageToFullscreen}
@@ -178,7 +178,7 @@ export const Writer = () => {
             )}
 
             {confirmingDiscard && (
-              <div className="composer-discard-confirm" role="alertdialog" aria-label="Discard draft">
+              <div className="composer-discard-confirm" role="alertdialog" aria-label={t("writer.discardDraft")}>
                 <span>{t("composer.discard")}</span>
                 <button className="discard-yes" onClick={handleCancelClick}>{t("composer.yes")}</button>
                 <button className="discard-no" onClick={() => setConfirmingDiscard(false)}>{t("composer.no")}</button>

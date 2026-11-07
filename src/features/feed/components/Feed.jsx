@@ -8,6 +8,7 @@ import Writer from "../../writer/components/Writer";
 import useAuth from "../../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import useFeed from "../hooks/useFeed";
+import { useTranslation } from "../../../i18n/useTranslation";
 import { getDirection } from "../../../utils/helpers";
 import { FEED_PREFETCH_THRESHOLD_PX } from "../../../constants/feedConfig";
 import { feedStore } from "../services/feedStore";
@@ -17,12 +18,15 @@ import Loader from "../../../components/ui/Loader";
 
 // Feature Components
 import FeedList from "./FeedList";
+import ShareSheet from "./ShareSheet";
+import "../styles/contentCard.css";
 import "../styles/feed.css";
 
 export const Feed = () => {
   const { typeArticle } = useParams();
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
     const navigate = useNavigate();
   
   // المسار → نوع الخلاصة المطلوب من الخادم:
@@ -161,19 +165,8 @@ const handleLike = useCallback(
     setActiveCommentId((prev) => (prev === postId ? null : postId));
   }, []);
 
-  const handleShare = useCallback(async (item) => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: item?.content || "Post",
-          text: item?.content?.slice(0, 100) || "",
-          url: window.location.href,
-        });
-      }
-    } catch (err) {
-      console.error("Share error:", err);
-    }
-  }, []);
+  const [shareItem, setShareItem] = useState(null);
+  const handleShare = useCallback((item) => setShareItem(item), []);
 
   return (
     <div className="feed-container">
@@ -195,6 +188,9 @@ const handleLike = useCallback(
           onPostDeleted={removePost}
         />
 
+        {/* Premium share: real content rendered as a share image */}
+        <ShareSheet open={Boolean(shareItem)} item={shareItem} onClose={() => setShareItem(null)} />
+
         {loading && <Loader />}
 
         {error && (
@@ -210,7 +206,7 @@ const handleLike = useCallback(
                 cursor: "pointer",
               }}
             >
-              إعادة المحاولة / Retry
+              {t("common.retry")}
             </button>
           </div>
         )}

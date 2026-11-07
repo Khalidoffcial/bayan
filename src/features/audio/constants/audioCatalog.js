@@ -56,11 +56,26 @@ export const QURAN_CATALOG = RECITERS_RAW.flatMap((r) =>
 const SOUNDHELIX = (n) => `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${n}.mp3`;
 
 export const AMBIENT_CATALOG = [
-  { id: "amb:piano", section: "ambient", title: "Piano", audioUrl: SOUNDHELIX(1), durationSec: 0, thumbnail: null, licenseCode: "demo", licenseUrl: "https://www.soundhelix.com", source: "soundhelix" },
-  { id: "amb:guitar", section: "ambient", title: "Guitar", audioUrl: SOUNDHELIX(2), durationSec: 0, thumbnail: null, licenseCode: "demo", licenseUrl: "https://www.soundhelix.com", source: "soundhelix" },
-  { id: "amb:white-noise", section: "ambient", title: "White noise", audioUrl: "https://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/thrust.mp3", durationSec: 0, thumbnail: null, licenseCode: "cc-by-3.0", licenseUrl: "https://creativecommons.org/licenses/by/3.0/", source: "codeskulptor" },
-  { id: "amb:deep-focus", section: "ambient", title: "Deep focus", audioUrl: SOUNDHELIX(3), durationSec: 0, thumbnail: null, licenseCode: "demo", licenseUrl: "https://www.soundhelix.com", source: "soundhelix" },
+  { id: "amb:piano", section: "ambient", title: "Piano", audioUrl: SOUNDHELIX(1), durationSec: 0, thumbnail: null, licenseCode: "demo", licenseUrl: "https://www.soundhelix.com", source: "soundhelix", mood: "calm" },
+  { id: "amb:guitar", section: "ambient", title: "Guitar", audioUrl: SOUNDHELIX(2), durationSec: 0, thumbnail: null, licenseCode: "demo", licenseUrl: "https://www.soundhelix.com", source: "soundhelix", mood: "reflective" },
+  { id: "amb:white-noise", section: "ambient", title: "White noise", audioUrl: "https://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/thrust.mp3", durationSec: 0, thumbnail: null, licenseCode: "cc-by-3.0", licenseUrl: "https://creativecommons.org/licenses/by/3.0/", source: "codeskulptor", mood: "focus" },
+  { id: "amb:deep-focus", section: "ambient", title: "Deep focus", audioUrl: SOUNDHELIX(3), durationSec: 0, thumbnail: null, licenseCode: "demo", licenseUrl: "https://www.soundhelix.com", source: "soundhelix", mood: "focus" },
 ];
+
+/** Music moods shown as filter chips in the AudioLibrary music tab. */
+export const MUSIC_MOODS = ["calm", "energetic", "reflective", "focus"];
+
+/** Unified track search across the local catalog (music moods → ambient, quran, ambient). */
+export const searchTracks = (query, { section = "music", mood } = {}) => {
+  const q = (query || "").trim().toLowerCase();
+  let pool;
+  if (section === "quran") pool = QURAN_CATALOG;
+  else if (section === "nature") pool = AMBIENT_CATALOG;
+  else pool = [...AMBIENT_CATALOG, ...QURAN_CATALOG];
+  if (mood) pool = pool.filter((t) => (t.mood || "calm") === mood);
+  if (!q) return pool;
+  return pool.filter((t) => `${t.title} ${t.author || ""} ${t.surahName || ""}`.toLowerCase().includes(q));
+};
 
 /** Local search within catalog (Quran surah names + reciters). */
 export const searchLocal = (query, { section = "quran", reciterId } = {}) => {
@@ -72,4 +87,4 @@ export const searchLocal = (query, { section = "quran", reciterId } = {}) => {
   });
 };
 
-export default { QURAN_CATALOG, AMBIENT_CATALOG, RECITERS, searchLocal };
+export default { QURAN_CATALOG, AMBIENT_CATALOG, RECITERS, MUSIC_MOODS, searchTracks, searchLocal };

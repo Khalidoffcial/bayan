@@ -4,11 +4,11 @@ import { FEED_BATCH_SIZE } from "../../../constants/feedConfig";
 // The server returns: { items, nextCursor, counts, error? }
 
 export const PROFILE_TABS = [
-  { key: "all", label: "All" },
-  { key: "posts", label: "Posts" },
-  { key: "replies", label: "Replies" },
-  { key: "articles", label: "Articles" },
-  { key: "novels", label: "Novels" },
+  { key: "all" },
+  { key: "posts" },
+  { key: "replies" },
+  { key: "articles" },
+  { key: "novels" },
 ];
 
 export const requestProfileContent = (socket, { userId, type = "all", cursor = 0, limit = FEED_BATCH_SIZE }) => {

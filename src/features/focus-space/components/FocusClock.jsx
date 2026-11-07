@@ -17,6 +17,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { getClockTheme } from "../constants/clockThemes";
 import { CLOCK_SIZE_MAX, CLOCK_SIZE_MIN } from "../constants/focusDefaults";
 import FocusAnalogClock from "./FocusAnalogClock";
+import { useTranslation } from "../../../i18n/useTranslation";
 import "./focusClock.css";
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -90,6 +91,7 @@ export const FocusClock = ({
   immersive,
   onOpen,
 }) => {
+  const { t } = useTranslation();
   // Accept the whole focus-document as `settings` (FocusSpacePage shape) or
   // plain individual props. Explicit props win over settings fields.
   const s = settings && typeof settings === "object" ? settings : {};
@@ -257,7 +259,7 @@ export const FocusClock = ({
     : null;
 
   return (
-    <div className={cls} style={style} role="timer" aria-label="clock" {...clickProps}>
+    <div className={cls} style={style} role="timer" aria-label={t("aria.clock")} {...clickProps}>
       {timeNode}
       {dateStr && <div className="fclk__date">{dateStr}</div>}
     </div>

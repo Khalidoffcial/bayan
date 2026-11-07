@@ -8,10 +8,12 @@
  * - `size` arrives as a % of the clock area; converted to vmin clamp
  */
 import React, { useMemo } from "react";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 const pad = (n) => String(n).padStart(2, "0");
 
 export const FocusAnalogClock = ({ now, color = "#ffffff", sizePct = 40, font, fontWeight, hour12, arabic, showSeconds }) => {
+  const { t } = useTranslation();
   // CSS size: percent of the available clock area → vmin clamp (never overflow)
   const css = `clamp(120px, ${(sizePct / 100) * 60}vmin, ${(sizePct / 100) * 0.9 * Math.min(
     typeof window !== "undefined" ? window.innerWidth : 1280,
@@ -46,7 +48,7 @@ export const FocusAnalogClock = ({ now, color = "#ffffff", sizePct = 40, font, f
   };
 
   return (
-    <div className="fclock-analog" style={style} role="timer" aria-label="analog clock" dir="ltr">
+    <div className="fclock-analog" style={style} role="timer" aria-label={t("aria.analogClock")} dir="ltr">
       <svg viewBox="0 0 100 100" className="fclock-analog__svg">
         {/* face */}
         <circle cx="50" cy="50" r="48" className="fclock-analog__face" />

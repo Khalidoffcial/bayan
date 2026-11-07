@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaRegEye } from "react-icons/fa";
+import { Eye as EyeIcon } from "lucide-react";
 import { registerView } from "../../services/view.service";
 import { useTranslation } from "../../i18n/useTranslation";
 import "./styles/viewCounter.css";
@@ -29,7 +29,7 @@ const formatViews = (n, locale) => {
  *  - أيقونة Eye + رقم بتنسيق مختصر، متناسق مع الثيمين وRTL/LTR.
  */
 const ViewCounter = ({ contentId, contentType, initialViews }) => {
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
   const [views, setViews] = useState(typeof initialViews === "number" ? initialViews : null);
   const [failed, setFailed] = useState(false);
 
@@ -39,11 +39,10 @@ const ViewCounter = ({ contentId, contentType, initialViews }) => {
     (async () => {
       const result = await registerView({ contentId, contentType });
       if (cancelled) return;
-      if (result.ok) {
-        setViews(result.views); // العدد الحقيقي من الخادم (يشمل هذه المشاهدة إن حُسبت)
-      } else {
-        setFailed(true);
-      }
+      // Registration is batched/deferred for performance (see view.service):
+      // the initial value from the feed payload is already accurate —
+      // a failed batch view simply isn't counted, no fake number shown.
+      if (!result.ok) setFailed(true);
     })();
     return () => { cancelled = true; };
     // مرة واحدة فقط لكل تركيب — لا تكرار عند إعادة الرندر
@@ -55,15 +54,15 @@ const ViewCounter = ({ contentId, contentType, initialViews }) => {
     if (typeof initialViews !== "number") return null;
     return (
       <span className="view-counter view-counter--stale" title="">
-        <FaRegEye className="view-counter__icon" />
+        <EyeIcon size={14} strokeWidth={2} className="view-counter__icon" aria-hidden />
         <span className="view-counter__num">{formatViews(initialViews, language)}</span>
       </span>
     );
   }
 
   return (
-    <span className="view-counter" title="Views">
-      <FaRegEye className="view-counter__icon" />
+    <span className="view-counter" title={t("views.title")}>
+      <EyeIcon size={14} strokeWidth={2} className="view-counter__icon" aria-hidden />
       <span className="view-counter__num">
         {views == null ? "…" : formatViews(views, language)}
       </span>

@@ -25,12 +25,25 @@ export function useAdSensePush(ref, active) {
         if (ins.dataset.adsenseInit === "1") return;    // same element already initialized
         if (typeof window === "undefined") return;
         // Library not present → stay silent forever (no retry loop).
-        if (!window.adsbygoogle) return;
-
         try {
             pushedRef.current = true;
             ins.dataset.adsenseInit = "1";
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
+            // If the deferred loader hasn't injected the library yet, load it
+            // now that a genuinely eligible unit is on screen — then push.
+            if (!window.adsbygoogle && typeof window.__loadAdsense === "function") {
+                window.__loadAdsense();
+            }
+            if (!window.adsbygoogle) return; // still loading — the script's own
+            // onload flow initializes existing <ins> nodes; retry once it lands.
+            const tryPush = (attempts) => {
+                if (!window.adsbygoogle) {
+                    if (attempts > 0) setTimeout(() => tryPush(attempts - 1), 400);
+                    return;
+                }
+                try { (window.adsbygoogle = window.adsbygoogle || []).push({}); }
+                catch { /* never break the host page */ }
+            };
+            tryPush(10);
         } catch {
             // Never let a failed ad push break the host page.
             pushedRef.current = false;

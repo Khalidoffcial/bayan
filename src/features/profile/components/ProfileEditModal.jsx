@@ -1,5 +1,6 @@
 import React from "react";
 import Cropper from "react-easy-crop";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const ProfileEditModal = ({
   image,
@@ -11,6 +12,7 @@ export const ProfileEditModal = ({
   onSave,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="crop-modal">
       <div className="crop-container">
@@ -26,10 +28,10 @@ export const ProfileEditModal = ({
       </div>
       <div className="crop-actions">
         <button onClick={onCancel} className="cancel-btn">
-          Cancel
+          {t("common.cancel")}
         </button>
         <button onClick={onSave} className="save-btn">
-          Save
+          {t("common.save")}
         </button>
       </div>
     </div>

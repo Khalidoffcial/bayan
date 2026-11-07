@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
+import { useTranslation } from "../../i18n/useTranslation";
 import "./profileImageViewer.css";
 
 /**
@@ -35,6 +36,7 @@ export const ProfileImageViewer = ({
   }, [imageUrl]);
 
   const requestClose = useCallback(() => onClose?.(), [onClose]);
+  const { t } = useTranslation();
 
   // Escape to close + background scroll lock.
   useEffect(() => {
@@ -81,7 +83,7 @@ export const ProfileImageViewer = ({
             <button
               className="piv-close"
               onClick={requestClose}
-              aria-label="إغلاق"
+              aria-label={t("viewer.close")}
               type="button"
             >
               <FaTimes />
@@ -102,9 +104,7 @@ export const ProfileImageViewer = ({
             )}
 
             {failed && (
-              <div className="piv-failed">
-                تعذّر تحميل الصورة — قد يكون الرابط غير صالح أو الصورة غير متاحة.
-              </div>
+              <div className="piv-failed">{t("viewer.loadFailed")}</div>
             )}
           </motion.div>
         </motion.div>

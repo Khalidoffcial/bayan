@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import LandingSection, { SectionHeading } from "./LandingPrimitives";
 import { LANDING_MODES, LANDING_FEATURES, WHY_POINTS, FOOTER_LINKS, SOCIAL_LINKS } from "../landingContent";
 import { useTranslation } from "../../../i18n/useTranslation";
-import logo from "../../../assets/icons/logo.png";
-import workspaceImg from "../../../assets/images/Bayan Space Modern Workspace.png";
-import interfaceImg from "../../../assets/images/bayan-interface.png";
+import logo from "../../../assets/icons/logo.webp";
+import workspaceImg from "../../../assets/images/Bayan Space Modern Workspace.webp";
+import interfaceImg from "../../../assets/images/bayan-interface.webp";
 
 /* ============ ما هي Bayan Space؟ — Editorial split: نص ضخم يسار، صورة يمين ============ */
 export const WhatIs = () => {
@@ -25,7 +25,7 @@ export const WhatIs = () => {
           </div>
         </div>
         <figure className="lp-what__figure">
-          <img src={interfaceImg} alt={t("landing.what.title")} loading="lazy" decoding="async" />
+          <img src={interfaceImg} alt={t("landing.what.title")} loading="lazy" decoding="async" width={1600} height={776} />
         </figure>
       </div>
     </LandingSection>
@@ -90,11 +90,11 @@ export const ProductPreview = () => {
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
-        <img src={workspaceImg} alt={t("landing.preview.workspace")} loading="lazy" decoding="async" />
+        <img src={workspaceImg} alt={t("landing.preview.workspace")} loading="lazy" decoding="async" width={1600} height={600} />
       </motion.div>
       <p className="lp-preview__caption">{t("landing.preview.workspace")}</p>
       <div className="lp-preview__interface">
-        <img src={interfaceImg} alt={t("landing.preview.title")} loading="lazy" decoding="async" />
+        <img src={interfaceImg} alt={t("landing.preview.title")} loading="lazy" decoding="async" width={1600} height={776} />
       </div>
     </LandingSection>
   );

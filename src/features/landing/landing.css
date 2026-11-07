@@ -34,6 +34,7 @@
 .lp-nav__brand-img {
   height: 40px;
   width: auto;
+  aspect-ratio: 640 / 295;
   object-fit: contain;
   display: block;
   background: rgba(255, 255, 255, .94);
@@ -140,7 +141,10 @@
 
 .lp-hero__logo {
   height: clamp(72px, 9vw, 110px);
+  /* WebP intrinsic ratio 640x295 — reserving the box kills the logo swap CLS */
+  aspect-ratio: 640 / 295;
   width: auto;
+  object-fit: contain;
   margin-inline: auto;
   display: block;
   margin-bottom: 36px;

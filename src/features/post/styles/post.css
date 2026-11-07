@@ -45,9 +45,10 @@
 
 .post-body {
   margin: 20px 0;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.9;
-  color: #222222;
+  color: var(--text-primary, #222222);
+  max-width: 68ch;
 }
 
 .post-content-text {
@@ -65,10 +66,10 @@
 
 .post-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   margin-top: 24px;
   padding-top: 16px;
-  border-top: 1px solid #efefef;
+  flex-wrap: wrap;
 }
 /* ---------- Owner actions (edit / delete) ---------- */
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaPen } from "react-icons/fa";
 import defaultImg from "../../../assets/icons/user_10374408.png";
 import ProfileImageViewer from "../../../components/common/ProfileImageViewer";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const ProfileHeader = ({
   imageUrl,
@@ -13,6 +14,7 @@ export const ProfileHeader = ({
   // Unified image viewer — "View Image" and clicking the picture itself
   // open the SAME viewer with the SAME (user's real) image URL.
   const [viewerOpen, setViewerOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleDropdownAction = (action) => {
     if (action === "view") {
@@ -51,8 +53,8 @@ export const ProfileHeader = ({
 
         {editable && dropdownOpen && (
           <div className="image-dropdown">
-            <button onClick={() => handleDropdownAction("view")}>View Image</button>
-            <button onClick={() => handleDropdownAction("change")}>Change Image</button>
+            <button onClick={() => handleDropdownAction("view")}>{t("profile.viewImage")}</button>
+            <button onClick={() => handleDropdownAction("change")}>{t("profile.changeImage")}</button>
           </div>
         )}
 

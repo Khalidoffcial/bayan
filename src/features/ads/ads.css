@@ -121,17 +121,22 @@
 
 .adsense-sidebar ins.adsbygoogle {
   display: block;
-  min-height: 0;
+  /* 300x250-compatible reserved placement: a real region of the layout,
+     NOT a fake advertisement — it stays when Google returns no fill. */
+  min-height: 250px;
   /* hard cap: even while a request is in flight (or hung), the reserved
      space can never grow into a huge empty column */
   max-height: 600px;
   overflow: hidden;
 }
 
-/* no fill → the whole container disappears (not just the <ins>), so no
-   empty bordered box is left behind. The component also drops the unit
-   entirely after its grace period (adsense-sidebar--idle). */
-.adsense-sidebar:has(ins.adsbygoogle[data-ad-status="unfilled"]),
-.adsense-sidebar:has(ins.adsbygoogle:empty) {
+/* no fill → only the <ins> unit collapses (Google marks it unfilled);
+   the rail and its reserved region REMAIN so the layout never jumps and
+   the rail's position is independent of the ad-fill state. */
+.adsense-sidebar ins.adsbygoogle[data-ad-status="unfilled"] {
   display: none;
+}
+
+.adsense-sidebar:has(ins.adsbygoogle[data-ad-status="unfilled"]) {
+  min-height: 0;
 }

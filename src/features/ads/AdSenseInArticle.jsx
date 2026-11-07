@@ -19,6 +19,7 @@
 import React, { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { canShowInArticleAd } from "./AdPolicy";
+import { useTranslation } from "../../i18n/useTranslation";
 import "./ads.css";
 
 /* Publisher-supplied values — byte-exact from the AdSense account. */
@@ -78,6 +79,7 @@ export function splitContentForInArticleAd(html) {
 
 export const AdSenseInArticle = ({ contentType }) => {
     const location = useLocation();
+    const { t } = useTranslation();
     const insRef = useRef(null);
     const pushedRef = useRef(false);
 
@@ -115,7 +117,7 @@ export const AdSenseInArticle = ({ contentType }) => {
     if (!eligible) return null;
 
     return (
-        <div className="adsense-in-article" aria-label="Sponsored">
+        <div className="adsense-in-article" aria-label={t("aria.sponsored")}>
             {/* The unit itself is direction-neutral; page text direction is untouched. */}
             <ins
                 ref={insRef}

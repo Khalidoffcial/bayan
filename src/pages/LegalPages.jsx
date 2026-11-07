@@ -54,7 +54,7 @@ const LegalPage = ({ kind = "privacy" }) => {
       </Helmet>
 
       <header className="legal__header">
-        <Link to="/" className="legal__back">← Bayan Space</Link>
+        <Link to="/" className="legal__back">{t("legal.back")}</Link>
         <h1 className="legal__title">{t(titleKey)}</h1>
         <p className="legal__updated">
           {t("legal.lastUpdated")}: 2026-11-02

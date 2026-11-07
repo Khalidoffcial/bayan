@@ -1,6 +1,10 @@
 import React from "react";
-import { FaHeart, FaComment, FaShareAlt, FaFilePdf } from "react-icons/fa";
+import {
+  Heart as HeartIcon, MessageCircle as CommentIcon,
+  Share2 as ShareIcon, FileDown as PdfIcon,
+} from "lucide-react";
 import { ReadLaterButton } from "../../focus-space/components/ReadLaterButton";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const ArticleActions = ({
   liked,
@@ -11,30 +15,32 @@ export const ArticleActions = ({
   onDownloadPDF,
   article,
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="article-actions">
       <button
         className={`action-btn like ${liked ? "active" : ""}`}
         onClick={onLike}
-        aria-label="Like article"
+        aria-label={t("article.like")}
       >
-        <FaHeart /> <span>{likesCount}</span>
+        <HeartIcon size={17} strokeWidth={liked ? 2.5 : 2} fill={liked ? "currentColor" : "none"} />
+        <span>{likesCount}</span>
       </button>
 
       <button
         className="action-btn comment"
         onClick={onComment}
-        aria-label="Comment on article"
+        aria-label={t("article.comment")}
       >
-        <FaComment />
+        <CommentIcon size={17} strokeWidth={2} />
       </button>
 
       <button
         className="action-btn share"
         onClick={onShare}
-        aria-label="Share article"
+        aria-label={t("article.share")}
       >
-        <FaShareAlt />
+        <ShareIcon size={17} strokeWidth={2} />
       </button>
 
       {/* اقرأها لاحقًا — يُحفظ في قاعدة بيانات المستخدم، ويزول عند الضغط تاني */}
@@ -50,9 +56,9 @@ export const ArticleActions = ({
       <button
         className="action-btn pdf"
         onClick={onDownloadPDF}
-        aria-label="Download article as PDF"
+        aria-label={t("article.downloadPdf")}
       >
-        <FaFilePdf /> PDF
+        <PdfIcon size={17} strokeWidth={2} /> <span>PDF</span>
       </button>
     </div>
   );

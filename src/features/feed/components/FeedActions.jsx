@@ -1,5 +1,7 @@
 import React from "react";
 import { FaHeart, FaComment, FaShareAlt } from "react-icons/fa";
+import { useTranslation } from "../../../i18n/useTranslation";
+ 
  
 export const FeedActions = ({
   itemId,
@@ -11,6 +13,10 @@ export const FeedActions = ({
   onShare,
   extra,
 }) => {
+  const { t } = useTranslation();
+
+  
+  
 
   
   
@@ -20,7 +26,7 @@ export const FeedActions = ({
         className="like_action"
         onClick={() => onLike(itemId)}
         style={{ color: liked ? "#d30000" : "#333" }}
-        aria-label="Like"
+        aria-label={t("feed.like")}
       >
         <FaHeart />
         <span>{likesCount || 0}</span>
@@ -29,7 +35,7 @@ export const FeedActions = ({
       <button
         className="comment_action"
         onClick={onComment}
-        aria-label={`Comment${commentsCount ? ` (${commentsCount})` : ""}`}
+        aria-label={commentsCount ? `${t("feed.comment")} (${commentsCount})` : t("feed.comment")}
       >
         <FaComment />
         {commentsCount > 0 && <span>{commentsCount}</span>}
@@ -38,7 +44,7 @@ export const FeedActions = ({
       <button
         className="share_action"
         onClick={onShare}
-        aria-label="Share"
+        aria-label={t("feed.share")}
       >
         <FaShareAlt />
       </button>

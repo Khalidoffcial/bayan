@@ -109,15 +109,16 @@ describe("AdSenseSidebar", () => {
         localStorage.setItem("language", "en");
     });
 
-    test("no fill after grace period → unit is removed, no tall empty box", async () => {
+    test("no fill after grace period → unit stays reserved, only <ins> collapses via CSS", async () => {
         jest.useFakeTimers();
         const { container } = renderAt("/");
-        expect(document.querySelector(".adsense-sidebar")).toBeTruthy();
         await act(async () => {
             jest.advanceTimersByTime(5100);
         });
-        // no data-ad-status="fill" → the component unmounts the unit
-        expect(container.querySelector(".adsense-sidebar")).toBeNull();
+        // The rail's layout existence is independent of the fill state —
+        // the reserved region remains; the <ins> collapses via CSS rules.
+        expect(container.querySelector(".adsense-sidebar")).toBeTruthy();
+        expect(container.querySelector(".adsbygoogle")).toBeTruthy();
         jest.useRealTimers();
     });
 

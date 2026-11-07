@@ -1,5 +1,6 @@
 import React from "react";
 import { FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaTimes } from "react-icons/fa";
+import { useTranslation } from "../../i18n/useTranslation";
 import "./toast.css";
 
 /**
@@ -33,6 +34,7 @@ const ICONS = {
 let toastSeq = 0;
 
 export const ToastProvider = ({ children }) => {
+  const { t } = useTranslation();
   const [toasts, setToasts] = React.useState([]);
   const timersRef = React.useRef(new Map());
 
@@ -78,7 +80,7 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div className="toast-stack" role="region" aria-label="Notifications">
+      <div className="toast-stack" role="region" aria-label={t("aria.notifications")}>
         {toasts.map((t) => {
           const Icon = ICONS[t.type] || FaInfoCircle;
           return (
@@ -89,7 +91,7 @@ export const ToastProvider = ({ children }) => {
                 type="button"
                 className="toast-close"
                 onClick={() => dismiss(t.id)}
-                aria-label="إغلاق الإشعار"
+                aria-label={t("toast.close")}
               >
                 <FaTimes aria-hidden="true" />
               </button>

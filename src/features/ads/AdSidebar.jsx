@@ -14,16 +14,18 @@ import { useLocation } from "react-router-dom";
 import { canShowSidebarAd } from "./AdPolicy";
 import { AdSenseSidebar } from "./AdSenseSidebar";
 import useAuth from "../../hooks/useAuth";
+import { useTranslation } from "../../i18n/useTranslation";
 
 export const AdSidebar = () => {
     const location = useLocation();
     const { user } = useAuth();
+    const { t } = useTranslation();
     // guests (landing experience) stay ad-free entirely
     if (!user?.id) return null;
     // Single source of truth — the centralized AdPolicy allowlist.
     if (!canShowSidebarAd(location.pathname, { visibility: "public" })) return null;
     return (
-        <aside className="ad-rail" aria-label="Sponsored">
+        <aside className="ad-rail" aria-label={t("aria.sponsored")}>
             <AdSenseSidebar />
         </aside>
     );

@@ -1,5 +1,4 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getDatabase } from "firebase/database";
 import { getStorage } from 'firebase/storage';
 import { getAuth } from "firebase/auth";
 
@@ -17,6 +16,5 @@ const firebaseConfig = {
 const storageApp = getApps().find(a => a.name === "storageApp")
   || initializeApp(firebaseConfig, "storageApp");
 
-export const database = getDatabase(storageApp);
 export const storage = getStorage(storageApp);
 export const auth = getAuth(storageApp);

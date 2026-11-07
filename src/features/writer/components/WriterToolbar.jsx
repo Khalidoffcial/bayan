@@ -1,10 +1,12 @@
 import React from "react";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const WriterToolbar = ({ activeType, onTypeChange }) => {
+  const { t } = useTranslation();
   const types = [
-    { id: "post", label: "Post" },
-    { id: "article", label: "Article" },
-    { id: "novels", label: "Novels" },
+    { id: "post", label: t("writer.type.post") },
+    { id: "article", label: t("writer.type.article") },
+    { id: "novels", label: t("writer.type.novels") },
   ];
 
   return (

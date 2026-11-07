@@ -11,6 +11,7 @@
 import React from "react";
 import AyaAvatar from "../../../assets/icons/736212.png";
 import "./ayaCompanion.css";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 const fmt = (ms) => {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -42,6 +43,7 @@ export const AyaCompanion = ({
 }) => {
   const phaseBreak = engineState?.meta?.ayaBreak === true;
   const state = stateOf(session, paused, idle, Boolean(message), phaseBreak);
+  const { t } = useTranslation();
 
   return (
     <div className={`aya-companion ${minimize ? "is-min" : ""}`} data-state={state} aria-live="polite">
@@ -59,9 +61,9 @@ export const AyaCompanion = ({
           <p>{message.text}</p>
           {goalQuestion && (
             <div className="aya-companion__bubble-actions">
-              <button className="aya-btn aya-btn--primary" onClick={() => onAnswerGoal("done")}>حققته ✓</button>
-              <button className="aya-btn" onClick={onExtend}>وقت زيادة +5</button>
-              <button className="aya-btn" onClick={onBreak}>استراحة</button>
+              <button className="aya-btn aya-btn--primary" onClick={() => onAnswerGoal("done")}>{t("aya.done")} ✓</button>
+              <button className="aya-btn" onClick={onExtend}>{t("aya.extend5")}</button>
+              <button className="aya-btn" onClick={onBreak}>{t("aya.break")}</button>
             </div>
           )}
           {session && !goalQuestion && (

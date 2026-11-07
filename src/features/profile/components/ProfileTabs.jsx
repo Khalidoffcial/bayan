@@ -1,5 +1,6 @@
 import React from "react";
 import { PROFILE_TABS } from "../services/profileContent.service";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 /**
  * Unified profile content tabs. "الكل" is the default tab and shows every
@@ -7,6 +8,7 @@ import { PROFILE_TABS } from "../services/profileContent.service";
  * server provides them.
  */
 export const ProfileTabs = ({ activeTab, onTabChange, counts = {} }) => {
+  const { t } = useTranslation();
   return (
     <div className="profile-tabs">
       {PROFILE_TABS.map(({ key, label }) => {
@@ -19,7 +21,7 @@ export const ProfileTabs = ({ activeTab, onTabChange, counts = {} }) => {
             className={`tab-item ${activeTab === key ? "active" : ""}`}
             onClick={() => onTabChange(key)}
           >
-            {label}
+            {t(`profile.tab.${key}`)}
             {hasCount && <span className="tab-count">{counts[key]}</span>}
           </button>
         );

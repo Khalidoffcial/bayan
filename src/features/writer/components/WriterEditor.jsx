@@ -1,7 +1,9 @@
-import React, { useEffect, useRef } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import React, { useEffect, useRef, Suspense, lazy } from "react";
 import { useTranslation } from "../../../i18n/useTranslation";
+
+// CKEditor (~1.4MB) is code-split: it downloads only when the user actually
+// expands the composer in article/novel mode — never on initial page load.
+const WriterCKEditor = lazy(() => import("./WriterCKEditor"));
 
 export const WriterEditor = ({
   type,
@@ -103,12 +105,24 @@ export const WriterEditor = ({
           )}
         </div>
 
-        <CKEditor
-          editor={ClassicEditor}
-          config={{ ...editorConfiguration, placeholder: t("composer.contentPlaceholder") }}
-          data={content}
-          onChange={(_, editor) => setContent(editor.getData())}
-        />
+        <Suspense
+          fallback={
+            <textarea
+              className="sm_WriterInput"
+              placeholder={t("composer.contentPlaceholder")}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              aria-label={t("composer.contentPlaceholder")}
+            />
+          }
+        >
+          <WriterCKEditor
+            content={content}
+            setContent={setContent}
+            placeholder={t("composer.contentPlaceholder")}
+            editorConfiguration={editorConfiguration}
+          />
+        </Suspense>
       </>
     );
   }

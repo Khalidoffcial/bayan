@@ -1,32 +1,38 @@
 import React from "react";
-import { FaHeart, FaComment, FaShareAlt } from "react-icons/fa";
+import {
+  Heart as HeartIcon, MessageCircle as CommentIcon,
+  Share2 as ShareIcon,
+} from "lucide-react";
 import { ReadLaterButton } from "../../focus-space/components/ReadLaterButton";
+import { useTranslation } from "../../../i18n/useTranslation";
 
 export const PostActions = ({ liked, likesCount, onLike, onComment, onShare, extraStats, post }) => {
+  const { t } = useTranslation();
   return (
     <div className="post-actions">
       <button
         className={`action-btn like ${liked ? "active" : ""}`}
         onClick={onLike}
-        aria-label="Like post"
+        aria-label={t("post.like")}
       >
-        <FaHeart /> <span>{likesCount}</span>
+        <HeartIcon size={17} strokeWidth={liked ? 2.5 : 2} fill={liked ? "currentColor" : "none"} />
+        <span>{likesCount}</span>
       </button>
 
       <button
         className="action-btn comment"
         onClick={onComment}
-        aria-label="Comment on post"
+        aria-label={t("post.comment")}
       >
-        <FaComment />
+        <CommentIcon size={17} strokeWidth={2} />
       </button>
 
       <button
         className="action-btn share"
         onClick={onShare}
-        aria-label="Share post"
+        aria-label={t("post.share")}
       >
-        <FaShareAlt />
+        <ShareIcon size={17} strokeWidth={2} />
       </button>
 
       {/* اقرأها لاحقًا — حفظ/إزالة في قاعدة بيانات المستخدم */}

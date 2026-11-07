@@ -22,9 +22,6 @@ export const FeedList = ({
       {feed.map((item, index) => {
         const rawId = item.id ?? item._id ?? item.id_post ?? `feed-item-${index}`;
         const itemId = String(rawId);
-console.log("feeds: ",feed)
-console.log("item like count: ",item?.likesCount)
-console.log("----: ",item?.likesBy?.[userId] || false)
         if (seenRenderKeys.has(itemId)) {
           return null;
         }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, renderHook, act } from '@testing-library/react';
+import { renderWithSettings } from '../../test/testUtils';
 import { BrowserRouter } from 'react-router-dom';
 import { SettingsProvider } from '../../contexts/SettingsContext';
 import {
@@ -324,7 +325,7 @@ describe('Feed Feature UI Components', () => {
   };
 
   test('renders FeedUser with user names', () => {
-    render(
+    renderWithSettings(
       <BrowserRouter>
         <FeedUser userData={mockUser} />
       </BrowserRouter>
@@ -338,7 +339,7 @@ describe('Feed Feature UI Components', () => {
     const handleComment = jest.fn();
     const handleShare = jest.fn();
 
-    render(
+    renderWithSettings(
       <FeedActions
         itemId="post1"
         liked={false}
@@ -362,7 +363,7 @@ describe('Feed Feature UI Components', () => {
       userData: mockUser,
     };
 
-    render(
+    renderWithSettings(
       <SettingsProvider>
         <BrowserRouter>
           <ArticleCard item={mockArticle} />
@@ -382,7 +383,7 @@ describe('Feed Feature UI Components', () => {
       userData: mockUser,
     }));
 
-    render(
+    renderWithSettings(
       <SettingsProvider>
         <BrowserRouter>
           <FeedList

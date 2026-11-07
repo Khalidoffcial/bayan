@@ -1,0 +1,224 @@
+/* ShareSheet — quiet premium sharing surface */
+
+.ssheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(10, 14, 20, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.ssheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: var(--bg-primary, #fff);
+  border-radius: 20px;
+  border: 1px solid var(--border, rgba(0, 0, 0, .07));
+  box-shadow: 0 24px 80px -12px rgba(0, 0, 0, .25);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ssheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ssheet-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary, #171717);
+}
+
+.ssheet-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text3, #9ca3af);
+  cursor: pointer;
+  transition: background .15s ease;
+}
+
+.ssheet-close:hover {
+  background: var(--surface-hover, rgba(0, 0, 0, .05));
+}
+
+/* Size chips */
+.ssheet-sizes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.ssheet-size {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 4px;
+  border: 1px solid var(--border, rgba(0, 0, 0, .08));
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+
+.ssheet-size:hover {
+  border-color: var(--border-md, rgba(0, 0, 0, .16));
+}
+
+.ssheet-size.is-active {
+  border-color: var(--blue, #0f8ee2);
+  background: rgba(15, 142, 226, .06);
+}
+
+.ssheet-size-ratio {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary, #171717);
+}
+
+.ssheet-size-name {
+  font-size: 11px;
+  color: var(--text3, #9ca3af);
+}
+
+/* Preview */
+.ssheet-preview {
+  min-height: 180px;
+  border-radius: 14px;
+  background: var(--bg2, #f4f4f2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--border, rgba(0, 0, 0, .06));
+}
+
+.ssheet-preview-img {
+  max-width: 100%;
+  max-height: 320px;
+  display: block;
+  border-radius: 12px;
+}
+
+.ssheet-preview-loading,
+.ssheet-preview-failed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text3, #9ca3af);
+  padding: 40px 20px;
+}
+
+.ssheet-spin {
+  animation: ssheet-rotate 0.9s linear infinite;
+}
+
+@keyframes ssheet-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ssheet-spin {
+    animation: none;
+  }
+}
+
+/* Actions */
+.ssheet-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ssheet-btn {
+  flex: 1;
+  min-width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border, rgba(0, 0, 0, .1));
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-primary, #171717);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.ssheet-btn:hover:not(:disabled) {
+  background: var(--surface-hover, rgba(0, 0, 0, .04));
+  border-color: var(--border-md, rgba(0, 0, 0, .16));
+}
+
+.ssheet-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.ssheet-btn--primary {
+  background: var(--blue, #0f8ee2);
+  border-color: var(--blue, #0f8ee2);
+  color: #fff;
+}
+
+.ssheet-btn--primary:hover:not(:disabled) {
+  background: #0d7fc9;
+  border-color: #0d7fc9;
+}
+
+/* Status */
+.ssheet-status {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text3, #9ca3af);
+  text-align: center;
+}
+
+.ssheet-status--ok {
+  color: #10b981;
+}
+
+.ssheet-status--err {
+  color: #e0245e;
+}
+
+@media (max-width: 480px) {
+  .ssheet {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .ssheet-actions {
+    flex-direction: column;
+  }
+
+  .ssheet-btn {
+    min-height: 44px;
+  }
+}

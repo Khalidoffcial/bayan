@@ -8,7 +8,7 @@ import articleIcon from "../../assets/icons/article.png";
 import novelIcon from "../../assets/icons/novel.png";
 import examIcon from "../../assets/icons/exam.png";
 import focusIcon from "../../assets/icons/allOutline.png";
-import workspaceImg from "../../assets/images/Bayan Space Modern Workspace.png";
+import workspaceImg from "../../assets/images/Bayan Space Modern Workspace.webp";
 
 /** الأقسام/الأنماط الفعلية في المنصة — مستخرجة من Routing والمكونات الحقيقية.
  *  4 Content Modes (routes) + 2 Experience Modes (قراءة/تركيز وسلاسل الروايات).

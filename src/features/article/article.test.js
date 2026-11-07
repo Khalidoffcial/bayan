@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
+import { renderWithSettings } from '../../test/testUtils';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { SettingsProvider } from '../../contexts/SettingsContext';
@@ -7,7 +8,7 @@ import { ArticleHeader, ArticleBody, ArticleActions, ArticleReading } from './in
 
 describe('Article Feature Components', () => {
   test('renders ArticleHeader with title and description', () => {
-    render(
+    renderWithSettings(
       <HelmetProvider>
         <ArticleHeader
           title="Understanding Modern Architecture"
@@ -22,7 +23,7 @@ describe('Article Feature Components', () => {
   });
 
   test('renders ArticleBody with HTML content and image', () => {
-    render(
+    renderWithSettings(
       <SettingsProvider>
         <ArticleBody
           content="<p>Main article text</p>"
@@ -44,7 +45,7 @@ describe('Article Feature Components', () => {
     const handleShare = jest.fn();
     const handleDownloadPDF = jest.fn();
 
-    render(
+    renderWithSettings(
       <ArticleActions
         liked={false}
         likesCount={12}
@@ -64,7 +65,7 @@ describe('Article Feature Components', () => {
   });
 
   test('renders ArticleReading not found fallback when no state is passed', () => {
-    render(
+    renderWithSettings(
       <BrowserRouter>
         <HelmetProvider>
           <ArticleReading />

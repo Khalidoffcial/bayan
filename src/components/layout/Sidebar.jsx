@@ -30,7 +30,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <button className="menu-btn" onClick={() => setSidebarOpen(true)} aria-label="Menu">
+      <button className="menu-btn" onClick={() => setSidebarOpen(true)} aria-label={t("aria.menu")}>
         <MenuIcon size={22} aria-hidden />
       </button>
 
