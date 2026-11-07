@@ -120,7 +120,9 @@ export const useFlowFeed = ({ userId }) => {
     return arr;
   };
 
-  /** Fetch one page from the server through the deduped request helper. */
+  /** Fetch one page from the server through the deduped request helper.
+      Resolves null ONLY on transport failure (timeout/disconnect) —
+      a real empty page from the server resolves as an empty array. */
   const fetchPage = useCallback(
     (cursor) =>
       dedupRequest(`flow:${FLOW_TYPE}:${cursor}`, () =>
@@ -161,7 +163,9 @@ export const useFlowFeed = ({ userId }) => {
     try {
       const res = await fetchPage(s.cursor);
       if (res == null) {
-        if (!s.firstLoaded) setError("تعذّر الاتصال — أعد المحاولة");
+        // Transport failure (socket not connected / timeout) — retryable.
+        console.error("[Flow] feed request failed: no server response (transport)");
+        if (!s.firstLoaded) setError("retryable");
         return;
       }
       const raw = extractItems(res).map((item, i) => ({
@@ -181,8 +185,10 @@ export const useFlowFeed = ({ userId }) => {
       s.firstLoaded = true;
       setError(null);
       setItems([...s.items]);
-    } catch {
-      if (!stateRef.current.firstLoaded) setError("تعذّر تحميل المحتوى — أعد المحاولة");
+    } catch (err) {
+      // Safe log — message only, never payloads/tokens/user data.
+      console.error("[Flow] feed load failed:", err?.message || err);
+      if (!stateRef.current.firstLoaded) setError("retryable");
     } finally {
       stateRef.current.loadingMore = false;
       setLoadingMore(false);

@@ -11,6 +11,7 @@ import { Link, useLocation } from "react-router-dom";
 import "./styles/sidebar.css";
 import { useTranslation } from "../../i18n/useTranslation";
 import { NAV_ICONS, MenuIcon } from "../../features/focus-space/constants/focusIcons";
+import { FLOW_NAME } from "../../features/flow";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -19,8 +20,8 @@ const Sidebar = () => {
 
   const channels = [
     { key: "nav.all", icon: NAV_ICONS.all, path: "/", match: (p) => p === "/" || p === "/all" },
-    // Bayan Flow — immersive vertical discovery (full-screen, after All)
-    { key: "nav.flow", icon: NAV_ICONS.flow, path: "/flow", match: (p) => p === "/flow" },
+    // Bayan Flow — the name is NEVER translated (official product name).
+    { key: "nav.flow", icon: NAV_ICONS.flow, path: "/flow", match: (p) => p === "/flow", label: FLOW_NAME },
     { key: "nav.posts", icon: NAV_ICONS.posts, path: "/posts", match: (p) => p === "/posts" },
     { key: "nav.articles", icon: NAV_ICONS.articles, path: "/articles", match: (p) => p === "/articles" },
     { key: "nav.novels", icon: NAV_ICONS.novels, path: "/novels", match: (p) => p === "/novels" },
@@ -57,7 +58,7 @@ const Sidebar = () => {
                 <span className="nav-icon" aria-hidden>
                   <Icon size={20} strokeWidth={1.75} />
                 </span>
-                <span>{t(channel.key)}</span>
+                <span>{channel.label || t(channel.key)}</span>
               </Link>
             );
           })}

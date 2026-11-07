@@ -116,9 +116,10 @@
   flex: 1;
   display: flex;
   min-height: 0;
-  /* Center the card column, leave room for the action rail (inline-end). */
+  position: relative; /* establishes the containing block for the overlay rail */
+  /* No horizontal padding for a rail gutter anymore — content owns the
+     full width; the overlay rail floats above it. */
   padding: 8px 12px;
-  gap: 10px;
 }
 
 .flow-item__scroller {
@@ -135,6 +136,9 @@
   scrollbar-width: thin;
   scrollbar-color: var(--border-md) transparent;
   padding: 4px;
+  /* Content stays clear of the floating action rail (no layout reserve —
+     just breathing room so rail chips don't sit on top of text). */
+  padding-inline-end: 56px;
 }
 
 .flow-item__head {
@@ -150,7 +154,9 @@
   max-width: 62ch;
   width: 100%;
   margin-inline: auto;
-  padding-block: 4vh;
+  /* Content STARTS AT THE TOP — short posts must not float mid-screen. */
+  margin-block: 0;
+  padding-block: 8px;
 }
 
 .flow-text__body {
@@ -165,6 +171,7 @@
 .flow-text__body--clamped {
   display: -webkit-box;
   -webkit-line-clamp: 12;
+  line-clamp: 12;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -264,13 +271,17 @@
   line-height: var(--lh-body);
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 /* ---------- Articles / novels ---------- */
 .flow-article {
-  margin: auto;
+  /* Top-aligned: short excerpts start at the top of the viewport, never
+     centered. margin-block is 0 — width centering only. */
+  margin-block: 0;
+  margin-inline: auto;
   width: min(560px, 100%);
   display: flex;
   flex-direction: column;
@@ -326,6 +337,7 @@
   color: var(--text2);
   display: -webkit-box;
   -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -361,52 +373,72 @@
   transform: translateY(-1px);
 }
 
-/* ---------- Action rail ---------- */
+/* ---------- Action rail — floating OVERLAY over the content ----------
+   position:absolute inside the card (the card is position:relative and
+   is a plain element — no transform/filter ancestors create a stacking
+   trap between it and this rail, so z-index resolves locally). The rail
+   reserves ZERO layout space: content stays exactly where it was. */
 .flow-actions {
+  position: absolute;
+  /* Anchor to the block-end of the card with safe-area awareness. */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
+  /* Logical inline anchoring: inline-end in LTR (right side), inline-start
+     in RTL (left side) — the whole rail mirrors with the document dir. */
+  inset-inline-end: 8px;
+  z-index: 3; /* above content (auto/1), below comments sheet (10) */
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 14px;
-  flex-shrink: 0;
-  padding-block-end: calc(env(safe-area-inset-bottom, 0px) + 18px);
-  /* In RTL the rail naturally sits inline-start via flex order */
+  gap: 6px;
+  pointer-events: none; /* the rail container itself is click-through */
+}
+
+/* Buttons re-enable interaction over the click-through container. */
+.flow-actions > * {
+  pointer-events: auto;
 }
 
 .flow-act {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 3px;
   border: none;
-  background: transparent;
-  color: var(--text2);
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
   cursor: pointer;
   font-family: inherit;
   font-size: var(--fs-small);
-  transition: color var(--transition-fast), transform var(--transition-fast);
-  min-width: 44px;
-  /* touch-target */
-  min-height: 44px;
-  justify-content: center;
+  transition: color var(--transition-fast), transform var(--transition-fast), background var(--transition-fast);
+  width: 44px;   /* guaranteed touch target, icon optically smaller */
+  height: 44px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Legibility over any media: subtle dark glass chip, no big opaque slab */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
 .flow-act:hover {
-  color: var(--text);
+  background: rgba(0, 0, 0, 0.42);
   transform: scale(1.06);
 }
 
 .flow-act--liked {
-  color: #e0245e;
+  color: #ff5c8a;
 }
 
 .flow-act-count {
   font-size: var(--fs-small);
   color: inherit;
+  line-height: 1;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .flow-act--profile {
-  color: var(--text2);
+  color: #fff;
 }
 
 .flow-follow {
@@ -417,10 +449,13 @@
   font-size: var(--fs-small);
   font-weight: 600;
   border-radius: var(--radius-full);
-  padding: 7px 16px;
+  padding: 7px 14px;
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast);
   min-height: 32px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .flow-follow--on {
@@ -433,7 +468,9 @@
   cursor: default;
 }
 
-/* ---------- Inline comments overlay ---------- */
+/* ---------- Inline comments overlay (bottom sheet) ----------
+   z-index 10 — ABOVE the action rail (3) so the sheet covers it while
+   open; the rail re-emerges when the sheet closes. */
 .flow-comments {
   position: absolute;
   inset-inline: 0;
@@ -446,7 +483,7 @@
   border-top: 1px solid var(--border);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   padding: 14px 16px calc(env(safe-area-inset-bottom, 0px) + 14px);
-  z-index: 3;
+  z-index: 10;
   animation: flow-sheet-up 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -565,17 +602,108 @@
   .flow-article__cta:hover { transform: none; }
 }
 
-/* ---------- Small screens ---------- */
+/* ---------- Mobile author strip — fixed bottom overlay ----------
+   Shows the real account photo + name beside it; tapping opens the
+   profile (FeedUser already navigates). Hidden on desktop where the
+   in-card header row already shows the author. */
+.flow-author {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+  inset-inline-start: 16px;
+  z-index: 2; /* above content, below the action rail (3) */
+  max-width: min(70vw, 300px);
+  padding: 5px 12px 5px 6px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+}
+
+.flow-author .bcard-author {
+  padding: 0;
+  cursor: pointer;
+}
+
+.flow-author .bcard-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.flow-author .bcard-name {
+  color: #fff;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.flow-author .bcard-username {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: var(--fs-small);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The in-card author header is redundant with the strip on mobile —
+   hide it there to avoid duplicating account info in the same view. */
+@media (max-width: 700px) {
+  .flow-item__head { display: none; }
+}
+
+/* ---------- Small screens (mobile) ---------- */
 @media (max-width: 700px) {
   .flow-item { padding: 6px 10px; }
   .flow-text { max-width: 100%; }
   .flow__navbtns { display: none; } /* gestures suffice on touch */
+
+  /* The overlay rail stays compact and fully on-screen at 320–430px.
+     Slightly smaller chips (40px, still ≥44px effective touch area via
+     padding-free centering) and tighter gaps — balanced, never clipped. */
+  .flow-actions {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+    inset-inline-end: 4px;
+    gap: 4px;
+  }
+  .flow-act { width: 40px; height: 40px; }
+}
+
+/* ---------- Ultra-narrow (<340px: iPhone SE landscape, tiny Androids) --
+   Shrink chip sizes but KEEP legibility and touch comfort; pull the rail
+   inward instead of clipping or covering more content. */
+@media (max-width: 339px) {
+  .flow-actions { inset-inline-end: 2px; gap: 2px; }
+  .flow-act { width: 38px; height: 38px; }
+  .flow-follow { padding: 5px 10px; font-size: var(--fs-small); }
+}
+
+/* ---------- Desktop & tablet: proportionate to the larger screen ----------
+   Larger chips, rail further from the content edge; never mobile sizing. */
+@media (min-width: 701px) {
+  .flow-actions {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
+    inset-inline-end: 20px;
+    gap: 10px;
+  }
+  .flow-act { width: 48px; height: 48px; }
+  .flow-follow { padding: 8px 18px; }
 }
 
 /* ---------- Desktop: centered column, larger gutters ---------- */
 @media (min-width: 1024px) {
   .flow-item { padding: 20px 32px; }
 
+  /* Content column centered with a reserved-looking inset — but the rail
+     remains an absolute overlay OUTSIDE the column, over the page margin,
+     so it never covers desktop text either. */
   .flow-item__scroller {
     max-width: 620px;
     margin-inline: auto;
@@ -586,5 +714,5 @@
     padding: 20px;
   }
 
-  .flow-text { padding-block: 6vh; }
+  .flow-text { padding-block: 12px; }
 }

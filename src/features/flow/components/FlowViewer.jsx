@@ -35,6 +35,9 @@ import "./flow.css";
 /** How many adjacent cards keep live content (1 = preload next). */
 const WINDOW = 1;
 
+/** The official section name — NEVER translated, identical in every locale. */
+export const FLOW_NAME = "Bayan Flow";
+
 export const FlowViewer = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -218,9 +221,9 @@ if (loading && !items.length) {
 }
 
 return (
-  <div className="flow" dir="ltr" data-flow-root>
+  <div className="flow" data-flow-root>
     <div className="flow__topbar">
-      <span className="flow__brand" dir="auto">{t("flow.title")}</span>
+      <span className="flow__brand" dir="auto">{FLOW_NAME}</span>
       <button
         type="button"
         className="flow__refresh"
@@ -243,7 +246,7 @@ return (
         className="flow__track"
         ref={containerRef}
         tabIndex={0}
-        aria-label={t("flow.title")}
+        aria-label={FLOW_NAME}
         role="region"
       >
         {windowedItems.map(({ item, index, mounted }) => (
@@ -275,9 +278,14 @@ return (
           </div>
         ))}
 
-        {!items.length && !error && (
+        {/* Empty state — distinct from error: server answered, zero content.
+            Shown only after loading completes (never before). */}
+        {!items.length && !error && !loading && (
           <div className="flow-empty">
             <p>{t("flow.empty")}</p>
+            <button type="button" className="flow-empty__retry" onClick={() => refresh()}>
+              {t("feed.retry")}
+            </button>
           </div>
         )}
       </div>

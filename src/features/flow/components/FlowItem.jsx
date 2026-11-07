@@ -351,6 +351,7 @@ export const FlowItem = ({
       aria-hidden={!active}
       aria-roledescription="slide"
     >
+      {/* Content layer — full height, untouched by the action rail. */}
       <div className="flow-item__scroller">
         {item._kind === "post" ? (
           <>
@@ -368,6 +369,17 @@ export const FlowItem = ({
         )}
       </div>
 
+      {/* Mobile author strip — fixed at the bottom over the content.
+          Rendered ONLY for posts (articles/novels show the author inside
+          their excerpt card, so this would duplicate it). */}
+      {item._kind === "post" && (item.userData?.F_user || item.userData?.S_user) && (
+        <div className="flow-author">
+          <FeedUser userData={item.userData} variant="card" />
+        </div>
+      )}
+
+      {/* Overlay layer — the action rail floats ABOVE the content without
+          reserving layout space (position:absolute within this card). */}
       <FlowActions
         item={item}
         liked={liked}
