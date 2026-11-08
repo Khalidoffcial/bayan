@@ -25,6 +25,8 @@ async function harvestRun() {
             batches++;
             if (token && batches < MAX_BATCHES_PER_RUN) await new Promise((res) => setTimeout(res, BATCH_DELAY_MS));
         } while (token && batches < MAX_BATCHES_PER_RUN);
+        // honest meta for the UI: when the index was last touched + size
+        await doab.writeMeta({ added: totalAdded, exhausted: !token, at: new Date().toISOString() }).catch(() => {});
         return { added: totalAdded, batches, exhausted: !token };
     } catch (e) {
         return { added: totalAdded, batches, error: e.message };

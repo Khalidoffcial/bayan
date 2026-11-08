@@ -18,6 +18,12 @@ module.exports = function createGoogleBooksProvider({ injectedCache }) {
     const cached = makeCacheHelper(injectedCache, "bk:gbk", 900);
     const keyParam = () => (process.env.GOOGLE_BOOKS_API_KEY ? `&key=${encodeURIComponent(process.env.GOOGLE_BOOKS_API_KEY)}` : "");
 
+    // quota guard: after a 429 we back off for 10 min and never hammer the API
+    let blockedUntil = 0;
+    const QUOTA_BACKOFF_MS = 10 * 60 * 1000;
+    const quotaBlocked = () => Date.now() < blockedUntil;
+    const markQuota = () => { blockedUntil = Date.now() + QUOTA_BACKOFF_MS; };
+
     return {
         id: "googlebooks",
         label: "Google Books",
@@ -25,6 +31,7 @@ module.exports = function createGoogleBooksProvider({ injectedCache }) {
         capabilities: { pdf: false, epub: false, html: false, embed: true, borrow: false, download: false },
 
         async searchBooks(query, filters, { page = 1 }) {
+            if (quotaBlocked()) return { count: 0, next: null, items: [], quotaLimited: true };
             if (!query || !String(query).trim()) return { count: 0, next: null, items: [] }; // GB requires a query
             const startIndex = Math.max(0, (Number(page) - 1)) * 24;
             const parts = [String(query).slice(0, 120)];
@@ -41,16 +48,50 @@ module.exports = function createGoogleBooksProvider({ injectedCache }) {
                     next: (data.items || []).length >= 24 ? Number(page) + 1 : null,
                     items: (data.items || []).map(normalize).filter(Boolean),
                 };
-            }, url);
+            }, url).catch((e) => {
+                if (String(e.message).includes("429")) markQuota();
+                throw e;
+            });
         },
 
         async getBook(providerBookId) {
             const id = String(providerBookId).slice(0, 40);
             if (!/^[A-Za-z0-9_-]+$/.test(id)) return null;
+            // Details API may be quota-limited; the EMBEDDED VIEWER does not
+            // consume quota, so we still return a minimal renderable book —
+            // the reader page shows title "…" + the viewer, never a 404.
+            if (quotaBlocked()) {
+                return this._fallbackBook(id);
+            }
             return cached(async () => {
                 const v = await fetchJson(`${GB}/volumes/${id}?country=US${keyParam()}`, { timeoutMs: 25000 });
                 return normalize(v);
-            }, `id:${id}`);
+            }, `id:${id}`).catch((e) => {
+                if (String(e.message).includes("429")) {
+                    markQuota();
+                    return this._fallbackBook(id);
+                }
+                throw e;
+            });
+        },
+
+        /** minimal renderable book when the Details API is quota-limited —
+         *  the embedded viewer doesn't consume quota, so reading still works */
+        _fallbackBook(id) {
+            return {
+                provider: "googlebooks",
+                providerBookId: id,
+                titleKey: "books.gb.titleFallback", // client translates it
+                title: "Google Books volume",
+                authors: [],
+                cover: `https://books.google.com/books/content?id=${id}&printsec=frontcover&img=1&zoom=1&source=gbs_api`,
+                viewability: "UNKNOWN",
+                embeddable: true,
+                formats: {},
+                downloadAllowed: false,
+                fullTextAvailable: false,
+                quotaLimited: true,
+            };
         },
     };
 };

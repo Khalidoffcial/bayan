@@ -70,8 +70,19 @@ module.exports = function createDoabProvider({ injectedCache }) {
             }, `id:${handle}`);
         },
 
-        /**
-         * Harvest one OAI ListRecords batch into the local index.
+        /** harvest status metadata for the UI (last update, item count) */
+        async writeMeta({ added, exhausted, at }) {
+            const itemsSnap = await get(ref(db, `${INDEX_PATH}/items`));
+            const count = Object.keys(itemsSnap.val() || {}).length;
+            await set(ref(db, `${INDEX_PATH}/meta`), {
+                itemCount: count,
+                lastAdded: added || 0,
+                indexComplete: Boolean(exhausted),
+                lastHarvestAt: at,
+            });
+        },
+
+        /** harvest one OAI ListRecords batch into the local index.
          * Called periodically by doabHarvest (or manually via admin route).
          * Returns how many NEW records were added.
          */

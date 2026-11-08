@@ -136,24 +136,25 @@ async function getBookReadingSources(book) {
     } else if (book.provider === "internetarchive" && book.accessLevel === "full" && book.pdfFile) {
         sources.push({ kind: "pdf", url: book.pdfFile, label: "PDF", canDownload: true, license: book.license, provider: book.provider });
     }
-    // 2. EPUB in-site only when we can actually render it: browsers cannot
-    //    fetch remote EPUBs cross-origin unless the source sends CORS headers
-    //    (Gutenberg does not) — so EPUB stays a download option, not a reader
-    //    source, unless the entry explicitly opts in with canStream:true.
-    if (book.formats?.epub && book.downloadAllowed && book.formats.epubCanStream) {
-        sources.push({ kind: "epub", url: book.formats.epub, label: "EPUB", canDownload: true, license: book.license, provider: book.provider });
+    // 2. in-site EPUB via our backend proxy — the browser can't fetch remote
+    //    EPUBs cross-origin (no CORS from Gutenberg); the proxy serves it
+    //    same-origin. Only public-domain items reach this path.
+    if (book.formats?.epub && book.downloadAllowed) {
+        sources.push({ kind: "epub", url: `/books/${encodeURIComponent(book.provider)}/${encodeURIComponent(book.providerBookId)}/epub`, label: "EPUB", canDownload: true, license: book.license, provider: book.provider, proxied: true });
     }
     // 3. HTML / full text (Gutenberg + Wikisource)
     if (book.formats?.html && book.fullTextAvailable) {
         sources.push({ kind: "html", url: book.formats.html, label: "HTML", canDownload: false, license: book.license || book.licenseUrl, provider: book.provider });
     }
-    // 4. Google Books embedded viewer (preview honesty enforced by the engine UI)
-    if (book.provider === "googlebooks" && book.embeddable && book.previewUrl) {
+    // 4. Google Books embedded viewer (preview honesty enforced by the engine UI).
+    //    The viewer doesn't consume API quota — available even when the API is
+    //    rate-limited (viewability UNKNOWN → the viewer itself is the truth).
+    if (book.provider === "googlebooks" && (book.embeddable || book.quotaLimited) && (book.previewUrl || book.providerBookId)) {
         sources.push({
             kind: "embed",
             volumeId: book.providerBookId,
-            label: book.viewability === "ALL_PAGES" ? "Full view" : "Preview",
-            previewOnly: book.viewability !== "ALL_PAGES",
+            label: book.viewability === "ALL_PAGES" ? "Full view" : book.viewability === "UNKNOWN" ? "Google Books" : "Preview",
+            previewOnly: book.viewability === "PARTIAL" || book.viewability === "SAMPLE" || book.viewability === "UNKNOWN",
             canDownload: false,
             provider: book.provider,
         });

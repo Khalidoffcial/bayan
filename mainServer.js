@@ -444,11 +444,12 @@ async function recommendFeed(user, type) {
         const collectionTypeById = new Map();
 
         for (const t of types) {
-            // استخراج الاهتمامات حسب نوع المحتوى
+            // استخراج الاهتمامات حسب نوع المحتوى — الضيف (user=null) لا يملك
+            // اهتمامات، فيذهب مباشرة لمسار المحتوى العام أدناه.
             const interests =
-                t === "novels"
+                (user && (t === "novels"
                     ? (user?.interesting?.novels || [])
-                    : (user?.interesting?.articles || []);
+                    : (user?.interesting?.articles || []))) || [];
 
             // محتوى هذا النوع وحده — الرجوع (fallback) لكل نوع مستقل
             // حتى لا يمتلئ الـ feed من posts ويُقصى novels/articles
@@ -2537,6 +2538,70 @@ app.delete(
     }
 );
 
+// EPUB proxy — public-domain Gutenberg EPUBs only. The URL is resolved
+// server-side from Gutendex metadata (never from user input → no SSRF).
+// epub.js reads it cross-origin-free and lazily fetches CFI ranges.
+app.get(
+    "/books/:provider/:providerBookId/epub",
+    async(req, res) => {
+        try {
+            const { provider, providerBookId } = req.params;
+            let url = null;
+            if (provider === "gutenberg") {
+                url = await booksRegistry.getProvider("gutenberg").getEpubUrl(providerBookId);
+            }
+            if (!url) return res.status(404).json({ status: "error", message: "NO_EPUB" });
+            const upstream = await fetch(url, { headers: { "User-Agent": "BayanSpace/1.0" } });
+            if (!upstream.ok) return res.status(502).json({ status: "error", message: `UPSTREAM_${upstream.status}` });
+            const len = upstream.headers.get("content-length");
+            // guard: refuse absurdly large files (20MB cap)
+            if (len && Number(len) > 20 * 1024 * 1024) return res.status(413).json({ status: "error", message: "EPUB_TOO_LARGE" });
+            res.writeHead(200, {
+                "Content-Type": "application/epub+zip",
+                ...(len ? { "Content-Length": len } : {}),
+                "Cache-Control": "public, max-age=86400",
+            });
+            if (typeof upstream.body.pipe === "function") {
+                upstream.body.pipe(res);
+                upstream.body.on("error", () => res.destroy());
+            } else {
+                const { Readable } = require("stream");
+                Readable.fromWeb(upstream.body).pipe(res);
+            }
+            req.on("close", () => { try { upstream.body?.destroy?.(); } catch { /* gone */ } });
+        } catch (err) {
+            console.error("GET /books/:provider/:id/epub error:", err.message);
+            if (!res.headersSent) res.status(err.status || 500).json({ status: "error", message: err.message });
+            else res.destroy();
+        }
+    }
+);
+
+// EPUB proxy — same-origin streaming for public-domain EPUBs only.
+// Access + host are verified server-side (SSRF-safe, DRM never passes).
+const { epubProxyHandler } = require("./service/books/epubProxy.js");
+app.get(
+    "/books/:provider/:providerBookId/epub",
+    (req, res) => epubProxyHandler(req, res, booksRegistry)
+);
+
+// DOAB index status — honest loading state for the UI while the first
+// harvest populates the local index (never show "no results" while empty
+// due to initial harvesting in progress).
+app.get(
+    "/books-doab-status",
+    async(req, res) => {
+        try {
+            const snap = await get(ref(db, "books_index/doab/meta"));
+            const meta = snap.val() || {};
+            res.json({ status: "ok", ...meta });
+        } catch (err) {
+            console.error("GET /books/doab/status error:", err.message);
+            res.status(500).json({ status: "error", message: err.message });
+        }
+    }
+);
+
 setInterval(() => {
     const cutoff = Date.now() - 60 * 60 * 1000; // 1h
     for (const [k, v] of triviaSessions) if (v.at < cutoff) triviaSessions.delete(k);
@@ -2933,11 +2998,14 @@ socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 20 })
         console.log("User:", user);
 
         if (!user) {
-            console.log("User not found");
-            return socket.emit("FEED_RESULT", {
-                items: [],
-                nextCursor: null
-            });
+            // Guests (and unknown ids) get the general discovery feed — same
+            // behavior the Home feed expects. Previously this branch emitted
+            // NOTHING, so guest clients hung until timeout and showed an
+            // error instead of content.
+            let feed = await recommendFeed(null, type);
+            feed = await enrichContent(feed);
+            const result = paginate(feed, limit, cursor);
+            return socket.emit("FEED_RESULT", result);
         }
 
         let feed = await recommendFeed(user, type);
@@ -3001,6 +3069,33 @@ socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 20 })
         onlineUsers.delete(socket.userId);
     });
 });
+
+// ======================================================
+// BAYAN CONTROL CENTER — admin namespace (/admin/api/*)
+// Independent credential store, JWT secret, sessions and RBAC.
+// Mounted AFTER all user routes; touches no existing behavior.
+// See control-center/docs/ for the architecture map and API docs.
+// ======================================================
+try {
+    const adminCore = require("./admin/core");
+    const adminRouter = require("./admin/index");
+    // db          = user/auth database (chatweb-2e06a)
+    // dao's db    = content database (tiaralamal)
+    const contentDb = require("./datastore/firebaseArticle").db;
+    adminCore.initAdmin({
+        dbUsers: db,
+        dbContent: contentDb,
+        cacheGet,
+        cacheSet,
+        io,
+        redisMode: useRedis ? "redis" : "memory",
+    });
+    app.use("/admin/api", adminRouter);
+    console.log("🛡️  Control Center admin API mounted at /admin/api");
+} catch (adminErr) {
+    // Fail-safe: an admin module problem must never take the platform down.
+    console.error("Control Center admin module failed to mount:", adminErr.message);
+}
 
 // ======================================================
 // START SERVER

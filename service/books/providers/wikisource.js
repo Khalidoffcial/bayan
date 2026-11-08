@@ -65,11 +65,44 @@ module.exports = function createWikisourceProvider({ injectedCache }) {
                 const data = await fetchJson(url, { timeoutMs: 25000 });
                 const p = Object.values(data?.query?.pages || {})[0];
                 if (!p || p.missing !== undefined) return null;
-                return normalizeHit({ title: p.title }, ed, p.extract || null);
+                const book = normalizeHit({ title: p.title }, ed, p.extract || null);
+                // chapter detection: works/anthologies are index pages whose
+                // wikitext links to subpages (Page/Chapter). Extract them in
+                // order so the reader can offer real chapters.
+                book.chapters = await this.getChapters(lang, pageTitle).catch(() => []);
+                return book;
             }, `id:${providerBookId}`);
         },
 
-        /** rendered HTML of a Wikisource page (their own API-rendered output) */
+        /** ordered chapter list of a work's index page (empty for plain pages) */
+        async getChapters(lang, pageTitle) {
+            const ed = EDITIONS.find((e) => e.lang === lang);
+            if (!ed) return [];
+            return cached(async () => {
+                const url = `https://${ed.host}/w/api.php?action=parse&page=${encodeURIComponent(pageTitle)}&prop=wikitext&format=json`;
+                const data = await fetchJson(url, { timeoutMs: 20000 });
+                const wikitext = data?.parse?.wikitext?.["*"] || "";
+                const prefix = pageTitle + "/";
+                const seen = new Set();
+                const chapters = [];
+                const re = /\[\[([^\]|#]+)(?:\|([^\]]+))?\]\]/g;
+                let m;
+                while ((m = re.exec(wikitext)) && chapters.length < 200) {
+                    const target = m[1].trim();
+                    if (!target.startsWith(prefix)) continue;          // only this work's subpages
+                    if (target.includes("#") || target.includes(":")) continue; // sections/namespaces out
+                    if (seen.has(target)) continue;
+                    seen.add(target);
+                    const label = (m[2] || target.slice(prefix.length)).trim();
+                    chapters.push({ title: label.slice(0, 200), path: target });
+                }
+                return chapters;
+            }, `ch:${lang}:${pageTitle}`);
+        },
+
+        /** rendered HTML of a Wikisource page (their own API-rendered output).
+         *  Accepts a plain page id (ws:lang:Title) or a chapter id
+         *  (ws:lang:Title/Chapter) so the reader serves real chapters. */
         async getReadContent(providerBookId) {
             const raw = String(providerBookId);
             let decoded = raw;

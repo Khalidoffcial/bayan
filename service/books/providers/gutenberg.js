@@ -84,6 +84,19 @@ module.exports = function createGutenbergProvider({ injectedCache }) {
                 return b.pdfUrl;
             } catch { return null; }
         },
+
+        /** EPUB byte URL for the in-proxy reader. Only public-domain books,
+         *  only the exact gutenberg.org URL returned by Gutendex (never user
+         *  input — this is what keeps the proxy SSRF-safe). */
+        async getEpubUrl(providerBookId) {
+            const gid = String(providerBookId).replace(/\D/g, "").slice(0, 8);
+            if (!gid) return null;
+            try {
+                const b = await this.getBook(gid);
+                if (!b || b.copyright || !b.formats?.epub) return null;
+                return b.formats.epub;
+            } catch { return null; }
+        },
     };
 };
 
@@ -111,6 +124,10 @@ function normalize(b) {
         formats: {
             pdf: pick((k) => k.startsWith("application/pdf")),
             epub: pick((k) => k.startsWith("application/epub+zip")),
+            // Gutenberg sends no CORS headers on file downloads — direct browser
+            // EPUB fetch fails, but our backend proxy streams the same file.
+            // Public domain only → reading inside Bayan is authorized.
+            epubCanStream: publicDomain && Boolean(pick((k) => k.startsWith("application/epub+zip"))),
             html: pick((k) => k.startsWith("text/html")),
             text: pick((k) => k.startsWith("text/plain")),
         },

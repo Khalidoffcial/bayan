@@ -97,7 +97,7 @@ const defaultSettings = {
   appearance: {
     theme: "light",
     fontSize: "medium",
-    fontFamily: "Inter",
+    fontFamily: "Zain",
     language: "en",
     direction: "ltr",
     primaryColor: "#4A7DFF",
