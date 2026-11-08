@@ -80,7 +80,7 @@ const FlowActions = ({
     <div className="flow-actions" role="toolbar" aria-label={t("flow.actions")}>
       <button
         type="button"
-        className={`flow-act ${liked ? "flow-act--liked" : ""}`}
+        className={`flow-act ${liked ? "flow-act--liked" : ""} ${Boolean(likesCount) ? "flow-act--with-count" : ""}`}
         onClick={stop(() => onLike?.(item.id))}
         aria-label={t("feed.like")}
         aria-pressed={Boolean(liked)}
@@ -91,7 +91,7 @@ const FlowActions = ({
 
       <button
         type="button"
-        className="flow-act"
+        className={`flow-act ${Boolean(commentsCount) ? "flow-act--with-count" : ""}`}
         onClick={stop(() => onComment?.(item.id))}
         aria-label={t("feed.comment")}
       >

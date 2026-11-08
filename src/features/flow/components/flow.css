@@ -79,6 +79,9 @@
   min-height: 0;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
+  /* Vertical pan only — horizontal moves (image galleries, etc.) stay
+     untouched; pinch-zoom preserved for accessibility. */
+  touch-action: pan-y pinch-zoom;
   /* iOS momentum + hide scrollbar for immersion; keyboard scroll still works */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -116,29 +119,32 @@
   flex: 1;
   display: flex;
   min-height: 0;
-  position: relative; /* establishes the containing block for the overlay rail */
-  /* No horizontal padding for a rail gutter anymore — content owns the
-     full width; the overlay rail floats above it. */
+  position: relative; /* containing block for the overlay rail */
   padding: 8px 12px;
 }
 
+/* Content layer — NO own scroller on mobile. The inner overflow-y made
+   this an independent scroll container that swallowed the touch gesture
+   (overscroll-behavior: contain blocked chaining to the snap track), so
+   swipes died inside the card unless started over the click-through
+   action rail. Content is height-fitted; long posts use their own full
+   reader via "Continue Reading". Desktop keeps inner scrolling for
+   mouse users. */
 .flow-item__scroller {
   flex: 1;
   min-width: 0;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  /* Long content scrolls INSIDE the card; only when at its edge does the
-     swipe continue to the next card (browser-native nested scroll). */
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-md) transparent;
   padding: 4px;
-  /* Content stays clear of the floating action rail (no layout reserve —
-     just breathing room so rail chips don't sit on top of text). */
+  /* Give touches to the snap track — never trap them here. */
+  touch-action: pan-y;
+  overflow: visible;
+  /* Breathing room so the floating rail never sits on top of text. */
   padding-inline-end: 56px;
+  /* Do NOT become a scroll container on mobile: */
+  overflow-y: visible;
 }
 
 .flow-item__head {
@@ -201,6 +207,18 @@
   flex-direction: column;
   gap: 10px;
   min-height: 0;
+  /* Vertical pans pass THROUGH to the snap track (no trapping). */
+  touch-action: pan-y;
+}
+
+/* Media elements must not swallow the vertical swipe: images/videos get
+   default browser gestures (pinch-zoom preserved), vertical panning is
+   explicitly allowed to chain up. */
+.flow-media img,
+.flow-media video {
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .flow-media__stage {
@@ -373,90 +391,111 @@
   transform: translateY(-1px);
 }
 
-/* ---------- Action rail — floating OVERLAY over the content ----------
-   position:absolute inside the card (the card is position:relative and
-   is a plain element — no transform/filter ancestors create a stacking
-   trap between it and this rail, so z-index resolves locally). The rail
-   reserves ZERO layout space: content stays exactly where it was. */
+/* ---------- Action rail — Reels-style floating overlay ----------
+   position:absolute inside the card. pointer-events:none on the rail
+   container itself keeps the whole rail area click-through to the snap
+   track (swipes over the rail still paginate); only the individual
+   buttons re-enable pointer-events. */
 .flow-actions {
   position: absolute;
-  /* Anchor to the block-end of the card with safe-area awareness. */
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
-  /* Logical inline anchoring: inline-end in LTR (right side), inline-start
-     in RTL (left side) — the whole rail mirrors with the document dir. */
-  inset-inline-end: 8px;
-  z-index: 3; /* above content (auto/1), below comments sheet (10) */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
+  inset-inline-end: 10px;
+  z-index: 3; /* above content, below comments sheet (10) */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  pointer-events: none; /* the rail container itself is click-through */
+  gap: 14px;
+  pointer-events: none;
 }
 
-/* Buttons re-enable interaction over the click-through container. */
 .flow-actions > * {
   pointer-events: auto;
 }
 
+/* Minimal circular glass button — small, transparent, Reels-like.
+   The 44px touch area comes from padding around a 24px glyph, not a
+   large filled chip. */
 .flow-act {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
   border: none;
-  background: rgba(0, 0, 0, 0.28);
+  border-radius: 50%;
+  background: transparent;
   color: #fff;
   cursor: pointer;
   font-family: inherit;
-  font-size: var(--fs-small);
-  transition: color var(--transition-fast), transform var(--transition-fast), background var(--transition-fast);
-  width: 44px;   /* guaranteed touch target, icon optically smaller */
-  height: 44px;
-  border-radius: var(--radius-full);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  /* Legibility over any media: subtle dark glass chip, no big opaque slab */
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.12s ease;
+  /* Legibility over any media: soft shadow + faint glass halo. */
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55));
 }
 
-.flow-act:hover {
-  background: rgba(0, 0, 0, 0.42);
-  transform: scale(1.06);
+.flow-act::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: -1;
+  transition: background 0.12s ease;
 }
+
+.flow-act:hover::before { background: rgba(0, 0, 0, 0.34); }
+
+/* Press feedback — instant, subtle, no heavy animation. */
+.flow-act:active { transform: scale(0.88); }
 
 .flow-act--liked {
-  color: #ff5c8a;
+  color: #ff3b5c;
 }
 
 .flow-act-count {
-  font-size: var(--fs-small);
-  color: inherit;
-  line-height: 1;
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
   font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
 }
+
+/* Count needs room below the circular glyph — bump the button height
+   only visually via the count's absolute position (no layout change). */
+.flow-act--with-count { height: 52px; }
 
 .flow-act--profile {
   color: #fff;
 }
 
 .flow-follow {
-  border: 1.5px solid var(--blue);
-  background: var(--blue);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.22);
   color: #fff;
   font-family: inherit;
-  font-size: var(--fs-small);
+  font-size: 12px;
   font-weight: 600;
-  border-radius: var(--radius-full);
-  padding: 7px 14px;
+  border-radius: 999px;
+  padding: 6px 14px;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
-  min-height: 32px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.12s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55));
 }
+
+.flow-follow--on {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: transparent;
+}
+
+.flow-follow:disabled { opacity: 0.6; cursor: default; }
 
 .flow-follow--on {
   background: transparent;
@@ -469,14 +508,16 @@
 }
 
 /* ---------- Inline comments overlay (bottom sheet) ----------
-   z-index 10 — ABOVE the action rail (3) so the sheet covers it while
-   open; the rail re-emerges when the sheet closes. */
+   z-index 10 — above the action rail (3). Its own pan-y touch-action
+   means scrolling inside the comments NEVER paginates the track. */
 .flow-comments {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
   max-height: 62%;
   overflow-y: auto;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
   background: var(--glass, var(--bg-primary));
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -701,9 +742,21 @@
 @media (min-width: 1024px) {
   .flow-item { padding: 20px 32px; }
 
-  /* Content column centered with a reserved-looking inset — but the rail
-     remains an absolute overlay OUTSIDE the column, over the page margin,
-     so it never covers desktop text either. */
+  /* Desktop restores an inner scroller for mouse/wheel users (long posts
+     stay in place instead of jumping to the next card). Touch is not
+     affected — this breakpoint only hits precise pointers. */
+  @media (pointer: fine) {
+    .flow-item__scroller {
+      overflow-y: auto;
+      max-height: 100%;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-md) transparent;
+    }
+  }
+
+  /* Content column centered — the rail remains an absolute overlay
+     OUTSIDE the column, over the page margin, never over text. */
   .flow-item__scroller {
     max-width: 620px;
     margin-inline: auto;
@@ -712,6 +765,7 @@
     border: 1px solid var(--border);
     box-shadow: var(--shadow-md);
     padding: 20px;
+    padding-inline-end: 20px;
   }
 
   .flow-text { padding-block: 12px; }
