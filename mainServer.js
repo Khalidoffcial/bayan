@@ -87,7 +87,6 @@ const novel_categories = JSON.parse(fs.readFileSync("novel_categories.json", "ut
 const allowedOrigins = [
     "https://bayan-space.vercel.app",
     "https://bayan-production-0201.up.railway.app",
-    "http://localhost:3000",
     "http://localhost:5174"
 ];
 
