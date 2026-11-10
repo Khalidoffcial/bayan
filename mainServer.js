@@ -88,6 +88,7 @@ const allowedOrigins = [
     "https://bayan-space.vercel.app",
     "https://bayan-production-0201.up.railway.app",
     "http://localhost:3000",
+    "http://localhost:5174"
 ];
 
 // Dev-only: allow the local React dev server(s). Production keeps the
