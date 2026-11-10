@@ -14,6 +14,7 @@ const auth = require("./auth");
 const router = express.Router();
 // handles() gives live access to db connections after initAdmin()
 const H = () => core.handles();
+const _rt = () => core.rtdbFns(); const ref=(...a)=>_rt().ref(...a), get=(...a)=>_rt().get(...a), set=(...a)=>_rt().set(...a), update=(...a)=>_rt().update(...a), push=(...a)=>_rt().push(...a), remove=(...a)=>_rt().remove(...a), runTransaction=(...a)=>_rt().runTransaction(...a), query=(...a)=>_rt().query(...a), orderByChild=(...a)=>_rt().orderByChild(...a), equalTo=(...a)=>_rt().equalTo(...a), limitToLast=(...a)=>_rt().limitToLast(...a);
 
 const BOOTSTRAP_TOKEN = process.env.ADMIN_BOOTSTRAP_TOKEN || "";
 const SUPER_ADMIN_ROOT = "control_admins";
@@ -120,7 +121,7 @@ router.post("/bootstrap", async (req, res) => {
       uid, name: String(name || "").slice(0, 80), email: String(email).toLowerCase().slice(0, 120),
       psw: await bcrypt.hash(String(password), 12), role: "super_admin", active: true, createdAt: new Date().toISOString(),
     };
-    await set(ref(h.dbUsers, `${SUPER_ADMIN_ROOT}/${uid}`), rec);
+    await h.set(h.ref(h.dbUsers, `${SUPER_ADMIN_ROOT}/${uid}`), rec);
     await core.writeAudit({ adminUid: uid, adminRole: "super_admin", action: "admin.bootstrap", targetType: "admin", targetId: uid, success: true });
     return res.status(201).json({ status: "ok", uid });
   } catch (err) {

@@ -16,8 +16,8 @@ cloudinary.config({
 });
 
 /**
- * تصنيف تلقائي — يستخدم الترجمة إلى الإنجليزية عبر Translation Service
- * بدل مكتبة Google المباشرة (تم استبدالها بـ LibreTranslate).
+ * ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚Â ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã…Â  ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¥Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¥Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â²Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â± Translation Service
+ * ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã†â€™ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¨ÃƒËœÃ‚Â© Google ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§ÃƒËœÃ‚Â´ÃƒËœÃ‚Â±ÃƒËœÃ‚Â© (ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â€šÂ¬ LibreTranslate).
  */
 async function translateToEnglish(text) {
     try {
@@ -32,11 +32,12 @@ async function translateToEnglish(text) {
         return result.ok ? result.translatedText : text;
     } catch (err) {
         console.error("Classification translate failed:", err.message);
-        return text; // fallback للنص الأصلي — التصنيف يستمر
+        return text; // fallback Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Âµ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£ÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â  ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚Â Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â±
     }
 }
 
-const sign = require("./datastore/signin_signupDao_firebase.js");
+const sign = require("./datastore/signin_signupDao_firebase.js");// SECURITY (P2): Firebase ID token verification for Google sign-in.
+const { verifyFirebaseIdToken } = require("./admin/firebaseIdToken.js");
 const dao = require("./datastore/Dao.js");
 const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
 const { saveContent_Article_Novels, saveContent_Posts, saveContent_Comment } = require("./service/saveContent.js");
@@ -59,8 +60,8 @@ const {
     QURAN_RECITERS,
     quranSurahTrack,
 } = require("./service/audioHub.service.js");
-// Firebase Realtime Database — المستخدمة في getFocusData و/update(ref(db...)))
-// (كانت تُستخدم دون استيراد في أجزاء قديمة — تصحيح: استيراد موحد هنا)
+// Firebase Realtime Database ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  getFocusData Ãƒâ„¢Ã‹â€ /update(ref(db...)))
+// (Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Âª ÃƒËœÃ‚ÂªÃƒâ„¢Ã‚ÂÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  ÃƒËœÃ‚Â£ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â²ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂµÃƒËœÃ‚Â­Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â­: ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§)
 const {
     db,
     ref,
@@ -90,7 +91,7 @@ const allowedOrigins = [
 ];
 
 // Dev-only: allow the local React dev server(s). Production keeps the
-// strict list above — no wildcard, and these are never sent in prod.
+// strict list above ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no wildcard, and these are never sent in prod.
 if (process.env.NODE_ENV !== "production") {
     allowedOrigins.push("http://localhost:3001", "http://localhost:3011");
 }
@@ -98,7 +99,7 @@ if (process.env.NODE_ENV !== "production") {
 const app = express();
 const httpServer = createServer(app);
 
-// CORS لطلبات Express العادية مثل signup و login
+// CORS Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â·Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Express ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â«Ãƒâ„¢Ã¢â‚¬Å¾ signup Ãƒâ„¢Ã‹â€  login
 app.use(
     cors({
         origin: allowedOrigins,
@@ -110,7 +111,7 @@ app.use(
 
 app.options("*", cors()); // handle preflight (older Express)
 app.use(express.json());
-// CORS الخاص بـ Socket.IO
+// CORS ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Âµ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â€šÂ¬ Socket.IO
 const io = new Server(httpServer, {
     cors: {
         origin: allowedOrigins,
@@ -191,19 +192,19 @@ const onlineUsers = new Map();
         try {
             await redisClient.connect();
             useRedis = true;
-            console.log("🟢 Redis Connected");
+            console.log("ÃƒÂ°Ã…Â¸Ã…Â¸Ã‚Â¢ Redis Connected");
         } catch {
-            console.log("⚠ Redis not available -> Memory Cache Enabled");
+            console.log("ÃƒÂ¢Ã…Â¡Ã‚Â  Redis not available -> Memory Cache Enabled");
             useRedis = false;
         }
     } catch {
-        console.log("⚠ Redis package not installed -> Memory Cache Enabled");
+        console.log("ÃƒÂ¢Ã…Â¡Ã‚Â  Redis package not installed -> Memory Cache Enabled");
         useRedis = false;
     }
 })();
 
 // ======================================================
-// HELPERS (مشتركة)
+// HELPERS (Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â´ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â©)
 // ======================================================
 
 function generateUniqueId() {
@@ -212,6 +213,110 @@ function generateUniqueId() {
 
 function generateToken(payload) {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "720h" });
+}
+// SECURITY (Phase 1): JWTs must NEVER carry secrets. Payload is identity-only:
+// { id, name, username } ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no password, no bcrypt hash, no tokens.
+function tokenPayloadFromUser(user) {
+    return { id: user.Id_user, name: user.F_user, username: user.S_user };
+}
+// Verify a Bearer token and require that the user still exists in the DB.
+// Rejects suspended/banned accounts (accountState). attachUser=true ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ req.userProfile
+// holds the profile (incl. psw) for server-side checks; never serialized.
+function requireUser(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    let decoded;
+    try {
+        decoded = jwt.verify(authHeader.slice(7), process.env.ACCESS_TOKEN_SECRET);
+    } catch (err) {
+        return res.status(401).json({ success: false, message: "Invalid token" });
+    }
+    if (!decoded || decoded.id == null) {
+        return res.status(401).json({ success: false, message: "Invalid token" });
+    }
+    if (decoded.pass !== undefined) {
+        // Legacy tokens (pre-security-fix) embed the bcrypt hash. Rejected:
+        // forces a fresh login and retires every legacy token.
+        return res.status(401).json({ success: false, message: "Token expired, please sign in again" });
+    }
+    (async () => {
+        try {
+            const user = await DaoForDbUser.findbyID(decoded.id);
+            if (!user) return res.status(401).json({ success: false, message: "Invalid token" });
+            const state = String(user.accountState || "active");
+            if (state === "banned") return res.status(403).json({ success: false, message: "Account banned" });
+            req.user = { id: decoded.id, name: decoded.name, username: decoded.username };
+            req.userProfile = user;
+            req.userAccountState = state;
+            next();
+        } catch (err) {
+            console.error("requireUser error:", err.message);
+            return res.status(500).json({ success: false, message: "Auth error" });
+        }
+    })();
+}
+// Same userData shape as before, minus the password. Compatibility preserved.
+function buildUserData(user, settings) {
+    return {
+        imgProfile: user.imgProfile,
+        id: user.Id_user,
+        name: user.F_user,
+        username: user.S_user,
+        Bio: user.Bio,
+        followers: user.followers,
+        following: user.following,
+        IdPoster: user.Posters,
+        settings,
+    };
+}
+// Login/verification endpoints: fixed, tiny bucket per IP (memory-based,
+// per-instance ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â acceptable for the single Railway instance).
+const loginBuckets = new Map();
+const LOGIN_WINDOW_MS = 5 * 60 * 1000;
+const LOGIN_MAX = 20;
+function loginRateLimit(req, res, next) {
+    const key = (req.headers["x-forwarded-for"]?.split(",")[0]?.trim()) || req.socket?.remoteAddress || "unknown";
+    const now = Date.now();
+    const b = loginBuckets.get(key);
+    if (!b || now - b.firstAt > LOGIN_WINDOW_MS) {
+        loginBuckets.set(key, { count: 1, firstAt: now });
+        return next();
+    }
+    b.count += 1;
+    if (b.count > LOGIN_MAX) {
+        return res.status(429).json({ success: false, message: "Too many attempts, try later" });
+    }
+    next();
+}
+// Socket-level rate limiter (fixed window, per-user/event, in-memory).
+const sockBuckets = new Map();
+function rateOK(key, max, windowMs) {
+    const now = Date.now();
+    const b = sockBuckets.get(key);
+    if (!b || now - b.firstAt > windowMs) {
+        sockBuckets.set(key, { count: 1, firstAt: now });
+        if (sockBuckets.size > 20000) sockBuckets.clear();
+        return true;
+    }
+    b.count += 1;
+    return b.count <= max;
+}
+// Interests allowlist: only known keys, bounded string values.
+function sanitizeInterests(input) {
+    if (!input || typeof input !== "object") return null;
+    const out = {};
+    for (const key of ["articles", "novels"]) {
+        const list = Array.isArray(input[key]) ? input[key] : [];
+        const clean = list
+            .filter((v) => typeof v === "string")
+            .map((v) => v.trim().slice(0, 60))
+            .filter(Boolean)
+            .slice(0, 30);
+        if (clean.length) out[key] = clean;
+    }
+    return out.articles || out.novels ? out : null;
 }
 
 function shuffle(arr) {
@@ -254,7 +359,7 @@ async function cacheGet(key) {
 
         if (!entry) return null;
 
-        // حذف العنصر عند انتهاء صلاحيته
+        // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂµÃƒËœÃ‚Â± ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ ÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­Ãƒâ„¢Ã…Â ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¡
         if (Date.now() >= entry.expiresAt) {
             memoryCache.delete(key);
             return null;
@@ -298,19 +403,19 @@ async function cacheDel(key) {
     }
 }
 
-// نظام الصوت (Audio Hub) — حقن الكاش والـ fetch من هذا الملف
+// Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¸ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂµÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Âª (Audio Hub) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§ÃƒËœÃ‚Â´ Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ fetch Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚Â
 initAudioHub({ cacheGet, cacheSet, fetchImpl: fetch });
 
 
 async function cacheDelPattern(pattern) {
-    // حذف المفاتيح المطابقة من Memory Cache
+    // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â­ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â·ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  Memory Cache
     for (const key of memoryCache.keys()) {
         if (key.startsWith(pattern.replace("*", ""))) {
             memoryCache.delete(key);
         }
     }
 
-    // حذف المفاتيح المطابقة من Redis
+    // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â­ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â·ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  Redis
     if (useRedis && redisClient?.isReady) {
         try {
             for await (const key of redisClient.scanIterator({
@@ -352,7 +457,7 @@ async function getUser(userId) {
 
         userId = Number(userId);
 
-        // التحقق من صحة الرقم
+        // ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚ÂµÃƒËœÃ‚Â­ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â±Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Â¦
         if (Number.isNaN(userId)) {
             console.error("Invalid userId:", userId);
             return null;
@@ -439,20 +544,20 @@ async function recommendFeed(user, type) {
                 : [String(type).toLowerCase()];
 
         let allContent = [];
-        // المصدر الحقيقي لكل سجل: id → المجموعة التي جاء منها فعلاً
-        // (يتجاهل الكشف التقريبي بالشكل — السجلات القديمة بلا type تُعرّف من هنا)
+        // ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚ÂµÃƒËœÃ‚Â¯ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾: id ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â  ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¹
+        // (Ãƒâ„¢Ã…Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â´Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â±Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â  ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â´Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ type ÃƒËœÃ‚ÂªÃƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹ÃƒËœÃ‚Â±Ãƒâ„¢Ã¢â‚¬ËœÃƒâ„¢Ã‚Â Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§)
         const collectionTypeById = new Map();
 
         for (const t of types) {
-            // استخراج الاهتمامات حسب نوع المحتوى — الضيف (user=null) لا يملك
-            // اهتمامات، فيذهب مباشرة لمسار المحتوى العام أدناه.
+            // ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â­ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¨ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¶Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚Â (user=null) Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™
+            // ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒËœÃ…â€™ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â ÃƒËœÃ‚Â°Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â¨ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§ÃƒËœÃ‚Â´ÃƒËœÃ‚Â±ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â£ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡.
             const interests =
                 (user && (t === "novels"
                     ? (user?.interesting?.novels || [])
                     : (user?.interesting?.articles || []))) || [];
 
-            // محتوى هذا النوع وحده — الرجوع (fallback) لكل نوع مستقل
-            // حتى لا يمتلئ الـ feed من posts ويُقصى novels/articles
+            // Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¡ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ (fallback) Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¾
+            // ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¦ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ feed Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  posts Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Â° novels/articles
             let typeContent = [];
 
             // =====================================
@@ -479,14 +584,14 @@ async function recommendFeed(user, type) {
             }
 
             // =====================================
-            // إذا لم توجد اهتمامات أو لم ينتج عنها محتوى — لكل نوع على حدة
+            // ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â£Ãƒâ„¢Ã‹â€  Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¬ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â©
             // =====================================
             if (typeContent.length === 0) {
                 console.log("No personalized feed found. Loading random content...", t);
                 typeContent = await dao.getAllContent(t, 20);
             }
 
-            // وسم كل سجل بمجموعته قبل الدمج — هذا هو التطبيع الموحد للعرض
+            // Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¡ Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¬ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â·ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¹ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¶
             for (const item of typeContent) {
                 if (!item || item.id == null) continue;
                 const key = String(item.id);
@@ -496,7 +601,7 @@ async function recommendFeed(user, type) {
         }
 
         // =====================================
-        // إزالة المحتويات المكررة
+        // ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â²ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â±ÃƒËœÃ‚Â±ÃƒËœÃ‚Â©
         // =====================================
         console.log("Before filter:", allContent.length);
 
@@ -511,15 +616,15 @@ async function recommendFeed(user, type) {
 
         console.log("After filter:", allContent.length);
 
-        // كل نوع يحمل نوعه من المجموعة التي جاء منها فعلاً (المصدر الموثوق) —
-        // حقل type على السجل قد يكون ملوثًا (الردود تحمل parentType) أو غائبًا (سجلات قديمة).
+        // Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â¡ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â  ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¹ (ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚ÂµÃƒËœÃ‚Â¯ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â«Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¡) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
+        // ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¾ type ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â«Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ (ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ parentType) ÃƒËœÃ‚Â£Ãƒâ„¢Ã‹â€  ÃƒËœÃ‚ÂºÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ (ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â©).
         allContent = allContent.map((item) => ({
             ...item,
             type: collectionTypeById.get(String(item.id)) || item.type || "posts",
         }));
 
         // =====================================
-        // حساب الـ Score لكل محتوى
+        // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ Score Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â°
         // =====================================
         const scored = await Promise.all(
             allContent.map(async (item) => ({
@@ -530,8 +635,8 @@ async function recommendFeed(user, type) {
         console.log("All scored: ", scored.length);
 
         // =====================================
-        // ترتيب: الـ score أولًا، ثم الأحدث زمنيًا عند تساوي الـ score
-        // (السجلات القديمة بلا timestamp تذهب أخيرًا بأمان)
+        // ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â¨: ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ score ÃƒËœÃ‚Â£Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ÃƒËœÃ…â€™ ÃƒËœÃ‚Â«Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â« ÃƒËœÃ‚Â²Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¯ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â³ÃƒËœÃ‚Â§Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ score
+        // (ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ timestamp ÃƒËœÃ‚ÂªÃƒËœÃ‚Â°Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â£ÃƒËœÃ‚Â®Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â±Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â£Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â )
         // =====================================
         const tsOf = (item) => {
             const ts = Number(item?.timestamp);
@@ -578,7 +683,7 @@ async function enrichContent(contentArray) {
 // CLASSIFICATION HELPERS
 // ======================================================
 
-// translateToEnglish معرّف أعلى الملف — يستخدم Translation Service (LibreTranslate)
+// translateToEnglish Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â±Ãƒâ„¢Ã¢â‚¬ËœÃƒâ„¢Ã‚Â ÃƒËœÃ‚Â£ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ Translation Service (LibreTranslate)
 
 function classifyMultipleCategories(text, threshold = 0.05) {
     if (!text || typeof text !== "string") return [];
@@ -648,8 +753,8 @@ function classifyNovel(text, threshold = 2) {
 // REST API ROUTES
 // ======================================================
 
-// ✅ تسجيل الدخول
-app.post("/signin", async(req, res) => {
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â®Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾
+app.post("/signin", loginRateLimit, async(req, res) => {
     const { identifierUser, password } = req.body;
     if (!identifierUser || !password)
         return res.status(400).json({ message: "Please enter all fields" });
@@ -658,7 +763,9 @@ app.post("/signin", async(req, res) => {
         const user = await sign.login_user(identifierUser, password);
         if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-        const payload = { id: user.Id_user, name: user.F_user, username: user.S_user, pass: user.psw };
+        // SECURITY (Phase 1): identity-only JWT ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the bcrypt hash (pass) is no
+        // longer embedded. Existing clients only read accessToken/userData.
+        const payload = tokenPayloadFromUser(user);
         const settings =
             await sign.getUserSettings(
                 user.Id_user
@@ -682,43 +789,43 @@ app.post("/signin", async(req, res) => {
     }
 });
 
-// ✅ تسجيل الدخول بجوجل
-app.post("/authGoogle", async(req, res) => {
-    const { email, uid } = req.body;
-    if (!email || !uid) return res.status(400).json({ message: "Please enter all fields" });
-    console.log(email)
-    console.log(uid)
-
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â®Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¬Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾
+app.post("/authGoogle", loginRateLimit, async(req, res) => {
+    // SECURITY (P2): the client MUST present the Firebase ID token obtained
+    // from the actual Google popup sign-in. Signature/issuer/audience/expiry
+    // are verified server-side (admin/firebaseIdToken.js); uid and email are
+    // taken from the VERIFIED claims Ã¢â‚¬â€ never from the raw body Ã¢â‚¬â€ and must
+    // match an existing Bayan account. No JWT is issued otherwise.
+    const { idToken } = req.body || {};
+    if (!idToken) return res.status(400).json({ message: "Missing idToken" });
     try {
+        let claims;
+        try {
+            claims = await verifyFirebaseIdToken(idToken);
+        } catch (verr) {
+            if (verr.code === "FIREBASE_ADMIN_INIT_FAILED" || verr.message?.startsWith("FIREBASE_ADMIN_INIT_FAILED")) {
+                console.error("authGoogle: admin SDK not configured:", verr.message);
+                return res.status(503).json({ message: "GOOGLE_AUTH_UNAVAILABLE" });
+            }
+            console.error("authGoogle: idToken verification failed:", verr.code || verr.message);
+            return res.status(401).json({ message: "Invalid Google sign-in" });
+        }
+        const email = claims.email;
+        const uid = claims.uid;
         const existingUser = await sign.findUserByEmailAndUid(email, uid);
         if (!existingUser)
             return res.status(404).json({ message: "Invalid login credentials.", email, uid });
-
-        const payload = { id: existingUser.Id_user, name: existingUser.F_user, username: existingUser.S_user, pass: existingUser.psw };
-        const settings =
-            await sign.getUserSettings(
-                existingUser.Id_user
-            );
-        const userData = {
-            imgProfile: existingUser.imgProfile,
-            id: existingUser.Id_user,
-            name: existingUser.F_user,
-            username: existingUser.S_user,
-            Bio: existingUser.Bio,
-            followers: existingUser.followers,
-            following: existingUser.following,
-            IdPoster: existingUser.Posters,
-            settings
-        };
-
-        res.json({ message: "Login successful", accessToken: generateToken(payload), userData });
+        // SECURITY (Phase 1): identity-only JWT Ã¢â‚¬â€ no password hash inside.
+        const payload = tokenPayloadFromUser(existingUser);
+        const settings = await sign.getUserSettings(existingUser.Id_user);
+        res.json({ message: "Login successful", accessToken: generateToken(payload), userData: buildUserData(existingUser, settings) });
     } catch (err) {
-        console.error("Google login error:", err);
+        console.error("Google login error:", err.message);
         res.status(500).json({ message: "Internal server error" });
     }
 });
 
-// ✅ تسجيل حساب جديد
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â­ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¯
 app.post("/signup", async(req, res) => {
     const { fullName, username, email, uid, password } = req.body;
     if (!fullName || !username || !password)
@@ -731,7 +838,7 @@ app.post("/signup", async(req, res) => {
         const existingUser = await sign.findUserByEmailAndUid(email, uid);
 
         if (existingUser) {
-            const payload = { id: existingUser.Id_user, name: existingUser.F_user, username: existingUser.S_user, pass: existingUser.psw };
+            const payload = tokenPayloadFromUser(existingUser);
             const settings =
                 await sign.getUserSettings(
                     existingUser.Id_user
@@ -752,7 +859,8 @@ app.post("/signup", async(req, res) => {
 
         const uniqueId = generateUniqueId();
         const user = await sign.logup_user_Insert(fullName, username, email, uid, uniqueId, password);
-        const token = generateToken({ id: uniqueId, username, pass: password });
+        // SECURITY (Phase 1): the plaintext password is never signed into a JWT.
+        const token = generateToken(tokenPayloadFromUser(user));
         const userData = {
             imgProfile: user.imgProfile,
             id: user.Id_user,
@@ -772,7 +880,7 @@ app.post("/signup", async(req, res) => {
     }
 });
 
-// ✅ تحقق من الـ Token
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ Token
 app.post("/auth", (req, res) => {
     if (!req.headers.authorization?.startsWith("Bearer "))
         return res.status(401).json({ message: "No token provided" });
@@ -781,8 +889,21 @@ app.post("/auth", (req, res) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err, decoded) => {
         if (err) return res.status(403).json({ message: "Invalid token" });
+        // SECURITY (Phase 1): /auth no longer re-derives identity from a hash.
+        // New tokens carry { id, name, username }; the user record is loaded
+        // fresh from the DB. Legacy tokens (with `pass`) are rejected with a
+        // clear message so the client re-authenticates ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the ONLY behavior
+        // change, required to retire hash-bearing tokens.
+        if (!decoded || decoded.id == null) return res.status(403).json({ message: "Invalid token" });
+        if (decoded.pass !== undefined) {
+            return res.status(401).json({ message: "Token expired, please sign in again" });
+        }
         try {
-            const user = await sign.login_user(decoded.id, decoded.pass);
+            const user = await DaoForDbUser.findbyID(decoded.id);
+            if (!user) return res.status(403).json({ message: "Invalid token" });
+            if (String(user.accountState || "active") === "banned") {
+                return res.status(403).json({ message: "Account banned" });
+            }
             const settings =
                 await sign.getUserSettings(
                     user.Id_user
@@ -805,66 +926,53 @@ app.post("/auth", (req, res) => {
     });
 });
 
-// ✅ تعديل الملف الشخصي
-app.post("/editProfile", async(req, res) => {
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â´ÃƒËœÃ‚Â®ÃƒËœÃ‚ÂµÃƒâ„¢Ã…Â 
+// SECURITY (Phase 1): was verified only at signature level, and the profile
+// DAOs were invoked with decoded.pass (the hash carried in legacy JWTs) as an
+// auth side-channel. Now: full requireUser middleware (DB-backed identity),
+// the caller may only edit THEIR OWN profile row, DAO calls go through new
+// direct-by-id variants (no password side-channel), and input length is
+// validated. Old DAO-by-password functions stay unused by routes.
+app.post("/editProfile", requireUser, async(req, res) => {
+    if (req.userAccountState === "suspended") return res.status(403).json({ success: false, message: "Account suspended" });
     const { Updatable, status } = req.body;
-    if (!req.headers.authorization?.startsWith("Bearer "))
-        return res.status(401).json({ message: "No token provided" });
-
-    const token = req.headers.authorization.split(" ")[1];
-
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err, decoded) => {
-        if (err) return res.status(403).json({ message: "Invalid token" });
-
-        const buildUserData = async(u) => {
-            const settings = await sign.getUserSettings(u.Id_user);
-
-            return {
-                imgProfile: u.imgProfile,
-                id: u.Id_user,
-                name: u.F_user,
-                username: u.S_user,
-                Bio: u.Bio,
-                followers: u.followers,
-                following: u.following,
-                IdPoster: u.Posters,
-                settings
-            };
-        };
-        try {
-            let updatedUser;
-            // تطبيع اسم الحقل: الواجهة قد ترسل "Bio" أو "bio" أو "name"/"img" بأي حالة.
-            const statusKey = String(status || "").toLowerCase();
-            const trimmedValue = typeof Updatable === "string" ? Updatable.trim() : Updatable;
-
-            if (statusKey === "img") {
-                updatedUser = await sign.logup_user_Insert_ImgProfile(trimmedValue, decoded.username, decoded.pass);
-            } else if (statusKey === "name") {
-                updatedUser = await sign.logup_user_Insert_Name(trimmedValue, decoded.username, decoded.pass);
-            } else if (statusKey === "bio") {
-                // فارغ مسموح (تصميم المنتج يسمح بمحيّة بدون بايو) — لكن ليس undefined/null.
-                if (trimmedValue == null)
-                    return res.status(400).json({ message: "Bio value is required (may be empty string)" });
-                updatedUser = await sign.logup_user_Insert_BIO(trimmedValue, decoded.username, decoded.pass);
-            } else {
-                return res.status(400).json({ message: "Invalid status" });
-            }
-
-            if (!updatedUser || updatedUser.Id_user == null)
-                return res.status(500).json({ message: "Profile update did not return user data" });
-
-            await invalidateUserCache(updatedUser.Id_user);
-            res.json({ message: "Profile updated", userData: await buildUserData(updatedUser) });
-        } catch (err) {
-            console.error("Profile update error:", err);
-            res.status(500).json({ message: err?.message || "Error updating profile" });
+    const statusKey = String(status || "").toLowerCase();
+    const trimmedValue = typeof Updatable === "string" ? Updatable.trim() : Updatable;
+    try {
+        if ((statusKey === "name" || statusKey === "img") &&
+            (typeof trimmedValue !== "string" || !trimmedValue || trimmedValue.length > 80)) {
+            return res.status(400).json({ message: "Invalid value" });
         }
-    });
+        if (statusKey === "bio" &&
+            (typeof trimmedValue !== "string" || trimmedValue.length > 500)) {
+            return res.status(400).json({ message: "Bio value is required (may be empty string, max 500 chars)" });
+        }
+        const uid = req.user.id;
+        if (statusKey === "img") {
+            await sign.setProfileImgProfileById(uid, trimmedValue);
+        } else if (statusKey === "name") {
+            await sign.setProfileFieldById(uid, "F_user", trimmedValue);
+        } else if (statusKey === "bio") {
+            await sign.setProfileFieldById(uid, "Bio", trimmedValue);
+        } else {
+            return res.status(400).json({ message: "Invalid status" });
+        }
+        const updatedUser = await sign.findbyID(uid);
+        if (!updatedUser || updatedUser.Id_user == null)
+            return res.status(500).json({ message: "Profile update did not return user data" });
+        await invalidateUserCache(updatedUser.Id_user);
+        const settings = await sign.getUserSettings(updatedUser.Id_user);
+        res.json({ message: "Profile updated", userData: buildUserData(updatedUser, settings) });
+    } catch (err) {
+        console.error("Profile update error:", err.message);
+        res.status(500).json({ message: err?.message || "Error updating profile" });
+    }
 });
 
 
-// ✅ حفظ مقال أو رواية — الهوية من التوكن (لا نثق بالـ autherID من الواجهة)
-app.post("/saveArticle_novels", verifyToken, async (req, res) => {
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â£Ãƒâ„¢Ã‹â€  ÃƒËœÃ‚Â±Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â  (Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â«Ãƒâ„¢Ã¢â‚¬Å¡ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ autherID Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â©)
+app.post("/saveArticle_novels", requireUser, async (req, res) => {
+    if (req.userAccountState === "suspended") return res.status(403).json({ status: "error", message: "Account suspended" });
     try {
         const trustedAuthorId = String(req.user?.id ?? "");
         if (!trustedAuthorId) {
@@ -881,7 +989,7 @@ app.post("/saveArticle_novels", verifyToken, async (req, res) => {
             });
         }
 
-        // بعد نجاح الحفظ فقط
+        // ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·
         await invalidateFeedCache("articles");
         await invalidateFeedCache("novels");
 
@@ -894,15 +1002,16 @@ app.post("/saveArticle_novels", verifyToken, async (req, res) => {
 
 
 
-// ✅ حفظ بوست — routes a comment payload to saveContent_Comment,
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Âª ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â routes a comment payload to saveContent_Comment,
 // normal posts to the existing normal-post path.
 // Identity: the verified JWT payload `{ id, name, username, pass }` is the
 // authoritative author ID; a mismatching client-supplied autherID is overridden.
-app.post("/saveposts", verifyToken, async (req, res) => {
+app.post("/saveposts", requireUser, async (req, res) => {
+  if (req.userAccountState === "suspended") return res.status(403).json({ status: "error", message: "Account suspended" });
   try {
     const { comment_on } = req.body;
 
-    // 💬 Comment payloads carry `comment_on` — persist in the comments path.
+    // ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¬ Comment payloads carry `comment_on` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â persist in the comments path.
     if (comment_on) {
       const trustedAuthorId = String(req.user?.id ?? "");
       if (!trustedAuthorId) {
@@ -911,7 +1020,7 @@ app.post("/saveposts", verifyToken, async (req, res) => {
 
       const payload = { ...req.body, autherID: trustedAuthorId };
 
-      // تحقق الخادم من حدود الوسائط قبل الحفظ
+      // ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â· Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸
       const mediaCheck = validateMediaManifest(payload.media || []);
       if (!mediaCheck.ok) {
         return res.status(400).json({ status: "error", message: mediaCheck.message });
@@ -920,7 +1029,7 @@ app.post("/saveposts", verifyToken, async (req, res) => {
       const result = await saveContent_Comment(payload);
 
       if (!result.success) {
-        console.error("POST /saveposts: reply failed —", result.message, result.reason || "");
+        console.error("POST /saveposts: reply failed ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â", result.message, result.reason || "");
         return res.status(400).json({
           status: "error",
           message: result.message,
@@ -938,7 +1047,7 @@ app.post("/saveposts", verifyToken, async (req, res) => {
       });
     }
 
-    // 📝 Normal post — unchanged behavior.
+    // ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â Normal post ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â unchanged behavior.
     const result = await saveContent_Posts(req.body);
 
     if (!result.success) {
@@ -965,8 +1074,8 @@ app.post("/saveposts", verifyToken, async (req, res) => {
   }
 });
 
-// 💬 جلب تعليقات محتوى محدد
-app.post("/getComments", verifyToken, async (req, res) => {
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¬ ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â¯
+app.post("/getComments", requireUser, async (req, res) => {
   try {
     const { parentId } = req.body;
 
@@ -993,8 +1102,8 @@ app.post("/getComments", verifyToken, async (req, res) => {
 });
 
 
-// 💬 جلب ردود محتوى محدد (بما فيها ردود على ردود)
-app.post("/getReplies", verifyToken, async (req, res) => {
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¬ ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â¯ (ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯)
+app.post("/getReplies", requireUser, async (req, res) => {
   try {
     const { parentId } = req.body;
 
@@ -1020,8 +1129,8 @@ app.post("/getReplies", verifyToken, async (req, res) => {
   }
 });
 
-// 📄 جلب بوست/رد واحد بالـ ID (يدعم فتح رد من الرابط مباشرة)
-app.post("/getPostById", verifyToken, async (req, res) => {
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Å¾ ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Âª/ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ ID (Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã‚ÂÃƒËœÃ‚ÂªÃƒËœÃ‚Â­ ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â· Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§ÃƒËœÃ‚Â´ÃƒËœÃ‚Â±ÃƒËœÃ‚Â©)
+app.post("/getPostById", requireUser, async (req, res) => {
   try {
     const { postId } = req.body;
 
@@ -1042,7 +1151,7 @@ console.log("Fetched post:", post);
       });
     }
 
-    // دمج بيانات الكاتب لعرض الاسم والصورة
+    // ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¬ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¨ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¶ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂµÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â±ÃƒËœÃ‚Â©
     const profile = await getUser(post.autherID);
     const enriched = profile
       ? {
@@ -1066,10 +1175,10 @@ console.log("Fetched post:", post);
   }
 });
 
-// 🌐 ترجمة المحتوى المنشور — عند طلب المستخدم فقط.
-// المحتوى الأصلي لا يُغيّر ولا يُستبدل؛ الترجمة تُرجع فقط في الاستجابة،
-// ولا تُخزن في قاعدة المحتوى إلا في كاش مؤقت مرتبط بـ contentVersion.
-app.post("/translate", verifyToken, async (req, res) => {
+// ÃƒÂ°Ã…Â¸Ã…â€™Ã‚Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â´Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â± ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â·Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·.
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£ÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬ËœÃƒËœÃ‚Â± Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ¢â‚¬Âº ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒËœÃ‚ÂªÃƒâ„¢Ã‚ÂÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â©ÃƒËœÃ…â€™
+// Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚ÂªÃƒâ„¢Ã‚ÂÃƒËœÃ‚Â®ÃƒËœÃ‚Â²Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â¥Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§ÃƒËœÃ‚Â´ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¤Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â±ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¨ÃƒËœÃ‚Â· ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â€šÂ¬ contentVersion.
+app.post("/translate", requireUser, async (req, res) => {
   try {
     const { contentId, contentType, targetLang, text } = req.body || {};
 
@@ -1080,9 +1189,9 @@ app.post("/translate", verifyToken, async (req, res) => {
       });
     }
 
-    // جلب المحتوى الأصلي من قاعدة البيانات — المحتوى هو المرجع، لا الواجهة.
-    // هذا يضمن أن contentVersion هو الإصدار الفعلي (إذا نُشر المحتوى عُدّل،
-    // يُرفض الكاش القديم تلقائيًا لأن الإصدار تغيّر).
+    // ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£ÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¹ÃƒËœÃ…â€™ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â©.
+    // Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¶Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â£Ãƒâ„¢Ã¢â‚¬Â  contentVersion Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¥ÃƒËœÃ‚ÂµÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â  (ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â´ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â¹Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬ËœÃƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ…â€™
+    // Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â±Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¶ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§ÃƒËœÃ‚Â´ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¥ÃƒËœÃ‚ÂµÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â± ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬ËœÃƒËœÃ‚Â±).
     let originalContent = null;
     switch (contentType) {
       case "posts":
@@ -1105,7 +1214,7 @@ app.post("/translate", verifyToken, async (req, res) => {
       });
     }
 
-    // إصدار المحتوى: تاريخ التعديل أو hash. إذا تغيّر، تُهمل الترجمة القديمة.
+    // ÃƒËœÃ‚Â¥ÃƒËœÃ‚ÂµÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â°: ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Â±Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â® ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â£Ãƒâ„¢Ã‹â€  hash. ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬ËœÃƒËœÃ‚Â±ÃƒËœÃ…â€™ ÃƒËœÃ‚ÂªÃƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â©.
     const contentVersion =
       originalContent.updatedAt ||
       originalContent.editedAt ||
@@ -1121,7 +1230,7 @@ app.post("/translate", verifyToken, async (req, res) => {
       isLong: contentType === "articles" || contentType === "novels",
     });
 
-    // دقة الحالات: كل خطأ له HTTP status مناسب — لا 400 مضلل
+    // ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª: Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â®ÃƒËœÃ‚Â·ÃƒËœÃ‚Â£ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡ HTTP status Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¨ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ 400 Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¶Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾
     if (!result.ok) {
       const statusMap = {
         MISSING_PARAMS: 400,
@@ -1159,17 +1268,17 @@ app.post("/translate", verifyToken, async (req, res) => {
   }
 });
 
-// ℹ️ حالة مزود الترجمة — للتشخيص فقط (لا تكشف أي مفاتيح)
-app.get("/translate/provider", verifyToken, async (req, res) => {
+// ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¹ÃƒÂ¯Ã‚Â¸Ã‚Â ÃƒËœÃ‚Â­ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â²Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â´ÃƒËœÃ‚Â®Ãƒâ„¢Ã…Â ÃƒËœÃ‚Âµ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· (Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚ÂªÃƒâ„¢Ã†â€™ÃƒËœÃ‚Â´Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â­)
+app.get("/translate/provider", requireUser, async (req, res) => {
   return res.status(200).json({
     status: "ok",
     provider: getProviderInfo(),
   });
 });
 
-// 👁️ تسجيل مشاهدة محتوى — زيادة ذرية في Backend فقط.
-// الهوية تُستخرج من الجلسة الموثقة للمسجلين، أو IP hashed للزوار.
-// الواجهة لا تختار العدد ولا تعيده الزيادة إلا من استجابة الخادم.
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚ÂÃƒÂ¯Ã‚Â¸Ã‚Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â´ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â²Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© ÃƒËœÃ‚Â°ÃƒËœÃ‚Â±Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  Backend Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·.
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚ÂªÃƒâ„¢Ã‚ÂÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â«Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ…â€™ ÃƒËœÃ‚Â£Ãƒâ„¢Ã‹â€  IP hashed Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â²Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â±.
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¹Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¡ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â²Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¥Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦.
 app.post("/view", async (req, res) => {
   try {
     const { contentId, contentType } = req.body || {};
@@ -1178,14 +1287,14 @@ app.post("/view", async (req, res) => {
       return res.status(400).json({ status: "error", message: "Missing contentId or contentType" });
     }
 
-    // اختياري: التوكن — لو موجود نتحقق منه ونستخرج الهوية منه
+    // ÃƒËœÃ‚Â§ÃƒËœÃ‚Â®ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Â±Ãƒâ„¢Ã…Â : ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â  ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€  Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¬Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡ Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡
     const authHeader = req.headers.authorization;
     if (authHeader) {
       try {
         const token = authHeader.split(" ")[1];
         req.user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       } catch (e) {
-        // توكن غير صالح → نتعامل كزائر (لا نفشل الطلب)
+        // ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â ÃƒËœÃ‚Â± ÃƒËœÃ‚ÂµÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­ ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¹ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â²ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â± (Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â´Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â·Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨)
         req.user = null;
       }
     }
@@ -1205,7 +1314,7 @@ app.post("/view", async (req, res) => {
     return res.status(200).json({
       status: "ok",
       views: result.views,
-      counted: result.counted, // false = مشاهدة مكررة داخل النافذة
+      counted: result.counted, // false = Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â´ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â±ÃƒËœÃ‚Â±ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â®Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â°ÃƒËœÃ‚Â©
     });
   } catch (err) {
     console.error("POST /view error:", err.message);
@@ -1213,13 +1322,13 @@ app.post("/view", async (req, res) => {
   }
 });
 
-// 🔍 SEO — robots.txt (عام، بدون auth)
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â SEO ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â robots.txt (ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ…â€™ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â  auth)
 app.get("/robots.txt", (req, res) => {
   res.type("text/plain");
   res.send(robotsTxt());
 });
 
-// 🔍 SEO — sitemap.xml ديناميكي من المحتوى المنشور الفعلي
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â SEO ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â sitemap.xml ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â´Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â 
 app.get("/sitemap.xml", async (req, res) => {
   try {
     const [articles, novels] = await Promise.all([
@@ -1230,20 +1339,20 @@ app.get("/sitemap.xml", async (req, res) => {
     res.send(sitemapXml({ articles: articles || [], novels: novels || [] }));
   } catch (err) {
     console.error("GET /sitemap.xml error:", err.message);
-    // لا نفشل الفهرسة بالكامل — نرجع sitemap بالصفحات الأساسية فقط
+    // Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â´Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â±ÃƒËœÃ‚Â³ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¹ sitemap ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂµÃƒâ„¢Ã‚ÂÃƒËœÃ‚Â­ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·
     res.type("application/xml");
     res.send(sitemapXml({}));
   }
 });
 
-// 🔐 توقيع رفع Cloudinary — التوقيع يُنشأ على الخادم فقط بعد التحقق من الهوية.
-// العميل يختار النوع (image/video) فقط؛ لا يمكنه التلاعب بباراميترات التوقيع.
-app.post("/media/upload-signature", verifyToken, async (req, res) => {
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¹ ÃƒËœÃ‚Â±Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹ Cloudinary ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â´ÃƒËœÃ‚Â£ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â©.
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â®ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¹ (image/video) Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·ÃƒËœÃ¢â‚¬Âº Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¹.
+app.post("/media/upload-signature", requireUser, async (req, res) => {
     try {
         const kind = req.body?.kind;
 
         if (!isConfigured()) {
-            // logCloudinaryConfigStatus داخل buildSignedUpload يسجل أي متغير مفقود (الأسماء فقط)
+            // logCloudinaryConfigStatus ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â®Ãƒâ„¢Ã¢â‚¬Å¾ buildSignedUpload Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â ÃƒËœÃ‚Â± Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ (ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·)
             console.error("POST /media/upload-signature: Cloudinary env vars missing (userId=" +
                 String(req.user?.id ?? "") + ")");
             return res.status(500).json({ status: "error", message: "Cloudinary not configured" });
@@ -1258,7 +1367,7 @@ app.post("/media/upload-signature", verifyToken, async (req, res) => {
             return res.status(500).json({ status: "error", message: result.message });
         }
 
-        // حدود الوسائط تُرسل للواجهة للتحقق المسبق فقط — الخادم هو المرجع النهائي.
+        // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â· ÃƒËœÃ‚ÂªÃƒâ„¢Ã‚ÂÃƒËœÃ‚Â±ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¡ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¹ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã…Â .
         return res.status(200).json({ status: "ok", ...result, limits: MEDIA_LIMITS });
     } catch (err) {
         console.error("POST /media/upload-signature error:", err);
@@ -1266,9 +1375,9 @@ app.post("/media/upload-signature", verifyToken, async (req, res) => {
     }
 });
 
-// 🧹 تنظيف وسائط يتيمة (فشل حفظ المنشور بعد نجاح الرفع) — المالك فقط،
-// ولا يُحذف ملف إلا إذا تم تمريره صراحةً من الواجهة بعد فشل الحفظ.
-app.post("/media/discard", verifyToken, async (req, res) => {
+// ÃƒÂ°Ã…Â¸Ã‚Â§Ã‚Â¹ ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¸Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â· Ãƒâ„¢Ã…Â ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© (Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â´Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â´Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â± ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â±Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·ÃƒËœÃ…â€™
+// Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â¥Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â±Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â±Ãƒâ„¢Ã¢â‚¬Â¡ ÃƒËœÃ‚ÂµÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ÃƒËœÃ‚Â©Ãƒâ„¢Ã¢â‚¬Â¹ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â´Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸.
+app.post("/media/discard", requireUser, async (req, res) => {
     try {
         const assets = Array.isArray(req.body?.assets) ? req.body.assets.slice(0, 10) : [];
         const valid = assets
@@ -1303,8 +1412,8 @@ app.post("/media/discard", verifyToken, async (req, res) => {
     }
 });
 
-// ✏️ تعديل بوست — المالك فقط (الهوية من التوكن، ليس من الواجهة)
-app.post("/editPost", verifyToken, async (req, res) => {
+// ÃƒÂ¢Ã…â€œÃ‚ÂÃƒÂ¯Ã‚Â¸Ã‚Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Âª ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· (ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ…â€™ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â³ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â©)
+app.post("/editPost", requireUser, async (req, res) => {
     try {
         const { postId, content, media, removedMedia } = req.body;
         const trustedAuthorId = String(req.user?.id ?? "");
@@ -1322,7 +1431,7 @@ app.post("/editPost", verifyToken, async (req, res) => {
             return res.status(403).json({ status: "error", message: "Not authorized to edit this post" });
         }
 
-        // تحقق الخادم من حدود الوسائط الجديدة
+        // ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â· ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â©
         if (Array.isArray(media) && media.length) {
             const check = validateMediaManifest(media);
             if (!check.ok) {
@@ -1333,15 +1442,15 @@ app.post("/editPost", verifyToken, async (req, res) => {
         const updates = {};
         if (typeof content === "string" && content.trim()) updates.content = content.trim();
         if (Array.isArray(media)) {
-            // حفظ الوسائط الجديدة + الإبقاء على أي وسائط قديمة لم تُحذف
+            // ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â· ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© + ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â· Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒâ„¢Ã‚ÂÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â
             updates.media = media;
-            // حافظ على توافق الحقل القديم img
+            // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â§Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ img
             updates.img = media.map((m) => (typeof m === "string" ? m : m.url)).filter(Boolean);
         }
 
         await dao.updateContent("posts", String(postId), updates);
 
-        // حذف ملفات Cloudinary المحذوفة من الوسائط القديمة — فقط لو غير مستخدمة في سجل آخر
+        // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Cloudinary ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â· ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€  ÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â ÃƒËœÃ‚Â± Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â¢ÃƒËœÃ‚Â®ÃƒËœÃ‚Â±
         let cleanup = null;
         if (Array.isArray(removedMedia) && removedMedia.length) {
             cleanup = await deleteCloudinaryAssetsIfUnused({
@@ -1365,8 +1474,8 @@ app.post("/editPost", verifyToken, async (req, res) => {
     }
 });
 
-// 🗑️ حذف بوست/رد — المالك فقط (الهوية من التوكن، ليست من الواجهة)
-app.post("/deletePost", verifyToken, async (req, res) => {
+// ÃƒÂ°Ã…Â¸Ã¢â‚¬â€Ã¢â‚¬ËœÃƒÂ¯Ã‚Â¸Ã‚Â ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â¨Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Âª/ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· (ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ…â€™ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â³ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â©)
+app.post("/deletePost", requireUser, async (req, res) => {
     try {
         const postId = req.body?.postId;
         const trustedAuthorId = String(req.user?.id ?? "");
@@ -1380,8 +1489,8 @@ app.post("/deletePost", verifyToken, async (req, res) => {
 
         const id = String(postId).trim();
 
-        // البحث عن السجل في المسارات الثلاثة: ردود/بوستات، مقالات، روايات
-        // (الردود تُحفظ كسجلات posts — نفس دالة البحث تغطيهما)
+        // ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â­ÃƒËœÃ‚Â« ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â«Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â«ÃƒËœÃ‚Â©: ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯/ÃƒËœÃ‚Â¨Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒËœÃ…â€™ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒËœÃ…â€™ ÃƒËœÃ‚Â±Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª
+        // (ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒËœÃ‚ÂªÃƒâ„¢Ã‚ÂÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª posts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â³ ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â­ÃƒËœÃ‚Â« ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂºÃƒËœÃ‚Â·Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§)
         let record = null;
         let contentType = "posts";
 
@@ -1403,18 +1512,18 @@ app.post("/deletePost", verifyToken, async (req, res) => {
         const recordAuthorId = String(record.autherID ?? "");
         if (!recordAuthorId || recordAuthorId !== trustedAuthorId) {
             console.warn(
-                `POST /deletePost: forbidden — record=${id} author=${recordAuthorId} requester=${trustedAuthorId}`
+                `POST /deletePost: forbidden ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â record=${id} author=${recordAuthorId} requester=${trustedAuthorId}`
             );
             return res.status(403).json({ status: "error", message: "Not authorized to delete this post" });
         }
 
-        // وسائط هذا السجل فقط — ردود البوست سجلات مستقلة بملفاتها
+        // Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â· Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚Âª ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§
         const ownMedia = [
             ...(Array.isArray(record.media) ? record.media : []),
             ...(Array.isArray(record.img) ? record.img : []),
         ];
 
-        // حذف السجل من المسار الصحيح
+        // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂµÃƒËœÃ‚Â­Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â­
         if (contentType === "articles") {
             await dao.deleteArticle(id);
         } else if (contentType === "novels") {
@@ -1423,7 +1532,7 @@ app.post("/deletePost", verifyToken, async (req, res) => {
             await dao.deletePost(id);
         }
 
-        // إزالة الـ ID من قائمة محتوى المالك (لن يظهر في بروفايله بعد الحذف)
+        // ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â²ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ ID Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ (Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¸Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â± Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â±Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â§Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â)
         let profileCleanup = "skipped";
         try {
             await sign.deletePostsFrom_User(trustedAuthorId, id);
@@ -1435,8 +1544,8 @@ app.post("/deletePost", verifyToken, async (req, res) => {
         await invalidateFeedCache(contentType);
         await invalidateUserCache(trustedAuthorId);
 
-        // حذف ملفات Cloudinary بعد نجاح حذف السجل، مع فحص إعادة الاستخدام
-        // فشلها لا يفشل الحذف نفسه — يُسجل لإعادة المحاولة
+        // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Cloudinary ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ…â€™ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â­ÃƒËœÃ‚Âµ ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦
+        // Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â´Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â´Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Â¡ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚Â§Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â©
         let cleanup = null;
         try {
             cleanup = await deleteCloudinaryAssetsIfUnused({
@@ -1453,10 +1562,10 @@ app.post("/deletePost", verifyToken, async (req, res) => {
             ` cleanup.deleted=${(cleanup?.deleted || []).length}`
         );
 
-        // حذف ردود البوست؟ — لا: الردود منشورات مستقلة (first-class)، تبقى كما هي.
+        // ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ…Â¸ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§: ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â´Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â© (first-class)ÃƒËœÃ…â€™ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã…Â .
 
         // Realtime content-deleted broadcast so open feeds/profiles update
-        // without a full reload. The profile layer removes the item by id —
+        // without a full reload. The profile layer removes the item by id ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
         // ownership was verified server-side above, never trusted from client.
         try {
             io.emit("CONTENT_DELETED", { contentType, id: String(id) });
@@ -1485,97 +1594,65 @@ app.post("/edit_bio", async(req, res) => {
 
 });
 
-// ✅ البحث عن مستخدم
-app.post("/getuser", async(req, res) => {
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â­ÃƒËœÃ‚Â« ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦
+app.post("/getuser", requireUser, async(req, res) => {
     const { idOtherUser } = req.body;
     try {
         const updatedUser = await sign.findbyID(idOtherUser);
-        const settings =
-            await sign.getUserSettings(
-                updatedUser.Id_user
-            );
-        res.json({
-            userData: {
-                imgProfile: updatedUser.imgProfile,
-                id: updatedUser.Id_user,
-                name: updatedUser.F_user,
-                username: updatedUser.S_user,
-                Bio: updatedUser.Bio,
-                followers: updatedUser.followers,
-                following: updatedUser.following,
-                IdPoster: updatedUser.Posters,
-                settings
-            },
-        });
+        if (!updatedUser) return res.status(404).json({ message: "User not found" });
+        const settings = await sign.getUserSettings(updatedUser.Id_user);
+        // SECURITY (Phase 1): requireUser ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â previously anyone could enumerate
+        // profiles with zero auth. Response goes through buildUserData (no psw).
+        res.json({ userData: buildUserData(updatedUser, settings) });
     } catch (err) {
-        console.error("Search error:", err);
+        console.error("Search error:", err.message);
         res.status(err.message === "User not found" ? 404 : 500).json({ message: err.message || "Error searching user" });
     }
 });
 
-// ✅ متابعة مستخدم
-app.post("/followingUser", async(req, res) => {
-    const { IdUser, idFollowedUser } = req.body;
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦
+app.post("/followingUser", requireUser, async(req, res) => {
+    if (req.userAccountState === "suspended") return res.status(403).json({ success: false, message: "Account suspended" });
+    // SECURITY (Phase 1): the acting user comes from the verified JWT, never
+    // from the request body (was spoofable). Target must exist.
+    const idFollowedUser = req.body?.idFollowedUser;
+    if (idFollowedUser == null || String(idFollowedUser) === String(req.user.id)) {
+        return res.status(400).json({ message: "Invalid follow target" });
+    }
     try {
-        const updatedUser = await sign.IncreasingFollowing(IdUser, idFollowedUser);
-        await sign.IncreasingFollowers(IdUser, idFollowedUser);
-
-        const settings =
-            await sign.getUserSettings(
-                updatedUser.Id_user
-            );
-        res.json({
-            userData: {
-                imgProfile: updatedUser.imgProfile,
-                id: updatedUser.Id_user,
-                name: updatedUser.F_user,
-                username: updatedUser.S_user,
-                Bio: updatedUser.Bio,
-                followers: updatedUser.followers,
-                following: updatedUser.following,
-                IdPoster: updatedUser.Posters,
-                settings
-            },
-        });
+        const target = await sign.findbyID(idFollowedUser);
+        if (!target) return res.status(404).json({ message: "User not found" });
+        const updatedUser = await sign.IncreasingFollowing(req.user.id, idFollowedUser);
+        await sign.IncreasingFollowers(req.user.id, idFollowedUser);
+        const settings = await sign.getUserSettings(updatedUser.Id_user);
+        res.json({ userData: buildUserData(updatedUser, settings) });
     } catch (err) {
-        console.error("Follow error:", err);
+        console.error("Follow error:", err.message);
         res.status(500).json({ message: "Error following user" });
     }
 });
 
-// ✅ إلغاء متابعة مستخدم
-app.post("/unfollowingUser", async(req, res) => {
-    const { IdUser, idFollowedUser } = req.body;
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚Â¥Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂºÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦
+app.post("/unfollowingUser", requireUser, async(req, res) => {
+    if (req.userAccountState === "suspended") return res.status(403).json({ success: false, message: "Account suspended" });
+    const idFollowedUser = req.body?.idFollowedUser;
+    if (idFollowedUser == null || String(idFollowedUser) === String(req.user.id)) {
+        return res.status(400).json({ message: "Invalid unfollow target" });
+    }
     try {
-        const updatedUser = await sign.DecreaseFollowing(IdUser, idFollowedUser);
-        await sign.DecreaseFollower(IdUser, idFollowedUser);
-
-        const settings =
-            await sign.getUserSettings(
-                updatedUser.Id_user
-            );
-        res.json({
-            userData: {
-                imgProfile: updatedUser.imgProfile,
-                id: updatedUser.Id_user,
-                name: updatedUser.F_user,
-                username: updatedUser.S_user,
-                Bio: updatedUser.Bio,
-                followers: updatedUser.followers,
-                following: updatedUser.following,
-                IdPoster: updatedUser.Posters,
-                settings
-            },
-        });
+        const updatedUser = await sign.DecreaseFollowing(req.user.id, idFollowedUser);
+        await sign.DecreaseFollower(req.user.id, idFollowedUser);
+        const settings = await sign.getUserSettings(updatedUser.Id_user);
+        res.json({ userData: buildUserData(updatedUser, settings) });
     } catch (err) {
-        console.error("Unfollow error:", err);
+        console.error("Unfollow error:", err.message);
         res.status(500).json({ message: "Error unfollowing user" });
     }
 });
 
 app.get(
     "/settings",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
 
@@ -1597,7 +1674,7 @@ console.log("Fetched settings for user", req.user.id, ":", settings);
     }
 );
 
-// Whitelist للحقول المسموح حفظها — لا يُقبل أي حقل مجهول من الواجهة
+// Whitelist Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â­ ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â  ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â©
 const SETTINGS_FIELDS = ["appearance", "notifications", "reading", "creator", "profile"];
 const ALLOWED_APPEARANCE = ["theme", "fontSize", "fontFamily", "language", "direction", "primaryColor", "customColor"];
 
@@ -1610,23 +1687,23 @@ function sanitizeSettings(body) {
             for (const key of ALLOWED_APPEARANCE) {
                 if (body.appearance[key] !== undefined) clean.appearance[key] = body.appearance[key];
             }
-            // ثيم مسموح فقط: light | dark | system
+            // ÃƒËœÃ‚Â«Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â­ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·: light | dark | system
             if (clean.appearance.theme && !["light", "dark", "system"].includes(clean.appearance.theme)) {
                 delete clean.appearance.theme;
             }
-            // لغة مسموح فقط من القائمة الرسمية — متزامنة مع LANGUAGES في الواجهة
+            // Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂºÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â­ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â±ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚ÂªÃƒËœÃ‚Â²ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¹ LANGUAGES Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â©
             const SUPPORTED_LANGUAGES = ["en", "ar", "fr", "es", "de", "pt", "tr", "zh", "ja", "ru"];
             if (clean.appearance.language && !SUPPORTED_LANGUAGES.includes(clean.appearance.language)) {
                 delete clean.appearance.language;
             }
-            // لون أساسي بصيغة hex سليمة فقط
+            // Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â£ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³Ãƒâ„¢Ã…Â  ÃƒËœÃ‚Â¨ÃƒËœÃ‚ÂµÃƒâ„¢Ã…Â ÃƒËœÃ‚ÂºÃƒËœÃ‚Â© hex ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·
             for (const colorKey of ["primaryColor", "customColor"]) {
                 if (clean.appearance[colorKey] && !/^#[0-9a-fA-F]{6}$/.test(clean.appearance[colorKey])) {
                     delete clean.appearance[colorKey];
                 }
             }
         } else {
-            // حقول boolean فقط لبقية الأقسام عدا profile (strings)
+            // ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ boolean Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ profile (strings)
             if (field === "profile") {
                 clean.profile = {};
                 for (const [k, v] of Object.entries(body.profile)) {
@@ -1649,7 +1726,7 @@ function sanitizeSettings(body) {
 
 app.put(
     "/settings",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const clean = sanitizeSettings(req.body || {});
@@ -1677,8 +1754,8 @@ app.put(
 );
 
 // ======================================================
-// FOCUS SPACE — بيانات مساحة التركيز لكل مستخدم
-// الهوية دائمًا من verifyToken (req.user.id) — لا نثق بـ userId من الواجهة
+// FOCUS SPACE ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â² Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  verifyToken (req.user.id) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â«Ãƒâ„¢Ã¢â‚¬Å¡ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â€šÂ¬ userId Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â©
 // ======================================================
 const FOCUS_LIMITS = {
     notes: 100,
@@ -1694,7 +1771,7 @@ async function getFocusData(userId) {
     return snap.exists() ? snap.val() : {};
 }
 
-// تنقية الملاحظات — نصوص آمنة فقط، بلا أي HTML/Script
+// ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¸ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂµÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Âµ ÃƒËœÃ‚Â¢Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·ÃƒËœÃ…â€™ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â  HTML/Script
 function sanitizeNotes(notes) {
     if (!Array.isArray(notes)) return [];
     return notes.slice(0, FOCUS_LIMITS.notes).map((n) => ({
@@ -1707,7 +1784,7 @@ function sanitizeNotes(notes) {
     })).filter((n) => n.id);
 }
 
-// تنقية المهام — حقول محددة فقط، قيم آمنة
+// ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·ÃƒËœÃ…â€™ Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â¢Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â©
 function sanitizeTasks(tasks) {
     if (!Array.isArray(tasks)) return [];
     const PRIORITIES = ["low", "medium", "high"];
@@ -1728,7 +1805,7 @@ function sanitizeTasks(tasks) {
     })).filter((t) => t.id);
 }
 
-// تنقية سجل جلسات التركيز — أرقام محصورة
+// ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â² ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â£ÃƒËœÃ‚Â±Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂµÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â±ÃƒËœÃ‚Â©
 function sanitizeSessions(sessions) {
     if (!Array.isArray(sessions)) return [];
     return sessions.slice(0, FOCUS_LIMITS.sessions).map((s) => ({
@@ -1743,7 +1820,7 @@ function sanitizeSessions(sessions) {
     })).filter((s) => s.id);
 }
 
-// تنقية إعدادات مساحة التركيز
+// ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â²
 const FOCUS_SETTING_KEYS = ["background", "backgroundFit", "overlayOpacity", "brightness",
     "bgBlur", "bgBrightness", "bgContrast", "bgSaturation", "backgroundAnim", "backgroundPosition",
     "clockType", "clockStyle", "clockColor", "clockSize", "clockFont", "clockFontWeight",
@@ -1761,7 +1838,7 @@ function sanitizeFocusSettings(settings) {
         if (settings[key] === undefined) continue;
         clean[key] = settings[key];
     }
-    // تحقق من الأنواع والقيم
+    // ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¦
     if (clean.clockType && !["digital", "analog"].includes(clean.clockType)) delete clean.clockType;
     if (clean.clockStyle && !["minimal", "classic", "modern"].includes(clean.clockStyle)) delete clean.clockStyle;
     if (typeof clean.clockColor === "string" && !/^#[0-9a-fA-F]{6}$/.test(clean.clockColor)) delete clean.clockColor;
@@ -1779,7 +1856,7 @@ function sanitizeFocusSettings(settings) {
             else delete clean[numKey];
         }
     }
-    // strings آمنة ومحصورة الطول
+    // strings ÃƒËœÃ‚Â¢Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â© Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂµÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â±ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â·Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾
     for (const strKey of ["background", "backgroundFit", "clockFont", "clockFontWeight", "clockTheme", "timerSound",
         "backgroundPosition", "timerTheme", "stopwatchTheme", "pomodoroTheme"]) {
         if (clean[strKey] != null) clean[strKey] = String(clean[strKey]).slice(0, 300);
@@ -1841,7 +1918,7 @@ function sanitizeFocusData(data) {
 
 app.get(
     "/focus-space",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const data = await getFocusData(req.user.id);
@@ -1855,14 +1932,14 @@ app.get(
 
 app.put(
     "/focus-space",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const clean = sanitizeFocusData(req.body || {});
             if (Object.keys(clean).length === 0) {
                 return res.status(400).json({ error: "No valid focus fields" });
             }
-            // دمج فوق الموجود — لا استبدال كامل
+            // ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¬ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¡ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¬Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾
             const existing = await getFocusData(req.user.id);
             const merged = { ...existing, ...clean, updatedAt: new Date().toISOString() };
             await update(ref(db, `${FOCUS_ROOT}/${req.user.id}`), merged);
@@ -1874,15 +1951,15 @@ app.put(
     }
 );
 
-// المحتوى المحفوظ الحقيقي — يجمع المقالات والروايات والبوستات المحفوظة من قاعدة البيانات
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¸ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â  ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¹ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â±Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¸ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª
 app.get(
     "/focus-space/saved-content",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const uid = req.user.id;
-            // user_data/Profile/<uid>/savedContent يحتوي مفاتيح كل محتوى حفظه المستخدم
-            // الشكل: { articles: {id1: true}, novels: {id2: true}, posts: {id3: true} }
+            // user_data/Profile/<uid>/savedContent Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â­ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸Ãƒâ„¢Ã¢â‚¬Â¡ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦
+            // ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â´Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾: { articles: {id1: true}, novels: {id2: true}, posts: {id3: true} }
             const userSnap = await get(ref(db, `user_data/Profile/${uid}`));
             const userData = userSnap.exists() ? userSnap.val() : {};
             const saved = userData.savedContent || userData.saved || {};
@@ -1910,7 +1987,7 @@ app.get(
                             lastReadAt: recObj.lastReadAt || null,
                             link: type === "posts" ? `/rp/${id}` : `/r/${id}`,
                         });
-                    } catch (e) { /* المحتوى محذوف — تخطَّ */ }
+                    } catch (e) { /* ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚Â°Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â·Ãƒâ„¢Ã…Â½Ãƒâ„¢Ã¢â‚¬Ëœ */ }
                 }
             }
             res.json({ items: result });
@@ -1922,12 +1999,12 @@ app.get(
 );
 
 // ======================================================
-// READ LATER — حفظ/إزالة/تحديث تقدم أي محتوى (مقال/رواية/منشور)
-// الشكل في قاعدة البيانات:
+// READ LATER ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸/ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â²ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â©/ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â« ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° (Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾/ÃƒËœÃ‚Â±Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â©/Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â´Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â±)
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â´Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª:
 //   user_data/Profile/{uid}/savedContent/{type}/{contentId} =
 //     { savedAt, readStatus: not_started|in_progress|completed,
 //       readProgressPercent, lastReadAt, completedAt }
-// الهوية دائمًا من verifyToken — لا يُثق بمعرف المستخدم من الواجهة.
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  verifyToken ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â«Ãƒâ„¢Ã¢â‚¬Å¡ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â±Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â©.
 // ======================================================
 const READ_LATER_TYPES = ["articles", "novels", "posts", "books"];
 const READ_STATUSES = ["not_started", "in_progress", "completed"];
@@ -1959,10 +2036,10 @@ function sanitizeReadLaterBody(body) {
     return clean;
 }
 
-// PUT /read-later — toggle / add / update progress
+// PUT /read-later ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â toggle / add / update progress
 app.put(
     "/read-later",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const clean = sanitizeReadLaterBody(req.body || {});
@@ -1971,7 +2048,7 @@ app.put(
             const base = `user_data/Profile/${uid}/savedContent/${clean.contentType}/${clean.contentId}`;
             const existingSnap = await get(ref(db, base));
 
-            // Toggle: العنصر محفوظ بالفعل ولم يطلب المستخدم تحديث تقدم → إزالة
+            // Toggle: ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂµÃƒËœÃ‚Â± Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¸ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â·Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â« ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â²ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â©
             if (existingSnap.exists() && clean.readStatus === undefined && clean.readProgressPercent === undefined) {
                 await set(ref(db, base), null);
                 return res.json({ status: "ok", saved: false });
@@ -1999,10 +2076,10 @@ app.put(
     }
 );
 
-// GET /read-later/:contentType/:contentId — هل المحتوى محفوظ لهذا المستخدم؟
+// GET /read-later/:contentType/:contentId ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¸ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ…Â¸
 app.get(
     "/read-later/:contentType/:contentId",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const contentType = String(req.params.contentType || "");
@@ -2019,10 +2096,10 @@ app.get(
     }
 );
 
-// GET /read-later — كل المحتوى المحفوظ للمستخدم الحالي فقط (metadata للعرض)
+// GET /read-later ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¸ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· (metadata Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¶)
 app.get(
     "/read-later",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const snap = await get(ref(db, `user_data/Profile/${req.user.id}/savedContent`));
@@ -2051,12 +2128,12 @@ app.get(
     }
 );
 
-// GET /focus-space/saved-content/:contentType/:contentId/full — المحتوى الأصلي كاملًا
-// للقراءة داخل Focus Space. متاح فقط إذا كان المحتوى محفوظًا فعليًا للمستخدم
-// (Authorization: القائمة خاصة بمستخدمها — لا قراءة لمحتوى مستخدم آخر).
+// GET /focus-space/saved-content/:contentType/:contentId/full ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£ÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â  Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§
+// Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â®Ãƒâ„¢Ã¢â‚¬Å¾ Focus Space. Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â°ÃƒËœÃ‚Â§ Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¸Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦
+// (Authorization: ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚ÂµÃƒËœÃ‚Â© ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â° Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â¢ÃƒËœÃ‚Â®ÃƒËœÃ‚Â±).
 app.get(
     "/focus-space/saved-content/:contentType/:contentId/full",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const contentType = String(req.params.contentType || "");
@@ -2100,9 +2177,9 @@ app.get(
 );
 
 // ======================================================
-// AUDIO HUB — نظام الاكتشاف والتشغيل الصوتي
-// الهوية دائمًا من verifyToken — تخزين بيانات المستخدم في Firebase
-// البحث الخارجي عبر Openverse (CC-licensed) مع Cache + Rate-limit خادمي
+// AUDIO HUB ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¸ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§Ãƒâ„¢Ã†â€™ÃƒËœÃ‚ÂªÃƒËœÃ‚Â´ÃƒËœÃ‚Â§Ãƒâ„¢Ã‚Â Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚Â´ÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂµÃƒâ„¢Ã‹â€ ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â 
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  verifyToken ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â²Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  Firebase
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â­ÃƒËœÃ‚Â« ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬Ãƒâ„¢Ã…Â  ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â± Openverse (CC-licensed) Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¹ Cache + Rate-limit ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â 
 // ======================================================
 const AUDIOHUB_LIMITS = {
     favorites: 500,
@@ -2117,7 +2194,7 @@ async function getAudioHubDoc(userId) {
     return snap.exists() ? snap.val() : {};
 }
 
-// تنقية بيانات المقطع — نصوص آمنة، أطوال محصورة
+// ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·ÃƒËœÃ‚Â¹ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂµÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Âµ ÃƒËœÃ‚Â¢Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â©ÃƒËœÃ…â€™ ÃƒËœÃ‚Â£ÃƒËœÃ‚Â·Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂµÃƒâ„¢Ã‹â€ ÃƒËœÃ‚Â±ÃƒËœÃ‚Â©
 function sanitizeTrack(t) {
     if (!t || typeof t !== "object") return null;
     const id = String(t.id || "").slice(0, 120);
@@ -2138,14 +2215,14 @@ function sanitizeTrack(t) {
     };
 }
 
-// تنقية سجل الاستماع — قواعد الاستماع الفعلي (وليس كل ضغطة Play)
+// ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â  (Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â³ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â¶ÃƒËœÃ‚ÂºÃƒËœÃ‚Â·ÃƒËœÃ‚Â© Play)
 function sanitizeListenEvent(e) {
     if (!e || typeof e !== "object") return null;
     const track = sanitizeTrack(e.track);
     if (!track) return null;
     const playedSec = Math.min(Math.max(Number(e.playedSec) || 0, 0), 86400);
     const durationSec = Math.min(Math.max(Number(e.durationSec) || 0, 0), 86400);
-    // استماع فعلي: ≥30 ثانية أو ≥50% من المدة (أيهما أقل)
+    // ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â : ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¥30 ÃƒËœÃ‚Â«ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â£Ãƒâ„¢Ã‹â€  ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¥50% Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â© (ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â£Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¾)
     const listenedFully = (durationSec > 0 && playedSec >= Math.min(30, durationSec * 0.5)) || playedSec >= 30;
     return {
         track,
@@ -2156,10 +2233,10 @@ function sanitizeListenEvent(e) {
     };
 }
 
-// بحث موسيقى CC عبر Openverse — محمي بالكاش وrate-limit خادمي
+// ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â­ÃƒËœÃ‚Â« Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Â° CC ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â± Openverse ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â  ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§ÃƒËœÃ‚Â´ Ãƒâ„¢Ã‹â€ rate-limit ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â 
 app.get(
     "/audio-hub/search",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const { q, page, limit } = req.query;
@@ -2172,15 +2249,15 @@ app.get(
     }
 );
 
-// بحث الموسيقى الحقيقي: iTunes (فنان/ألبوم/غلاف + معاينة 30 ث قانونية)
-// + Openverse (تشغيل كامل CC). source=itunes|openverse لاختيار المزود.
+// ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â­ÃƒËœÃ‚Â« ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â³Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã…Â : iTunes (Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â /ÃƒËœÃ‚Â£Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â¦/ÃƒËœÃ‚ÂºÃƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§Ãƒâ„¢Ã‚Â + Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â§Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â© 30 ÃƒËœÃ‚Â« Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â©)
+// + Openverse (ÃƒËœÃ‚ÂªÃƒËœÃ‚Â´ÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ CC). source=itunes|openverse Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â®ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â²Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¯.
 app.get(
     "/audio-hub/search-music",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const { q, page, limit, source } = req.query;
-            // jamendo — كتالوج Jamendo الكامل (CC، تشغيل كامل) عبر Openverse
+            // jamendo ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã†â€™ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¬ Jamendo ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ (CCÃƒËœÃ…â€™ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â´ÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾) ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â± Openverse
             if (source === "jamendo") {
                 const result = await searchOpenverse({ query: q, section: "music", page, limit, ovSource: "jamendo" });
                 return res.json({ status: "ok", provider: "jamendo", ...result });
@@ -2198,10 +2275,10 @@ app.get(
     }
 );
 
-// بيانات المستخدم: favorites + playlists + history
+// ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦: favorites + playlists + history
 app.get(
     "/audio-hub/library",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const doc = await getAudioHubDoc(req.user.id);
@@ -2217,10 +2294,10 @@ app.get(
     }
 );
 
-// مزامنة بيانات المستخدم — المفضلة/القوائم/السجل (كتابة كاملة للحقول المرسلة)
+// Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â²ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¶Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â©/ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã¢â‚¬Â¦/ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ (Ãƒâ„¢Ã†â€™ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â© Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â±ÃƒËœÃ‚Â³Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â©)
 app.put(
     "/audio-hub/library",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const body = req.body || {};
@@ -2248,7 +2325,7 @@ app.put(
                     .map(sanitizeListenEvent).filter(Boolean);
             }
             if (body.progress !== undefined && body.progress && typeof body.progress === "object") {
-                // استكمال الاستماع — خريطة trackId -> positionSec
+                // ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â®ÃƒËœÃ‚Â±Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â·ÃƒËœÃ‚Â© trackId -> positionSec
                 const prog = {};
                 for (const [k, v] of Object.entries(body.progress).slice(0, 200)) {
                     const sec = Number(v);
@@ -2272,11 +2349,11 @@ app.put(
     }
 );
 
-// الأكثر تشغيلًا على المنصة (عام) — تجميع من سجل الاستماع لكل المستخدمين
-// بدون أي بيانات شخصية: فقط عدد مرات الاستماع لكل مقطع
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â£Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â«ÃƒËœÃ‚Â± ÃƒËœÃ‚ÂªÃƒËœÃ‚Â´ÃƒËœÃ‚ÂºÃƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂµÃƒËœÃ‚Â© (ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Â 
+// ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â  ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â´ÃƒËœÃ‚Â®ÃƒËœÃ‚ÂµÃƒâ„¢Ã…Â ÃƒËœÃ‚Â©: Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â· ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·ÃƒËœÃ‚Â¹
 app.get(
     "/audio-hub/trending",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const cached = await cacheGet("audiohub:trending");
@@ -2308,17 +2385,17 @@ app.get(
 );
 
 // ======================================================
-// TRIVIA — Open Trivia DB (server-side proxy + cache + session answer key)
-// الهوية دائمًا من verifyToken حيث تتطلب؛ حفظ النتائج في user_data/Profile/{uid}/triviaResults
-// المصدر المجاني: https://opentdb.com — بلا مفتاح، احترام rate limits عبر الكاش
+// TRIVIA ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Open Trivia DB (server-side proxy + cache + session answer key)
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  verifyToken ÃƒËœÃ‚Â­Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â« ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂªÃƒËœÃ‚Â·Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¨ÃƒËœÃ¢â‚¬Âº ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Â¦ÃƒËœÃ‚Â¬ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã…Â  user_data/Profile/{uid}/triviaResults
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚ÂµÃƒËœÃ‚Â¯ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã…Â : https://opentdb.com ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‚ÂÃƒËœÃ‚ÂªÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ÃƒËœÃ…â€™ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ rate limits ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â± ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§ÃƒËœÃ‚Â´
 // ======================================================
 const trivia = require("./service/trivia.service.js");
 trivia.initTrivia({ cacheGet, cacheSet });
 
-// in-memory session keys (short TTL via periodic cleanup — a session lives minutes)
+// in-memory session keys (short TTL via periodic cleanup ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â a session lives minutes)
 const triviaSessions = new Map();
 
-// ---- BOOKS — unified provider registry (Gutenberg, Open Library, Google
+// ---- BOOKS ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â unified provider registry (Gutenberg, Open Library, Google
 // Books, Wikisource, Internet Archive, DOAB/OAPEN via local OAI index) ----
 const booksRegistry = require("./service/books/registry.js");
 booksRegistry.initBooksRegistry({ cacheGet, cacheSet });
@@ -2343,7 +2420,7 @@ app.get(
     }
 );
 
-// book details — provider + providerBookId are explicit (no parsing of
+// book details ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â provider + providerBookId are explicit (no parsing of
 // composite ids in the frontend); response carries readingSources resolved
 app.get(
     "/books/:provider/:providerBookId",
@@ -2386,7 +2463,7 @@ app.get(
     }
 );
 
-// in-site reading content — Gutenberg HTML/text or Wikisource HTML, proxied
+// in-site reading content ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Gutenberg HTML/text or Wikisource HTML, proxied
 // (sanitized downstream in the reader UI; scripts stripped before render)
 app.get(
     "/books/:provider/:providerBookId/read",
@@ -2405,7 +2482,7 @@ app.get(
     }
 );
 
-// PDF proxy — public-domain PDFs only (Gutenberg ebook / IA public scan).
+// PDF proxy ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â public-domain PDFs only (Gutenberg ebook / IA public scan).
 // Streams Range requests so pdf.js lazy-fetches pages instead of pulling
 // whole files. Access level is re-verified server-side before streaming.
 app.get(
@@ -2454,10 +2531,10 @@ app.get(
         }
     }
 );
-// GET /books/:provider/:providerBookId/progress — restore reading progress
+// GET /books/:provider/:providerBookId/progress ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â restore reading progress
 app.get(
     "/books/:provider/:providerBookId/progress",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const bookKey = bookRecordKey(req.params.provider, req.params.providerBookId);
@@ -2471,12 +2548,12 @@ app.get(
     }
 );
 
-// PUT /books/:provider/:providerBookId/progress — save reading position.
+// PUT /books/:provider/:providerBookId/progress ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â save reading position.
 // Identity from verifyToken only; field sizes validated; owner can never
 // touch another user's record because the path is derived from the token.
 app.put(
     "/books/:provider/:providerBookId/progress",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const bookKey = bookRecordKey(req.params.provider, req.params.providerBookId);
@@ -2521,10 +2598,10 @@ app.put(
     }
 );
 
-// DELETE — remove a book from the user's saved list (same authorization)
+// DELETE ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â remove a book from the user's saved list (same authorization)
 app.delete(
     "/books/:provider/:providerBookId/progress",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const bookKey = bookRecordKey(req.params.provider, req.params.providerBookId);
@@ -2538,8 +2615,8 @@ app.delete(
     }
 );
 
-// EPUB proxy — public-domain Gutenberg EPUBs only. The URL is resolved
-// server-side from Gutendex metadata (never from user input → no SSRF).
+// EPUB proxy ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â public-domain Gutenberg EPUBs only. The URL is resolved
+// server-side from Gutendex metadata (never from user input ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ no SSRF).
 // epub.js reads it cross-origin-free and lazily fetches CFI ranges.
 app.get(
     "/books/:provider/:providerBookId/epub",
@@ -2577,7 +2654,7 @@ app.get(
     }
 );
 
-// EPUB proxy — same-origin streaming for public-domain EPUBs only.
+// EPUB proxy ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â same-origin streaming for public-domain EPUBs only.
 // Access + host are verified server-side (SSRF-safe, DRM never passes).
 const { epubProxyHandler } = require("./service/books/epubProxy.js");
 app.get(
@@ -2585,7 +2662,7 @@ app.get(
     (req, res) => epubProxyHandler(req, res, booksRegistry)
 );
 
-// DOAB index status — honest loading state for the UI while the first
+// DOAB index status ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â honest loading state for the UI while the first
 // harvest populates the local index (never show "no results" while empty
 // due to initial harvesting in progress).
 app.get(
@@ -2621,7 +2698,7 @@ app.get(
 
 app.post(
     "/trivia/session",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const { amount, category, difficulty, type } = req.body || {};
@@ -2638,14 +2715,14 @@ app.post(
 
 app.post(
     "/trivia/answer",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const { sessionId, question, answer } = req.body || {};
             const session = triviaSessions.get(String(sessionId || ""));
             if (!session) return res.status(404).json({ status: "error", message: "SESSION_NOT_FOUND" });
             if (session.userId !== req.user.id) return res.status(403).json({ status: "error", message: "NOT_YOUR_SESSION" });
-            // منع إرسال إجابة السؤال أكثر من مرة
+            // Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¹ ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â±ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¤ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â£Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â«ÃƒËœÃ‚Â± Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â±ÃƒËœÃ‚Â©
             session.answered = session.answered || new Set();
             const answeredKey = String(question || "");
             if (session.answered.has(answeredKey)) {
@@ -2662,11 +2739,11 @@ app.post(
     }
 );
 
-// حفظ نتيجة مكتملة — السكور يُحسب من إجابات محققة مسبقًا على الخادم،
-// لا يُثق بأي رقم قادم من العميل.
+// ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã†â€™ÃƒËœÃ‚ÂªÃƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â© ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â³Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â± Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â­ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¨ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â© Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Â¹ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â° ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ…â€™
+// Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â«Ãƒâ„¢Ã¢â‚¬Å¡ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â  ÃƒËœÃ‚Â±Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾.
 app.post(
     "/trivia/save-result",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const { sessionId, config, answers, timeSpentSec } = req.body || {};
@@ -2709,10 +2786,10 @@ app.post(
     }
 );
 
-// سجل اختبارات المستخدم — عزل كامل: uid من الـ JWT فقط
+// ÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â®ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¨ÃƒËœÃ‚Â§ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â²Ãƒâ„¢Ã¢â‚¬Å¾ Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Å¾: uid Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ JWT Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·
 app.get(
     "/trivia/history",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const snap = await get(ref(db, `user_data/Profile/${req.user.id}/triviaResults`));
@@ -2730,8 +2807,8 @@ app.get(
 );
 
 // ======================================================
-// QURAN — AlQuran Cloud (proxy + cache؛ النص كما هو بلا أي تعديل)
-// العامة (بلا توكن) — قراءة فقط، لا بيانات شخصية
+// QURAN ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â AlQuran Cloud (proxy + cacheÃƒËœÃ¢â‚¬Âº ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Âµ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã‹â€  ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â£Ãƒâ„¢Ã…Â  ÃƒËœÃ‚ÂªÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾)
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â© (ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚ÂªÃƒâ„¢Ã‹â€ Ãƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Â ) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ÃƒËœÃ‚Â© Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·ÃƒËœÃ…â€™ Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª ÃƒËœÃ‚Â´ÃƒËœÃ‚Â®ÃƒËœÃ‚ÂµÃƒâ„¢Ã…Â ÃƒËœÃ‚Â©
 // ======================================================
 const quranService = require("./service/quran.service.js");
 quranService.initQuran({ cacheGet, cacheSet });
@@ -2785,10 +2862,10 @@ app.get(
     }
 );
 
-// آخر موضع قراءة + إشارات مرجعية — نفس بنية المستخدم الحالية، uid من الـ JWT
+// ÃƒËœÃ‚Â¢ÃƒËœÃ‚Â®ÃƒËœÃ‚Â± Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¶ÃƒËœÃ‚Â¹ Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¡ÃƒËœÃ‚Â© + ÃƒËœÃ‚Â¥ÃƒËœÃ‚Â´ÃƒËœÃ‚Â§ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒËœÃ‚Âª Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â±ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¹Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â³ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â© ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â³ÃƒËœÃ‚ÂªÃƒËœÃ‚Â®ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â©ÃƒËœÃ…â€™ uid Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ JWT
 app.get(
     "/quran/progress",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const snap = await get(ref(db, `user_data/Profile/${req.user.id}/quranProgress`));
@@ -2802,7 +2879,7 @@ app.get(
 
 app.put(
     "/quran/progress",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const surah = Math.min(Math.max(1, Number(req.body?.surah) || 1), 114);
@@ -2819,7 +2896,7 @@ app.put(
 
 app.get(
     "/quran/bookmarks",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const snap = await get(ref(db, `user_data/Profile/${req.user.id}/quranBookmarks`));
@@ -2835,7 +2912,7 @@ app.get(
 
 app.put(
     "/quran/bookmarks",
-    verifyToken,
+    requireUser,
     async(req, res) => {
         try {
             const surah = Math.min(Math.max(1, Number(req.body?.surah) || 1), 114);
@@ -2858,45 +2935,69 @@ app.put(
 );
 
 // ======================================================
-// BOOKS — Gutendex (Project Gutenberg) + Open Library proxy
-// الكاش خادمي؛ لا مفاتيح؛ لا تكلفة. التصنيف القانوني صريح
-// (full / borrow / readonline / metadata) — لا روابط وهمية.
+// BOOKS ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Gutendex (Project Gutenberg) + Open Library proxy
+// ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã†â€™ÃƒËœÃ‚Â§ÃƒËœÃ‚Â´ ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¯Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â ÃƒËœÃ¢â‚¬Âº Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â§ÃƒËœÃ‚ÂªÃƒâ„¢Ã…Â ÃƒËœÃ‚Â­ÃƒËœÃ¢â‚¬Âº Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚ÂªÃƒâ„¢Ã†â€™Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â©. ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã…Â Ãƒâ„¢Ã‚Â ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã…Â  ÃƒËœÃ‚ÂµÃƒËœÃ‚Â±Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â­
+// (full / borrow / readonline / metadata) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â§ ÃƒËœÃ‚Â±Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â· Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â©.
 // ======================================================
 
+io.use((socket, next) => {
+    // SECURITY (Phase 1): every Socket.IO connection may present the same
+    // Bearer JWT used by the REST API (socket.handshake.auth.token).
+    // Unauthenticated sockets connect ONLY as guests: no identity, no
+    // interest rooms, no follow/unfollow, no like/unlike; they receive the
+    // guest discovery feed only (pre-existing guest behavior preserved).
+    const raw = socket.handshake.auth?.token ||
+        (socket.handshake.headers?.authorization || "").replace(/^Bearer /, "");
+    if (raw) {
+        try {
+            const decoded = jwt.verify(raw, process.env.ACCESS_TOKEN_SECRET);
+            if (decoded && decoded.id != null && decoded.pass === undefined) {
+                socket.userId = String(decoded.id);
+                socket.userName = String(decoded.name || "");
+            }
+        } catch {
+            // invalid token ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ guest (identity NOT trusted)
+        }
+    }
+    next();
+});
 io.on("connection", (socket) => {
-    const userId = socket.handshake.query.userId;
+    // Server-side identity only ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â the client-supplied query userId is ignored.
+    const userId = socket.userId || null;
     if (userId) {
         onlineUsers.set(userId, socket.id);
-        socket.userId = userId;
+        socket.join(`user:${userId}`);
     }
 
-    // SET INTERESTS
+    // SET INTERESTS ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â SECURITY (Phase 1): identity from the authenticated
+    // handshake; the client-supplied idUser parameter is ignored.
     socket.on("setInterests", async(idUser, interests) => {
         try {
-            await DaoForDbUser.updateUserToInsertInteresting(idUser, interests);
-
+            if (!socket.userId) return socket.emit("result", { status: "error", message: "Authentication required" });
+            if (!rateOK(`si:${socket.userId}`, 10, 60000)) return socket.emit("result", { status: "error", message: "Rate limited" });
+            const clean = sanitizeInterests(interests);
+            if (!clean) return socket.emit("result", { status: "error", message: "Invalid interests" });
+            await DaoForDbUser.updateUserToInsertInteresting(socket.userId, clean);
             if (useRedis && redisClient) {
-                await redisClient.del(`user:${idUser}`);
+                await redisClient.del(`user:${socket.userId}`);
             } else {
-                memoryCache.delete(`user:${idUser}`);
+                memoryCache.delete(`user:${socket.userId}`);
             }
-
-            interests?.articles?.forEach((i) => socket.join(`room:${i}`));
-            interests?.novels?.forEach((i) => socket.join(`room:${i}`));
-
+            clean.articles?.forEach((i) => socket.join(`room:${i}`));
+            clean.novels?.forEach((i) => socket.join(`room:${i}`));
             socket.emit("result", { status: "ok" });
         } catch (err) {
-            console.log("❌ setInterests error:", err.message);
+            console.log("ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€¦Ã¢â‚¬â„¢ setInterests error:", err.message);
             socket.emit("result", { status: "error", message: "Failed to update interests" });
         }
     });
 
-    // JOIN ROOMS
-    socket.on("JOIN_ROOMS", async(userId) => {
+    // JOIN ROOMS ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â SECURITY (Phase 1): authenticated, own interests only.
+    socket.on("JOIN_ROOMS", async() => {
         try {
-            const user = await getUser(userId);
+            if (!socket.userId) return;
+            const user = await getUser(socket.userId);
             if (!user) return;
-
             (user?.interesting?.articles || []).forEach((i) => socket.join(`room:${i}`));
             (user?.interesting?.novels || []).forEach((i) => socket.join(`room:${i}`));
         } catch (err) {
@@ -2904,84 +3005,63 @@ io.on("connection", (socket) => {
         }
     });
 
-// TRACK ENGAGEMENT
-socket.on("ENGAGEMENT", async ({
-  contentId,
-  userId,
-  type,
-  contentType = "posts",
-}) => {
+// TRACK ENGAGEMENT ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â SECURITY (Phase 1): requires an authenticated socket;
+// the acting userId comes from the handshake, never the payload.
+socket.on("ENGAGEMENT", async ({ contentId, type, contentType = "posts" }) => {
   try {
-    if (!contentId || !userId) {
-      return socket.emit("ENGAGEMENT_ERROR", {
-        contentId,
-        message: "Missing contentId or userId",
-      });
+    if (!socket.userId) {
+      return socket.emit("ENGAGEMENT_ERROR", { contentId, message: "Authentication required" });
     }
-
+    const userId = socket.userId;
+    if (!contentId) {
+      return socket.emit("ENGAGEMENT_ERROR", { contentId, message: "Missing contentId" });
+    }
     if (!["like", "unlike"].includes(type)) {
-      return socket.emit("ENGAGEMENT_ERROR", {
-        contentId,
-        message: "Invalid engagement type",
-      });
+      return socket.emit("ENGAGEMENT_ERROR", { contentId, message: "Invalid engagement type" });
     }
-
-    // حفظ التفاعل في قاعدة البيانات
+    if (!rateOK(`eng:${userId}`, 60, 60000)) {
+      return socket.emit("ENGAGEMENT_ERROR", { contentId, message: "Rate limited" });
+    }
     await trackEngagement(contentId, userId, type);
-
-    // إبطال الكاش بعد نجاح التحديث
     await invalidateAllFeedCaches();
-
-    // جلب البوست المحدّث
     let dataContent;
-
     switch (contentType) {
       case "posts":
         dataContent = await dao.getPostID(contentId);
         break;
-
       case "articles":
         dataContent = await dao.getArticleID(contentId);
         break;
-
       case "novels":
         dataContent = await dao.getnovelsID(contentId);
         break;
-
       default:
-        return socket.emit("ENGAGEMENT_ERROR", {
-          contentId,
-          message: "Invalid content type",
-        });
+        return socket.emit("ENGAGEMENT_ERROR", { contentId, message: "Invalid content type" });
     }
-
     if (!dataContent) {
-      return socket.emit("ENGAGEMENT_ERROR", {
-        contentId,
-        message: "Content not found after update",
-      });
+      return socket.emit("ENGAGEMENT_ERROR", { contentId, message: "Content not found after update" });
     }
-
-    // إرسال البوست المحدّث لجميع العملاء المتصلين
-    io.emit("LIKE_UPDATED", {
-      contentType,
-      post: dataContent,
-    });
-
+    io.emit("LIKE_UPDATED", { contentType, post: dataContent });
   } catch (error) {
-    console.error("ENGAGEMENT error:", error);
-
-    socket.emit("ENGAGEMENT_ERROR", {
-      contentId,
-      message: "Failed to update engagement",
-    });
+    console.error("ENGAGEMENT error:", error.message);
+    socket.emit("ENGAGEMENT_ERROR", { contentId, message: "Failed to update engagement" });
   }
 });
 
-    // MY CONTENT — unified profile feed (posts + replies + articles + novels)
-    socket.on("MYCONTENT", async({ idUser, type = "all", cursor = 0, limit = 10 }) => {
+    // MY CONTENT ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â SECURITY (Phase 1): authenticated sockets only; idUser from
+    // the handshake. Guests get an empty result (same as unknown ids before).
+    socket.on("MYCONTENT", async(payload = {}) => {
         try {
-            const result = await getProfileContent({ idUser, type, cursor, limit });
+            const type = payload.type || "all";
+            const cursor = payload.cursor || 0;
+            const limit = payload.limit || 10;
+            if (!socket.userId) {
+                return socket.emit("CONTENT_RESULT", { items: [], nextCursor: null, counts: {} });
+            }
+            if (!rateOK(`mc:${socket.userId}`, 30, 60000)) {
+                return socket.emit("CONTENT_RESULT", { items: [], nextCursor: null, counts: {}, error: "Rate limited" });
+            }
+            const result = await getProfileContent({ idUser: socket.userId, type, cursor, limit });
             socket.emit("CONTENT_RESULT", result);
         } catch (err) {
             console.log("MYCONTENT ERROR:", err.message);
@@ -2989,74 +3069,67 @@ socket.on("ENGAGEMENT", async ({
         }
     });
 
-socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 20 }) => {
+socket.on("GET_FEED", async ({ type = "posts", cursor = 0, limit = 20 } = {}) => {
+    // SECURITY (Phase 1): the feed user comes from the authenticated
+    // handshake. Guests (unauthenticated) keep the discovery feed ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â
+    // identical public behavior to before.
     try {
-
-        console.log("User ID:", userId);
-
-        const user = await getUser(userId);
-        console.log("User:", user);
-
-        if (!user) {
-            // Guests (and unknown ids) get the general discovery feed — same
-            // behavior the Home feed expects. Previously this branch emitted
-            // NOTHING, so guest clients hung until timeout and showed an
-            // error instead of content.
+        const effectiveUser = socket.userId ? await getUser(socket.userId) : null;
+        if (socket.userId && !effectiveUser) {
             let feed = await recommendFeed(null, type);
             feed = await enrichContent(feed);
             const result = paginate(feed, limit, cursor);
             return socket.emit("FEED_RESULT", result);
         }
-
-        let feed = await recommendFeed(user, type);
-
+        let feed = await recommendFeed(effectiveUser, type);
         feed = await enrichContent(feed);
-
-        // لا خلط (shuffle): يكسر الترتيب الزمني ويكرر/يفقد عناصر بين الصفحات.
-        // الترتيب الآن: حسب الـ score ثم زمن الإنشاء داخل نفس الـ score تقريبًا.
         const result = paginate(feed, limit, cursor);
-
-
         socket.emit("FEED_RESULT", result);
-
     } catch (err) {
-        console.log("GET_FEED error:", err);
+        console.log("GET_FEED error:", err.message);
     }
 });
 
-    // NEW POST LIVE
-    socket.on("NEW_POST", async({ category, post }) => {
+    // NEW POST LIVE ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â public broadcast to category rooms (unchanged public
+    // behavior); authorship of the underlying content is enforced elsewhere.
+    socket.on("NEW_POST", async({ category, post } = {}) => {
         try {
+            if (!socket.userId) return; // guests cannot seed broadcasts
             io.to(`room:${category}`).emit("NEW_POST", post);
         } catch (err) {
             console.log("NEW_POST error:", err.message);
         }
     });
 
-    // FOLLOW USER
-    socket.on("followUser", async({ idUser, idFollowedUser }) => {
+    // FOLLOW USER ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â SECURITY (Phase 1): identity from handshake; spoofable
+    // idUser payload ignored; target must exist.
+    socket.on("followUser", async(payload = {}) => {
         try {
-            await sign.IncreasingFollowing(idUser, idFollowedUser);
-            await sign.IncreasingFollowers(idUser, idFollowedUser);
-
-            const targetSocket = onlineUsers.get(idFollowedUser);
-            if (targetSocket) io.to(targetSocket).emit("newFollower", { from: idUser });
-
+            const idFollowedUser = payload.idFollowedUser;
+            if (!socket.userId) return socket.emit("followError", { message: "Authentication required" });
+            if (!idFollowedUser || String(idFollowedUser) === String(socket.userId)) return;
+            const target = await getUser(idFollowedUser);
+            if (!target) return;
+            await sign.IncreasingFollowing(socket.userId, idFollowedUser);
+            await sign.IncreasingFollowers(socket.userId, idFollowedUser);
+            const targetSocket = onlineUsers.get(String(idFollowedUser));
+            if (targetSocket) io.to(targetSocket).emit("newFollower", { from: socket.userId });
             socket.emit("followSuccess", { userId: idFollowedUser });
         } catch (err) {
             console.log("followUser error:", err.message);
         }
     });
 
-    // UNFOLLOW USER
-    socket.on("unfollowUser", async({ idUser, idFollowedUser }) => {
+    // UNFOLLOW USER ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â same identity rules as followUser
+    socket.on("unfollowUser", async(payload = {}) => {
         try {
-            await sign.DecreaseFollowing(idUser, idFollowedUser);
-            await sign.DecreaseFollower(idUser, idFollowedUser);
-
-            const targetSocket = onlineUsers.get(idFollowedUser);
-            if (targetSocket) io.to(targetSocket).emit("lostFollower", { from: idUser });
-
+            const idFollowedUser = payload.idFollowedUser;
+            if (!socket.userId) return socket.emit("unfollowError", { message: "Authentication required" });
+            if (!idFollowedUser || String(idFollowedUser) === String(socket.userId)) return;
+            await sign.DecreaseFollowing(socket.userId, idFollowedUser);
+            await sign.DecreaseFollower(socket.userId, idFollowedUser);
+            const targetSocket = onlineUsers.get(String(idFollowedUser));
+            if (targetSocket) io.to(targetSocket).emit("lostFollower", { from: socket.userId });
             socket.emit("unfollowSuccess", { userId: idFollowedUser });
         } catch (err) {
             console.log("unfollowUser error:", err.message);
@@ -3065,13 +3138,12 @@ socket.on("GET_FEED", async ({ userId, type = "posts", cursor = 0, limit = 20 })
 
     // DISCONNECT
     socket.on("disconnect", () => {
-        console.log("🔴 Client disconnected:", socket.id);
-        onlineUsers.delete(socket.userId);
+        console.log("ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â´ Client disconnected:", socket.id);
+        if (socket.userId) onlineUsers.delete(socket.userId);
     });
 });
-
 // ======================================================
-// BAYAN CONTROL CENTER — admin namespace (/admin/api/*)
+// BAYAN CONTROL CENTER ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â admin namespace (/admin/api/*)
 // Independent credential store, JWT secret, sessions and RBAC.
 // Mounted AFTER all user routes; touches no existing behavior.
 // See control-center/docs/ for the architecture map and API docs.
@@ -3091,7 +3163,7 @@ try {
         redisMode: useRedis ? "redis" : "memory",
     });
     app.use("/admin/api", adminRouter);
-    console.log("🛡️  Control Center admin API mounted at /admin/api");
+    console.log("ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂºÃ‚Â¡ÃƒÂ¯Ã‚Â¸Ã‚Â  Control Center admin API mounted at /admin/api");
 } catch (adminErr) {
     // Fail-safe: an admin module problem must never take the platform down.
     console.error("Control Center admin module failed to mount:", adminErr.message);
@@ -3102,7 +3174,7 @@ try {
 // ======================================================
 
 httpServer.listen(PORT, "0.0.0.0", () => {
-    console.log(`✅ Unified Server running on port ${PORT}`);
-    console.log(`   REST API  → http://localhost:${PORT}`);
-    console.log(`   Socket.IO → ws://localhost:${PORT}`);
+    console.log(`ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Unified Server running on port ${PORT}`);
+    console.log(`   REST API  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ http://localhost:${PORT}`);
+    console.log(`   Socket.IO ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ ws://localhost:${PORT}`);
 });

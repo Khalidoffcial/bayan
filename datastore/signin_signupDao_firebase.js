@@ -60,7 +60,7 @@ async function login_user(identifierUser, password) {
                 throw new Error("There seems to be a registration error. Please try again.");
             }
 
-            console.log("User data:", userData);
+            // SECURITY (Phase 1): never log the user record (contains psw).
             return userData;
         }
 
@@ -279,6 +279,21 @@ async function updateUserToInsertInteresting(idUser, updates) {
     }
 }
 
+// SECURITY (Phase 1): direct-by-id profile mutators. The legacy *ByPassword
+// functions authenticated profile edits by comparing a bcrypt hash that used
+// to travel inside the JWT — that side-channel is retired. These variants are
+// used only from routes that have already verified the JWT and resolved the
+// user id server-side (requireUser).
+async function setProfileFieldById(idUser, field, value) {
+    const allowed = new Set(["F_user", "Bio", "imgProfile"]);
+    if (!allowed.has(field)) throw new Error("Field not editable");
+    if (idUser == null) throw new Error("User not found");
+    await update(ref(db, `user_data/Profile/${idUser}`), { [field]: value });
+    return true;
+}
+async function setProfileImgProfileById(idUser, value) {
+    return setProfileFieldById(idUser, "imgProfile", value);
+}
 async function findbyID(idN) {
     try {
         const userRef = ref(db, `user_data/Profile/${idN}`); // المسار بناءً على Id_user
@@ -511,7 +526,6 @@ async function deletePostsFrom_User(idUser, content_id) {
             const updatedSnapshot = await get(ref(db, `user_data/Profile/${idUser}`));
             const updatedData = updatedSnapshot.val();
 
-            console.log("Updated user data:", updatedData);
             return updatedData;
         } else {
             throw new Error("User not found");
@@ -575,6 +589,8 @@ async function resetUserSettings(userId) {
 }
 
 module.exports = {
+    setProfileFieldById,
+    setProfileImgProfileById,
     login_user,
     logup_user_Insert,
     logup_user_check_fsp,

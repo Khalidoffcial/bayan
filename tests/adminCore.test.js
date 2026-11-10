@@ -52,7 +52,7 @@ function ok(name, fn) {
 core.initAdmin({
     dbUsers: { label: "users-db" },
     dbContent: { label: "content-db" },
-    cacheGet: async () => null,
+    ref: dbfns.ref, get: dbfns.get, set: dbfns.set, update: dbfns.update, push: dbfns.push, remove: dbfns.remove, runTransaction: dbfns.runTransaction, cacheGet: async () => null,
     cacheSet: async () => { },
     io: null,
     redisMode: "memory",
@@ -60,7 +60,8 @@ core.initAdmin({
 // swap the real firebase helpers out via handles injection surface:
 // core.writeAudit uses handles() destructuring of { ref, push, set } — provide them
 const realHandles = core.handles;
-core.handles = () => ({
+const dbfns = require('../datastore/firebase.js');
+    core.handles = () => ({
     ...realHandles(),
     dbUsers: { label: "users-db" },
     dbContent: { label: "content-db" },
@@ -119,12 +120,14 @@ console.log("Audit:");
     });
 
     ok("audit failure visible when store throws", async () => {
-        core.handles = () => ({ ...realHandles(), dbUsers: {}, ref: mockRef, push: () => { throw new Error("db-down"); }, set: mockSet, get: mockGet });
+        const dbfns = require('../datastore/firebase.js');
+    core.handles = () => ({ ...realHandles(), dbUsers: {}, ref: mockRef, push: () => { throw new Error("db-down"); }, set: mockSet, get: mockGet });
         let threw = false;
         try { await core.writeAudit({ adminUid: "A1", action: "x" }); } catch { threw = true; }
         assert(threw);
         // restore the good shim
-        core.handles = () => ({ ...realHandles(), dbUsers: { label: "users-db" }, dbContent: { label: "content-db" }, ref: mockRef, set: mockSet, get: mockGet, push: mockPush, update: mockUpdate });
+        const dbfns = require('../datastore/firebase.js');
+    core.handles = () => ({ ...realHandles(), dbUsers: { label: "users-db" }, dbContent: { label: "content-db" }, ref: mockRef, set: mockSet, get: mockGet, push: mockPush, update: mockUpdate });
     });
 
     console.log("Admin JWT middleware:");

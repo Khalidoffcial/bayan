@@ -13,8 +13,23 @@ const crypto = require("crypto");
 
 // ── Firebase handles are injected (mainServer owns the connections) ──
 let H = null;
-function initAdmin({ dbUsers, dbContent, cacheGet, cacheSet, io, redisMode }) {
-  H = { dbUsers, dbContent, cacheGet, cacheSet, io, redisMode };
+function initAdmin(deps) {
+  // SECURITY: DB accessors come from ONE module. If a host/test provides
+  // them (deps.rtdb), use those; otherwise load the real RTDB lazily.
+  const rtdb = deps.rtdb || require("../datastore/firebase");
+  H = {
+    dbUsers: deps.dbUsers, dbContent: deps.dbContent,
+    cacheGet: deps.cacheGet, cacheSet: deps.cacheSet,
+    io: deps.io, redisMode: deps.redisMode,
+    ref: rtdb.ref, get: rtdb.get, set: rtdb.set, update: rtdb.update,
+    push: rtdb.push, remove: rtdb.remove, runTransaction: rtdb.runTransaction,
+    query: rtdb.query, orderByChild: rtdb.orderByChild, equalTo: rtdb.equalTo,
+    limitToLast: rtdb.limitToLast,
+  };
+}
+function rtdbFns() {
+  if (!H) throw new Error("ADMIN_NOT_INITIALIZED");
+  return H;
 }
 function handles() {
   if (!H) throw new Error("admin core not initialized");
@@ -119,7 +134,7 @@ function hashId(str) {
   return crypto.createHash("sha256").update(String(str) + (process.env.ADMIN_AUDIT_SALT || "")).digest("hex").slice(0, 16);
 }
 
-module.exports = {
+module.exports = { rtdbFns,
   initAdmin, handles, ROLES, MATRIX, permissionsFor, can,
   deepSanitize, maskEmail, writeAudit, hashId,
   AUDIT_ROOT,
