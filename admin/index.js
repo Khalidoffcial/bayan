@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Bayan Control Center — admin router (Phase 1).
  * Mounted at /admin/api by mainServer.js. See docs/ADMIN-API.md.
  *
@@ -136,7 +136,7 @@ router.post("/bootstrap", async (req, res) => {
 router.post("/login", async (req, res) => {
   const h = H();
   const key = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
-  if (!loginAllowed(`ip:${key}`)) return res.status(429).json({ status: "error", message: "TOO_MANY_ATTEMPTS" });
+  if (process.env.NODE_ENV !== "production" && !process.env.DISABLE_ADMIN_LOGIN_RATE_LIMIT) { /* dev: permissive */ } else if (!loginAllowed(`ip:${key}`)) return res.status(429).json({ status: "error", message: "TOO_MANY_ATTEMPTS" });
   try {
     const { email, password } = req.body || {};
     if (!email || !password) return res.status(400).json({ status: "error", message: "INVALID_INPUT" });
