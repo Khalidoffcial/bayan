@@ -93,7 +93,7 @@ const allowedOrigins = [
 // Dev-only: allow the local React dev server(s). Production keeps the
 // strict list above ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no wildcard, and these are never sent in prod.
 if (process.env.NODE_ENV !== "production") {
-    allowedOrigins.push("http://localhost:3001", "http://localhost:3011");
+    allowedOrigins.push("http://localhost:3001", "http://localhost:3011", "http://localhost:5173", "http://localhost:5174"); // 5173 = main SPA, 5174 = Control Center
 }
 
 const app = express();
