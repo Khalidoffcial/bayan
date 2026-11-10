@@ -93,9 +93,15 @@ const allowedOrigins = [
 // Dev-only: allow the local React dev server(s). Production keeps the
 // strict list above ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no wildcard, and these are never sent in prod.
 if (process.env.NODE_ENV !== "production") {
-    allowedOrigins.push("http://localhost:3001", "http://localhost:3011", "http://localhost:5173", "http://localhost:5174"); // 5173 = main SPA, 5174 = Control Center
+    allowedOrigins.push("http://localhost:3000", "http://localhost:3001", "http://localhost:3011", "http://localhost:5173", "http://localhost:5174","https://bayan-space.vercel.app"); // 5173 = main SPA, 5174 = Control Center
 }
 
+const corsOptions = {
+	origin: allowedOrigins,
+	methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+	allowedHeaders: ["Content-Type", "Authorization"],
+	credentials: true,
+};
 const app = express();
 const httpServer = createServer(app);
 
@@ -109,7 +115,10 @@ app.use(
     })
 );
 
-app.options("*", cors()); // handle preflight (older Express)
+// INCIDENT FIX: bare cors() defaulted to origin:'*' which — combined with
+// credentials:true — made preflights return 204 WITHOUT Access-Control-Allow-Origin
+// for the allowed origins, so browsers blocked signin/signup/authGoogle.
+app.options("*", cors(corsOptions));
 app.use(express.json());
 // CORS ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â®ÃƒËœÃ‚Â§ÃƒËœÃ‚Âµ ÃƒËœÃ‚Â¨Ãƒâ„¢Ã¢â€šÂ¬ Socket.IO
 const io = new Server(httpServer, {

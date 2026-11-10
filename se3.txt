@@ -1,0 +1,1 @@
+🌐 LIBRETRANSLATE_URL not set — translation provider disabled (server keeps running)
