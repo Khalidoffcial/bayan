@@ -364,6 +364,7 @@ const fr = {
   "common.error": "Une erreur est survenue",
   "common.loading": "Chargement...",
   "common.retry": "Réessayer",
+  "error.generic": "Une erreur s'est produite lors de l'affichage de cette section.",
   "common.deleteConfirm": "Êtes-vous sûr de vouloir supprimer ceci ?",
 
     "nav.books": "Livres",

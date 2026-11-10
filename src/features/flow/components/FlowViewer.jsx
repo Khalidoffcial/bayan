@@ -104,7 +104,11 @@ export const FlowViewer = () => {
       { root, threshold: [0.6] }
     );
 
-    cardRefs.current.forEach((el) => el && io.observe(el));
+    cardRefs.current.forEach((el) => {
+      // Observe only real Elements — stale slots (shorter list after a
+      // delete/edit) or pre-commit nulls must never reach the observer.
+      if (el instanceof Element) io.observe(el);
+    });
     return () => io.disconnect();
   }, [items, ensureBuffer, markSeen]);
 

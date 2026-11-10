@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Loader from "../components/ui/Loader";
+import ErrorBoundary from "../components/ui/ErrorBoundary";
 
 // Lazy Loaded Page Containers
 const HomePage = lazy(() => import("../pages/Home"));
@@ -22,7 +23,12 @@ const BooksPage = lazy(() => import("../pages/BooksPage"));
 const BookReaderPage = lazy(() => import("../pages/BookReaderPage"));
 
 export const AppRoutes = () => {
+  // Route-level containment: a crashed lazy page shows an inline error with
+  // Retry instead of destroying the whole tree (white screen). Remounting
+  // the boundary on every location change guarantees recovery on navigate.
+  const location = useLocation();
   return (
+    <ErrorBoundary key={location.pathname} labelKey="error.generic">
     <Suspense
       fallback={
         <div className="app-loader">
@@ -58,6 +64,7 @@ export const AppRoutes = () => {
         <Route path="/rp/:postId" element={<PostPage />} />
       </Routes>
     </Suspense>
+    </ErrorBoundary>
   );
 };
 

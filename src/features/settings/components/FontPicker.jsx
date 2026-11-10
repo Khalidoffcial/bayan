@@ -10,7 +10,7 @@
  *  - clear selected state + a "reset to default" row
  *  - direction-safe: rows flow RTL/LTR via the page's dir attribute
  */
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Check, RotateCcw, Search } from "lucide-react";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { FONTS, FONT_CATEGORIES, DEFAULT_FONT } from "../../../constants/fonts";
@@ -21,39 +21,72 @@ const SAMPLE_AR = "مساحة للتركيز والتعلم والنمو.";
 const SAMPLE_EN = "A Space to Focus. Connect. Grow.";
 
 /** IntersectionObserver-based lazy loader: fetches a family only when its
- *  preview row is about to be visible. One observer for the whole list. */
+ *  preview row is about to be visible. One observer per mount, owned and
+ *  disconnected by the hook itself — never leaked to row lifecycles.
+ *
+ *  Bug history: this used to be recreated in a useMemo whenever `activeFont`
+ *  changed while rows kept stale cleanup closures. During unmount React
+ *  nulls `ref.current` BEFORE effect cleanup runs, so the stale cleanup
+ *  called `io.unobserve(null)` → "parameter 1 is not of type 'Element'".
+ *  The observer is now an instance-stable ref; rows capture the element in
+ *  a local variable so cleanup always observes the exact element it added. */
 const useLazyPreview = (activeFont) => {
   const rootRef = useRef(null);
   const observerRef = useRef(null);
 
-  return useMemo(() => {
-    // Fresh observer per filter/search remount is cheap; the callback
-    // disconnects nothing — rows register themselves on mount.
-    observerRef.current?.disconnect();
+  // Create the observer once per component mount (rows register themselves).
+  // Selection changes re-render rows but must NOT swap the observer out from
+  // under live cleanups.
+  useEffect(() => {
+    // Environments without IntersectionObserver (very old browsers, jsdom)
+    // degrade to eager font loading instead of crashing.
+    if (typeof IntersectionObserver !== "function") return undefined;
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          const family = entry.target.dataset.fontFamily;
+          const family = entry.target?.dataset?.fontFamily;
           if (family) loadFontFamily(family, { wait: false });
-          io.unobserve(entry.target);
+          if (entry.target instanceof Element) io.unobserve(entry.target);
         }
       },
       { root: rootRef.current, rootMargin: "120px" }
     );
     observerRef.current = io;
-    return io;
-  }, [activeFont]); // re-created when selection changes (cheap)
+    return () => {
+      observerRef.current = null;
+      io.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return observerRef;
 };
 
-const FontRow = ({ font, selected, onSelect, io }) => {
+const FontRow = ({ font, selected, onSelect, observerRef }) => {
   const ref = useRef(null);
 
   React.useEffect(() => {
-    if (!io || !ref.current) return;
-    io.observe(ref.current);
-    return () => io.unobserve(ref.current);
-  }, [io]);
+    const io = observerRef?.current;
+    if (!io) return undefined;
+    const el = ref.current;
+    // Observe only a real Element; skip silently otherwise (rows may mount
+    // before the observer exists on the very first commit).
+    if (!io || !(el instanceof Element)) return undefined;
+    io.observe(el);
+    return () => {
+      // `ref.current` may ALREADY be nulled by React before this cleanup
+      // runs — using it here threw "parameter 1 is not of type 'Element'".
+      // The captured `el` is always the exact element we observed.
+      if (el instanceof Element) {
+        try {
+          io.unobserve(el);
+        } catch {
+          /* observer already disconnected — nothing to clean up */
+        }
+      }
+    };
+  }, [observerRef]);
 
   return (
     <button
@@ -80,7 +113,8 @@ const FontPicker = ({ value, onChange, onReset }) => {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
-  const io = useLazyPreview(value);
+  const observerRef = useLazyPreview(value);
+  const io = observerRef; // rows read observerRef.current
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -141,7 +175,7 @@ const FontPicker = ({ value, onChange, onReset }) => {
                 key={f.id}
                 font={f}
                 selected={value === f.id}
-                io={io}
+                observerRef={io}
                 onSelect={() => onChange(f.id)}
               />
             ))}

@@ -363,6 +363,7 @@ const de = {
   "common.error": "Etwas ist schiefgelaufen",
   "common.loading": "Wird geladen...",
   "common.retry": "Erneut versuchen",
+  "error.generic": "Beim Anzeigen dieses Bereichs ist ein Fehler aufgetreten.",
   "common.deleteConfirm": "Möchtest du das wirklich löschen?",
 
     "nav.books": "Bücher",

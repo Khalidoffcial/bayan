@@ -48,10 +48,17 @@ export const ToastProvider = ({ children }) => {
   }, []);
 
   const push = React.useCallback(
-    (message, { type = "info", duration = 3500 } = {}) => {
+    (rawMessage, { type = "info", duration = 3500 } = {}) => {
+      // Data contract: a toast message must end up as renderable text.
+      // Callers occasionally pass the API payload object itself — coerce
+      // instead of storing a non-string that would crash rendering.
+      const message =
+        typeof rawMessage === "string" || typeof rawMessage === "number"
+          ? rawMessage
+          : rawMessage?.message ?? rawMessage?.error ?? "";
       if (!message) return null;
       const id = ++toastSeq;
-      setToasts((prev) => [...prev.slice(-3), { id, message, type }]);
+      setToasts((prev) => [...prev.slice(-3), { id, message: String(message), type }]);
       if (duration > 0) {
         const timer = window.setTimeout(() => dismiss(id), duration);
         timersRef.current.set(id, timer);
@@ -81,16 +88,21 @@ export const ToastProvider = ({ children }) => {
     <ToastContext.Provider value={api}>
       {children}
       <div className="toast-stack" role="region" aria-label={t("aria.notifications")}>
-        {toasts.map((t) => {
-          const Icon = ICONS[t.type] || FaInfoCircle;
+        {toasts.map((toast) => {
+          // IMPORTANT: the callback param must NOT be named `t` — it shadowed
+          // the translation function and turned `aria-label={t("toast.close")}`
+          // into a call on the toast object (TypeError: e is not a function),
+          // crashing the whole tree the instant any toast rendered.
+          if (!toast || typeof toast !== "object" || toast.id == null) return null;
+          const Icon = ICONS[toast.type] || FaInfoCircle;
           return (
-            <div key={t.id} className={`toast toast--${t.type}`} role="status">
+            <div key={toast.id} className={`toast toast--${toast.type}`} role="status">
               <Icon className="toast-icon" aria-hidden="true" />
-              <span className="toast-message">{t.message}</span>
+              <span className="toast-message">{toast.message}</span>
               <button
                 type="button"
                 className="toast-close"
-                onClick={() => dismiss(t.id)}
+                onClick={() => dismiss(toast.id)}
                 aria-label={t("toast.close")}
               >
                 <FaTimes aria-hidden="true" />

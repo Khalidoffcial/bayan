@@ -1,0 +1,38 @@
+/* ErrorBoundary fallback — contained, readable, themed via existing vars */
+.error-boundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  margin: 16px 0;
+  border: 1px solid var(--primary-border, rgba(0, 0, 0, 0.1));
+  border-radius: 12px;
+  background: var(--surface, transparent);
+  color: var(--text, inherit);
+  text-align: center;
+  min-height: 160px;
+}
+
+.error-boundary__msg {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+.error-boundary button {
+  padding: 8px 22px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary-color, #2563eb);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.error-boundary button:hover {
+  background: var(--primary-hover, #1d4ed8);
+}

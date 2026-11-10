@@ -363,6 +363,7 @@ const es = {
   "common.error": "Algo salió mal",
   "common.loading": "Cargando...",
   "common.retry": "Reintentar",
+  "error.generic": "Se produjo un error al mostrar esta sección.",
   "common.deleteConfirm": "¿Seguro que quieres eliminar esto?",
 
     "nav.books": "Libros",

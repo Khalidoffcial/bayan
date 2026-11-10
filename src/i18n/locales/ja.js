@@ -379,6 +379,7 @@ const ja = {
   "common.error": "問題が発生しました",
   "common.loading": "読み込み中...",
   "common.retry": "再試行",
+  "error.generic": "このセクションの表示中にエラーが発生しました。",
   "common.deleteConfirm": "これを削除してもよろしいですか？",
 
     "nav.books": "本",

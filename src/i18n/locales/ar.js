@@ -432,6 +432,7 @@ const ar = {
   "common.error": "حصلت مشكلة",
   "common.loading": "جاري التحميل...",
   "common.retry": "حاول تاني",
+  "error.generic": "حدث خطأ أثناء عرض هذا القسم.",
   "common.deleteConfirm": "متأكد إنك عايز تحذف ده؟",
   // ---------- Navigation / Focus Space ----------
   "nav.focus": "مساحة التركيز",

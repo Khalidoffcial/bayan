@@ -363,6 +363,7 @@ const pt = {
   "common.error": "Algo deu errado",
   "common.loading": "Carregando...",
   "common.retry": "Tentar novamente",
+  "error.generic": "Ocorreu um erro ao exibir esta seção.",
   "common.deleteConfirm": "Tem certeza de que deseja excluir isso?",
 
     "nav.books": "Livros",

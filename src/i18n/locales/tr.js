@@ -363,6 +363,7 @@ const tr = {
   "common.error": "Bir sorun oluştu",
   "common.loading": "Yükleniyor...",
   "common.retry": "Tekrar dene",
+  "error.generic": "Bu bölüm görüntülenirken bir hata oluştu.",
   "common.deleteConfirm": "Bunu silmek istediğine emin misin?",
 
     "nav.books": "Kitaplar",

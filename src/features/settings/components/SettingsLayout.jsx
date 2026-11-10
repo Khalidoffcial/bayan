@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSettings } from "../../../contexts/SettingsContext";
 import { useTranslation } from "../../../i18n/useTranslation";
 import AppLayout from "../../../components/layout/AppLayout";
+import ErrorBoundary from "../../../components/ui/ErrorBoundary";
 
 import AppearanceSettings from "./AppearanceSettings";
 import NotificationsSettings from "./NotificationsSettings";
@@ -77,7 +78,12 @@ export const SettingsLayout = () => {
         </aside>
 
         <main className="settings-content">
-          <Panel />
+          {/* A crash in ONE tab (e.g. FontPicker observer race) must never
+              blank the whole app — the boundary contains it to this panel
+              and remounts a fresh panel on Retry / tab switch. */}
+          <ErrorBoundary key={active} labelKey="error.generic">
+            <Panel />
+          </ErrorBoundary>
         </main>
 
         {saveStatus && (

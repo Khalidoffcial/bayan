@@ -379,6 +379,7 @@ const zh = {
   "common.error": "出现问题",
   "common.loading": "加载中...",
   "common.retry": "重试",
+  "error.generic": "显示此部分时出错。",
   "common.deleteConfirm": "确定要删除此内容吗？",
 
     "nav.books": "书籍",

@@ -379,6 +379,7 @@ const ru = {
   "common.error": "Что-то пошло не так",
   "common.loading": "Загрузка...",
   "common.retry": "Повторить",
+  "error.generic": "Произошла ошибка при отображении этого раздела.",
   "common.deleteConfirm": "Вы уверены, что хотите это удалить?",
 
     "nav.books": "Книги",

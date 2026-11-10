@@ -432,6 +432,7 @@ const en = {
   "common.error": "Something went wrong",
   "common.loading": "Loading...",
   "common.retry": "Retry",
+  "error.generic": "Something went wrong rendering this section.",
   "common.deleteConfirm": "Are you sure you want to delete this?",
   // ---------- Navigation / Focus Space ----------
   "nav.focus": "Focus Space",
