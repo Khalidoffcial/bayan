@@ -1,0 +1,7 @@
+No Redis URL -> Memory Cache Enabled
+ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂºÃ‚Â¡ÃƒÂ¯Ã‚Â¸Ã‚Â  Control Center admin API mounted at /admin/api
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Unified Server running on port 4000
+   REST API  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ http://localhost:4000
+   Socket.IO ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ ws://localhost:4000
+ÃƒÂ¢Ã…Â¡Ã‚Â  Redis not available -> Memory Cache Enabled
+[doab-harvest] added=0 batches=40 (more pending)

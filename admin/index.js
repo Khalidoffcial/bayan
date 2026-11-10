@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Bayan Control Center — admin router (Phase 1).
  * Mounted at /admin/api by mainServer.js. See docs/ADMIN-API.md.
  *
@@ -509,4 +509,7 @@ router.get("/audit", auth.requireAdmin, async (req, res) => {
   }
 });
 
+
+// MODERATION - multilingual content moderation + Reason Library.
+// Mounted under /admin/api/moderation/*; every route requires a valid// admin session (requireAdmin) AND per-route core.can RBAC checks.
 module.exports = router;

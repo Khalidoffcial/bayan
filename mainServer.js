@@ -38,6 +38,8 @@ async function translateToEnglish(text) {
 
 const sign = require("./datastore/signin_signupDao_firebase.js");// SECURITY (P2): Firebase ID token verification for Google sign-in.
 const { verifyFirebaseIdToken } = require("./admin/firebaseIdToken.js");
+// Moderation: scan user content at submission/edit time (non-blocking hook).
+const { hookContentWrite, ensureSeeded: seedModeration } = require("./moderation/service");
 const dao = require("./datastore/Dao.js");
 const DaoForDbUser = require("./datastore/signin_signupDao_firebase.js");
 const { saveContent_Article_Novels, saveContent_Posts, saveContent_Comment } = require("./service/saveContent.js");
@@ -999,6 +1001,7 @@ app.post("/saveArticle_novels", requireUser, async (req, res) => {
         }
 
         // ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¹ÃƒËœÃ‚Â¯ Ãƒâ„¢Ã¢â‚¬Â ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â§ÃƒËœÃ‚Â­ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â­Ãƒâ„¢Ã‚ÂÃƒËœÃ‚Â¸ Ãƒâ„¢Ã‚ÂÃƒâ„¢Ã¢â‚¬Å¡ÃƒËœÃ‚Â·
+        if (result && result.id) moderationHook({ type: "articles", id: result.id, record: req.body, authorId: String(req.user?.id ?? "") });
         await invalidateFeedCache("articles");
         await invalidateFeedCache("novels");
 
@@ -1015,6 +1018,10 @@ app.post("/saveArticle_novels", requireUser, async (req, res) => {
 // normal posts to the existing normal-post path.
 // Identity: the verified JWT payload `{ id, name, username, pass }` is the
 // authoritative author ID; a mismatching client-supplied autherID is overridden.
+// Non-blocking moderation scan hook; failures never affect the user write path.
+function moderationHook(args) {
+    Promise.resolve(hookContentWrite(args)).catch((e) => console.error("moderationHook:", e.message));
+}
 app.post("/saveposts", requireUser, async (req, res) => {
   if (req.userAccountState === "suspended") return res.status(403).json({ status: "error", message: "Account suspended" });
   try {
@@ -1047,6 +1054,7 @@ app.post("/saveposts", requireUser, async (req, res) => {
 
       // Realtime broadcast AFTER Firebase persistence succeeded.
       io.emit("NEW_POST", result.comment);
+      moderationHook({ type: "comments", id: result.id, record: result.comment, authorId: trustedAuthorId });
 
       return res.status(200).json({
         status: "ok",
@@ -1066,6 +1074,7 @@ app.post("/saveposts", requireUser, async (req, res) => {
       });
     }
 
+    if (result && result.id) moderationHook({ type: "posts", id: result.id, record: req.body, authorId: String(req.user?.id ?? "") });
     await invalidateFeedCache("posts");
 
     return res.status(200).json({
@@ -1469,6 +1478,7 @@ app.post("/editPost", requireUser, async (req, res) => {
         }
 
         const updated = await dao.getPostID(String(postId));
+        moderationHook({ type: "posts", id: String(postId), record: { ...updated, ...(content ? { content } : {}) }, authorId: trustedAuthorId });
         io.emit("LIKE_UPDATED", { contentType: "posts", post: updated });
 
         return res.status(200).json({
@@ -3172,6 +3182,8 @@ try {
         redisMode: useRedis ? "redis" : "memory",
     });
     app.use("/admin/api", adminRouter);
+    // Seed moderation categories/dictionary/reason templates once (idempotent).
+    Promise.resolve(seedModeration()).catch((e) => console.error("moderation seed:", e.message));
     console.log("ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂºÃ‚Â¡ÃƒÂ¯Ã‚Â¸Ã‚Â  Control Center admin API mounted at /admin/api");
 } catch (adminErr) {
     // Fail-safe: an admin module problem must never take the platform down.
