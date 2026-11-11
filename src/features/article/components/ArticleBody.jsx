@@ -23,7 +23,7 @@ export const ArticleBody = ({ content, imageUrl, contentDir, articleRef, content
     <div className="article-body" ref={articleRef} dir={contentDir}>
       {imageUrl && (
         <div className="main-image">
-          <img src={imageUrl} alt="Article Main" />
+          <img src={imageUrl} alt="Article Main" width="800" height="450" decoding="async" loading="lazy" />
         </div>
       )}
       <div

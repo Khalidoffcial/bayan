@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaImage, FaTimes } from "react-icons/fa";
+import { Image as FaImage, X as FaTimes } from "lucide-react";
 import { useTranslation } from "../../../i18n/useTranslation";
 
 export const WriterImages = ({

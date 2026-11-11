@@ -22,7 +22,7 @@ const AuthShell = ({ titleKey, subtitleKey, children }) => {
       {/* الجزء البصري — Desktop فقط */}
       <aside className="auth-shell__visual" aria-hidden="true">
         <div className="auth-shell__visual-glow" />
-        <img src={workspaceImg} alt="" className="auth-shell__visual-img" loading="lazy" />
+        <img src={workspaceImg} alt="" className="auth-shell__visual-img" width="800" height="600" decoding="async" loading="lazy" />
         <div className="auth-shell__visual-copy">
           <p className="auth-shell__tagline">{t("landing.hero.tagline")}</p>
         </div>
@@ -32,7 +32,7 @@ const AuthShell = ({ titleKey, subtitleKey, children }) => {
       <main className="auth-shell__formside">
         <header className="auth-shell__top">
           <Link to="/welcome" className="auth-shell__brand" aria-label={t("aria.bayanBrand")}>
-            <img src={logo} alt="Bayan Space" className="auth-shell__brand-logo" />
+            <img src={logo} alt="Bayan Space" className="auth-shell__brand-logo" width="96" height="96" decoding="async" />
           </Link>
           <LanguageSwitcher variant="nav" />
         </header>

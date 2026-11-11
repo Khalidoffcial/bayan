@@ -119,7 +119,7 @@ export const FocusSavedContent = ({
           const done = item.readStatus === "completed";
           return (
             <div key={`${item.contentType}-${item.contentId}`} className={`fc-saved-item ${done ? "is-read" : ""}`}>
-              {item.image && <img className="fc-saved-item__thumb" src={item.image} alt="" loading="lazy" />}
+              {item.image && <img className="fc-saved-item__thumb" src={item.image} alt="" width="96" height="72" decoding="async" loading="lazy" />}
               <div className="fc-saved-item__body">
                 <div className="fc-saved-item__top">
                   <span className={`fc-saved-item__type fc-saved-item__type--${item.contentType}`}>

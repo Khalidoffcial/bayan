@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { Pencil as FaEdit, Trash2 as FaTrash } from "lucide-react";
 import InlineComments from "../../../components/common/InlineComments";
 import Loader from "../../../components/ui/Loader";
 import DropdownMenu from "../../../components/ui/DropdownMenu";

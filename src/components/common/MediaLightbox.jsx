@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { X as FaTimes, ChevronLeft as FaChevronLeft, ChevronRight as FaChevronRight } from "lucide-react";
 import { useTranslation } from "../../i18n/useTranslation";
 import "./mediaLightbox.css";
 

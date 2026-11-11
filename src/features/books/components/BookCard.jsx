@@ -31,7 +31,7 @@ export const BookCard = ({ book }) => {
             </span>
             <div className="book-card__cover-wrap">
                 {book.cover
-                    ? <img className="book-card__cover" src={book.cover} alt="" loading="lazy" />
+                    ? <img className="book-card__cover" src={book.cover} alt="" width="300" height="450" decoding="async" loading="lazy" />
                     : <span className="book-card__cover book-card__cover--ph"><BookOpenIcon size={34} strokeWidth={1.4} aria-hidden /></span>}
             </div>
             <h1 className="book-card__title">{book.title}</h1>

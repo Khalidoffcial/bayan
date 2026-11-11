@@ -34,7 +34,7 @@ export const ArticleReading = () => {
   if (loading) {
     return (
       <div className="article-reading-container">
-        <div className="loading"><Loader /></div>
+        <div className="loading"><Loader size="page" /></div>
       </div>
     );
   }

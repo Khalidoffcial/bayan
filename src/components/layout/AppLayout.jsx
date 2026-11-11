@@ -19,6 +19,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import Top from "./Top";
 import Sidebar from "./Sidebar";
+import BottomNav from "./BottomNav";
 import InterestsPopup from "../common/InterestsModal";
 import AdSidebar from "../../features/ads/AdSidebar";
 import { canShowSidebarAd } from "../../features/ads/AdPolicy";
@@ -55,11 +56,12 @@ export const AppLayout = ({ children }) => {
         <div className="app-shell">
             <Top />
             <Sidebar />
+            <BottomNav />
             <InterestsPopup />
-            <div className="app-workspace">
+            <main id="main-workspace" className="app-workspace">
                 <PageContent>{children}</PageContent>
                 {railEligible && <AdSidebar />}
-            </div>
+            </main>
         </div>
     );
 };

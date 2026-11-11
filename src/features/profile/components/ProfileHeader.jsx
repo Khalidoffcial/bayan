@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaPen } from "react-icons/fa";
+import { Pen as FaPen } from "lucide-react";
 import defaultImg from "../../../assets/icons/user_10374408.png";
 import ProfileImageViewer from "../../../components/common/ProfileImageViewer";
 import { useTranslation } from "../../../i18n/useTranslation";

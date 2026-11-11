@@ -10,7 +10,7 @@ export const PostBody = ({ content, imageUrl, contentDir, contentId, contentType
       />
       {imageUrl && (
         <div className="post-image">
-          <img src={imageUrl} alt="Post Content" />
+          <img src={imageUrl} alt="Post Content" width="800" height="450" decoding="async" loading="lazy" />
         </div>
       )}
       {/* خيار الترجمة يظهر أسفل الأصل فقط عند طلب المستخدم — لا ترجمة تلقائية */}

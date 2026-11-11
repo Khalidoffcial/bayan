@@ -54,4 +54,10 @@
     padding-top: 0;
     /* mobile header behaves differently (existing rule) */
   }
+  /* CLS protection: the fixed bottom bar's height is reserved from first
+     paint via a constant, so appearing/hiding it never shifts layout.
+     Keeps page content clear of the bar (safe-area included dynamically). */
+  .app-workspace {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
 }

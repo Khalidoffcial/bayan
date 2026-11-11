@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes } from "react-icons/fa";
+import { X as FaTimes } from "lucide-react";
 import { useTranslation } from "../../i18n/useTranslation";
 import "./profileImageViewer.css";
 

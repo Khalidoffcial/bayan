@@ -59,7 +59,7 @@ const LandingPage = () => {
 
       <header className="lp-nav">
         <a href="#top" className="lp-nav__brand" aria-label={t("aria.bayanBrand")}>
-          <img src={logo} alt="Bayan Space" className="lp-nav__brand-img" />
+          <img src={logo} alt="Bayan Space" className="lp-nav__brand-img" width="120" height="56" decoding="async" />
         </a>
         <nav className="lp-nav__links" aria-label={t("aria.main")}>
           <a href="#modes" className="lp-nav__link">{t("landing.nav.modes")}</a>

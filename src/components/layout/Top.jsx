@@ -45,6 +45,10 @@ const Top = () => {
           className="top-profile-pic top-header__profile-pic"
           src={user?.imgProfile || defaultUserIcon}
           alt={user?.name || "Profile"}
+          width="38"
+          height="38"
+          loading="lazy"
+          decoding="async"
         />
       </button>
     </header>

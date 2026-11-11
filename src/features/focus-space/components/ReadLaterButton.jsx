@@ -11,7 +11,7 @@
  * - Small, RTL/LTR aware, tooltip via title + aria-label.
  */
 import React, { useEffect, useState } from "react";
-import { FaRegBookmark, FaBookmark } from "react-icons/fa";
+import { Bookmark as FaRegBookmark, BookmarkCheck as FaBookmark } from "lucide-react";
 import useAuth from "../../../hooks/useAuth";
 import { useToast } from "../../../components/ui/Toast";
 import { useTranslation } from "../../../i18n/useTranslation";

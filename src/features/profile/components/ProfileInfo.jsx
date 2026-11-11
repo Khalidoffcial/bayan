@@ -1,6 +1,6 @@
 import React from "react";
-import { FaPen, FaCheck, FaUserPlus } from "react-icons/fa";
-import { SlUserFollow } from "react-icons/sl";
+import { Pen as FaPen, Check as FaCheck, UserPlus as FaUserPlus } from "lucide-react";
+
 import { useTranslation } from "../../../i18n/useTranslation";
 
 export const ProfileInfo = ({
@@ -93,7 +93,7 @@ export const ProfileInfo = ({
             </button>
           ) : (
             <button className="unfollow-btn" onClick={onUnfollow}>
-              <SlUserFollow /> {t("profile.unfollow")}
+              <FaUserPlus /> {t("profile.unfollow")}
             </button>
           )}
         </div>

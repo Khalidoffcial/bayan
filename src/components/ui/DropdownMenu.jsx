@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaEllipsisH } from "react-icons/fa";
+import { Ellipsis as FaEllipsisH } from "lucide-react";
 import "./dropdownMenu.css";
 
 /**

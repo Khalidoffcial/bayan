@@ -178,7 +178,7 @@ export const FocusMusicDiscovery = () => {
                     aria-label={t("common.play")}
                   >
                     {track.thumbnail
-                      ? <img src={track.thumbnail} alt="" className="fc-md__cover" loading="lazy" />
+                      ? <img src={track.thumbnail} alt="" className="fc-md__cover" width="96" height="96" decoding="async" loading="lazy" />
                       : <span className="fc-md__cover fc-md__cover--ph"><MusicIcon size={16} strokeWidth={1.5} aria-hidden /></span>}
                     {isCurrent && isPlaying
                       ? <span className="fc-md__play-ic"><PauseIcon size={14} strokeWidth={2} aria-hidden /></span>
@@ -187,7 +187,7 @@ export const FocusMusicDiscovery = () => {
                 ) : (
                   <span className="fc-md__play fc-md__play--info">
                     {track.thumbnail
-                      ? <img src={track.thumbnail} alt="" className="fc-md__cover" loading="lazy" />
+                      ? <img src={track.thumbnail} alt="" className="fc-md__cover" width="96" height="96" decoding="async" loading="lazy" />
                       : <span className="fc-md__cover fc-md__cover--ph"><MusicIcon size={16} strokeWidth={1.5} aria-hidden /></span>}
                   </span>
                 )}

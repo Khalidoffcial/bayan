@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { TriangleAlert as FaExclamationTriangle } from "lucide-react";
 import "./confirmDialog.css";
 
 /**

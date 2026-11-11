@@ -67,11 +67,27 @@ describe("Sidebar CSS contract — no physical side-locking", () => {
     expect(css).toMatch(/padding\s*:\s*0\s+14px/); // symmetric shorthand
   });
 
-  test("mobile hide animation flips direction via --dir-factor, not a fixed translateX", () => {
+  test("mobile: sidebar is hidden and the bottom navigation takes over", () => {
     const css = sidebarCss.replace(/\/\*[\s\S]*?\*\//g, "");
-    expect(css).toMatch(/translateX\(calc\(-100%\s*\*\s*var\(--dir-factor,\s*1\)\)\)/);
-    // No raw physical translateX(-100%) outside the calc wrapper
+    const mobileBlock = css.match(/@media \(max-width: 900px\) \{[\s\S]*$/);
+    expect(mobileBlock).toBeTruthy();
+    expect(mobileBlock[0]).toMatch(/\.sidebar\s*\{[^}]*display:\s*none/);
+    // No raw physical translateX(-100%) anywhere
     expect(css).not.toMatch(/translateX\(-100%\)/);
+  });
+  test("bottomNav.css reserves the bar height and never coexists with the sidebar", () => {
+    const css = fs.readFileSync(
+      path.resolve(__dirname, "styles/bottomNav.css"),
+      "utf8"
+    ).replace(/\/\*[\s\S]*?\*\//g, "");
+    // Fixed bar with a constant height (CLS-safe) and safe-area support
+    expect(css).toMatch(/position:\s*fixed/);
+    expect(css).toMatch(/height:\s*calc\(62px\s*\+\s*env\(safe-area-inset-bottom/);
+    // Shown only on mobile breakpoints
+    expect(css).toMatch(/@media \(max-width: 900px\)/);
+    // Logical properties only (RTL/LTR)
+    expect(css).not.toMatch(/\bleft:\s|\bright:\s/);
+    expect(css).toMatch(/inset-inline/);
   });
 
   test("hover slide also respects the direction factor", () => {
@@ -94,7 +110,7 @@ describe("Sidebar component — same markup in both directions", () => {
     document.documentElement.setAttribute("dir", "ltr");
     const { container } = renderSidebar();
     const items = container.querySelectorAll(".sidebar-item");
-    expect(items.length).toBe(8); // 5 channels + focus + settings
+    expect(items.length).toBe(9); // 8 channels + settings
     expect(document.querySelector(".menu-btn")).toBeTruthy();
   });
 
@@ -102,7 +118,7 @@ describe("Sidebar component — same markup in both directions", () => {
     document.documentElement.setAttribute("dir", "rtl");
     const { container } = renderSidebar();
     const items = container.querySelectorAll(".sidebar-item");
-    expect(items.length).toBe(8);
+    expect(items.length).toBe(9);
     // The component must NOT add any dir-specific classes or inline styles
     const sidebar = container.querySelector(".sidebar");
     expect(sidebar.className).not.toMatch(/rtl|ltr/i);

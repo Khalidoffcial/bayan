@@ -50,7 +50,7 @@ export const Modes = () => {
       <span className="lp-mode__glow" aria-hidden="true" />
       <span className="lp-mode__head">
         <span className="lp-mode__iconwrap">
-          <img src={mode.icon} alt="" className="lp-mode__icon" loading="lazy" />
+          <img src={mode.icon} alt="" className="lp-mode__icon" width="48" height="48" decoding="async" loading="lazy" />
         </span>
         <h3 className="lp-mode__title">{t(mode.titleKey)}</h3>
       </span>
@@ -166,7 +166,7 @@ export const FinalCta = ({ onGetStarted }) => {
   return (
     <LandingSection className="lp-final" id="start">
       <div className="lp-final__inner">
-        <img src={logo} alt="" className="lp-final__logo" aria-hidden="true" loading="lazy" />
+        <img src={logo} alt="" className="lp-final__logo" aria-hidden="true" width="120" height="56" decoding="async" loading="lazy" />
         <h2 className="lp-final__title">{t("landing.final.title")}</h2>
         <p className="lp-final__sub">{t("landing.final.sub")}</p>
         <div className="lp-final__actions">
@@ -189,7 +189,7 @@ export const Footer = () => {
     <footer className="lp-footer" dir="auto">
       <div className="lp-footer__inner">
         <div className="lp-footer__brand">
-          <img src={logo} alt="Bayan Space" className="lp-footer__logo-img" />
+          <img src={logo} alt="Bayan Space" className="lp-footer__logo-img" width="120" height="56" decoding="async" loading="lazy" />
           <p className="lp-footer__about">{t("landing.footer.about")}</p>
         </div>
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { FaCheckCircle, FaExclamationCircle, FaInfoCircle, FaTimes } from "react-icons/fa";
+import { CircleCheck as FaCheckCircle, CircleAlert as FaExclamationCircle, Info as FaInfoCircle, X as FaTimes } from "lucide-react";
 import { useTranslation } from "../../i18n/useTranslation";
 import "./toast.css";
 

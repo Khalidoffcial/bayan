@@ -82,7 +82,7 @@ const PlaylistPane = ({ onPick }) => {
             onClick={() => onPick(tr, i)}
           >
             {tr.thumbnail
-              ? <img src={tr.thumbnail} alt="" className="fmw-pl__thumb" loading="lazy" />
+              ? <img src={tr.thumbnail} alt="" className="fmw-pl__thumb" width="44" height="44" decoding="async" loading="lazy" />
               : <span className="fmw-pl__thumb fmw-pl__thumb--ph" />}
             <span className="fmw-pl__meta">
               <strong>{tr.title}</strong>
@@ -171,7 +171,7 @@ export const FocusMusicWidget = ({ reduceMotion, onHide }) => {
             aria-label={t("focus.music.expand")}
           >
             {cover
-              ? <img src={cover} alt="" className="fmw-cover-img" />
+              ? <img src={cover} alt="" className="fmw-cover-img" width="48" height="48" decoding="async" />
               : <span className="fmw-cover-img fmw-cover-img--ph" />}
             {isPlaying && !reduceMotion && <span className="fmw-eq" aria-hidden><i /><i /><i /></span>}
           </button>
@@ -217,7 +217,7 @@ export const FocusMusicWidget = ({ reduceMotion, onHide }) => {
 
           <div className={`fmw-exp__art ${isPlaying && !reduceMotion ? "is-spinning" : ""}`}>
             {cover
-              ? <img src={cover} alt="" className="fmw-cover-lg" />
+              ? <img src={cover} alt="" className="fmw-cover-lg" width="220" height="220" decoding="async" />
               : <span className="fmw-cover-lg fmw-cover-lg--ph" />}
           </div>
 

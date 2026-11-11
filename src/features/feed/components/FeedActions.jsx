@@ -1,5 +1,5 @@
 import React from "react";
-import { FaHeart, FaComment, FaShareAlt } from "react-icons/fa";
+import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { useTranslation } from "../../../i18n/useTranslation";
  
  
@@ -28,7 +28,7 @@ export const FeedActions = ({
         style={{ color: liked ? "#d30000" : "#333" }}
         aria-label={t("feed.like")}
       >
-        <FaHeart />
+        <Heart size={20} strokeWidth={1.75} aria-hidden />
         <span>{likesCount || 0}</span>
       </button>
 
@@ -37,7 +37,7 @@ export const FeedActions = ({
         onClick={onComment}
         aria-label={commentsCount ? `${t("feed.comment")} (${commentsCount})` : t("feed.comment")}
       >
-        <FaComment />
+        <MessageCircle size={20} strokeWidth={1.75} aria-hidden />
         {commentsCount > 0 && <span>{commentsCount}</span>}
       </button>
 
@@ -46,7 +46,7 @@ export const FeedActions = ({
         onClick={onShare}
         aria-label={t("feed.share")}
       >
-        <FaShareAlt />
+        <Share2 size={20} strokeWidth={1.75} aria-hidden />
       </button>
 
       {/* اقرأها لاحقًا — extra slot from PostCard */}

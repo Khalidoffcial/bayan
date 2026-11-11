@@ -1,5 +1,5 @@
 import React from "react";
-import { FaRegPaperPlane, FaUserCircle } from "react-icons/fa";
+import { Send as FaRegPaperPlane, CircleUser as FaUserCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useCommentForm from "../../hooks/useCommentForm";
 import useAuth from "../../hooks/useAuth";

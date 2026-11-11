@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaImage, FaTimes, FaGlobeAsia } from "react-icons/fa";
+import { Image as FaImage, X as FaTimes, Earth as FaGlobeAsia } from "lucide-react";
 import WriterToolbar from "./WriterToolbar";
 import WriterEditor from "./WriterEditor";
 import WriterImages from "./WriterImages";

@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import {
   Heart as HeartIcon, MessageCircle as CommentIcon,
   Share2 as ShareIcon,
+  Pencil as FaEdit, Trash2 as FaTrash,
 } from "lucide-react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+
 import useAuth from "../../../hooks/useAuth";
 import ViewCounter from "../../../components/common/ViewCounter";
 

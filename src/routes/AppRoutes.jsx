@@ -31,8 +31,8 @@ export const AppRoutes = () => {
     <ErrorBoundary key={location.pathname} labelKey="error.generic">
     <Suspense
       fallback={
-        <div className="app-loader">
-          <Loader />
+        <div className="app-loader" role="status" aria-label="جارٍ التحميل">
+          <Loader size="page" />
         </div>
       }
     >

@@ -105,6 +105,9 @@ export const MediaGallery = ({ media = [], img = null, onOpen }) => {
               src={cloudinaryFeedUrl(item.url)}
               alt=""
               loading="lazy"
+              decoding="async"
+              width="720"
+              height="540"
               draggable={false}
             />
           </div>

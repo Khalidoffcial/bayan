@@ -191,7 +191,8 @@ const handleLike = useCallback(
         {/* Premium share: real content rendered as a share image */}
         <ShareSheet open={Boolean(shareItem)} item={shareItem} onClose={() => setShareItem(null)} />
 
-        {loading && <Loader />}
+        {/* feed pagination — calm inline ring, no layout change, no overlay */}
+        {loading && <Loader size="inline" className="feed-loading" />}
 
         {error && (
           <div className="feed-error-container" style={{ textAlign: "center", padding: "16px" }}>

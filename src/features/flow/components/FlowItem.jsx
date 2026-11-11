@@ -285,7 +285,7 @@ const FlowArticleCard = ({ item }) => {
     <div className={`flow-article ${isNovel ? "flow-article--novel" : ""}`} dir="auto">
       {cover && (
         <button type="button" className="flow-article__cover" onClick={(e) => { e.stopPropagation(); open(); }}>
-          <img src={cover} alt="" loading="lazy" />
+          <img src={cover} alt="" width="780" height="440" decoding="async" loading="lazy" />
         </button>
       )}
       {isNovel && !cover && (

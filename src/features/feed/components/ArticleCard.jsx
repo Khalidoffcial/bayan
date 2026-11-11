@@ -36,7 +36,7 @@ export const ArticleCard = ({ item, kind, onShare }) => {
 
       {cover ? (
         <div className="bcard-cover">
-          <img src={cover} alt={item.title || ""} loading="lazy" />
+          <img src={cover} alt={item.title || ""} width="780" height="440" decoding="async" loading="lazy" />
         </div>
       ) : (
         isNovel && (

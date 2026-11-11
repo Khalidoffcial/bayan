@@ -1,0 +1,117 @@
+/* ============================================================
+   BottomNav — mobile fixed bottom navigation (<= 900px only).
+   Logical properties only: the flex row follows document
+   direction, so RTL/LTR flip with zero extra code.
+   Zero CLS: constant height from first paint; the workspace
+   reserves the matching padding at the same breakpoint.
+   ============================================================ */
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .bottom-nav {
+    display: block;
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 9997;
+    /* below topbar (10000), above page content */
+    background: var(--glass, rgba(255, 255, 255, 0.86));
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+    /* height constant from first paint; safe-area rides on top of the
+       constant so env() changes never shift layout */
+    height: calc(62px + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
+  }
+
+  .bottom-nav__list {
+    display: flex;
+    flex-direction: row;
+    /* RTL order handled automatically */
+    align-items: stretch;
+    list-style: none;
+    margin: 0;
+    padding: 0 6px;
+    height: 62px;
+    overflow-x: auto;
+    /* 9 destinations: iOS-style scrollable tray */
+    overflow-y: hidden;
+    scrollbar-width: none;
+    /* Firefox */
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .bottom-nav__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bottom-nav__item {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    display: flex;
+  }
+
+  .bottom-nav__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 13px;
+    margin-inline: 1px;
+    text-decoration: none;
+    color: var(--text-secondary, #6e6e73);
+    border-radius: 12px;
+    min-width: 54px;
+    min-height: 48px;
+    /* accessible touch target (WCAG 2.5.8) */
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .bottom-nav__link:hover {
+    color: var(--text-primary, #1d1d1f);
+  }
+
+  .bottom-nav__link.active {
+    color: var(--brand, #0f8ee2);
+    background: var(--bg4, rgba(15, 142, 226, 0.08));
+  }
+
+  .bottom-nav__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bottom-nav__label {
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    max-width: 76px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  [data-theme="dark"] .bottom-nav {
+    background: var(--navy, rgba(7, 27, 51, 0.88));
+    border-top-color: var(--border, rgba(255, 255, 255, 0.08));
+  }
+}
+
+/* Keyboard focus visible in both themes */
+.bottom-nav__link:focus-visible {
+  outline: 2px solid var(--brand, #0f8ee2);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav__link {
+    transition: none;
+  }
+}
