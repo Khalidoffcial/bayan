@@ -3199,3 +3199,26 @@ httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`   REST API  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ http://localhost:${PORT}`);
     console.log(`   Socket.IO ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ ws://localhost:${PORT}`);
 });
+
+// ======================================================
+// BAYAN CONTENT ENGINE — autonomous content ecosystem.
+// Mounted AFTER the server starts listening so an engine
+// fault can never block startup. Approval-gated by default;
+// the scheduler persists its queue in the users RTDB and
+// recovers pending work on restart. Control Center routes
+// are registered inside admin/index.js (behind RBAC + audit).
+// ======================================================
+try {
+    const CE = require("./contentEngine/index.js");
+    if (CE.config.enabled) {
+        CE.engine.start();
+        console.log("Content Engine scheduler started");
+    } else {
+        console.log("Content Engine present but disabled (CONTENT_ENGINE_ENABLED=false)");
+    }
+    const ceShutdown = () => { try { CE.engine.stop(); } catch (_) {} };
+    process.once("SIGINT", () => { ceShutdown(); process.exit(0); });
+    process.once("SIGTERM", () => { ceShutdown(); process.exit(0); });
+} catch (ceErr) {
+    console.error("Content Engine failed to mount:", ceErr.message);
+}

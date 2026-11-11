@@ -510,6 +510,13 @@ router.get("/audit", auth.requireAdmin, async (req, res) => {
 });
 
 
+// CONTENT ENGINE — autonomous content ecosystem (approval-gated).
+// Mounted under /admin/api/content-engine/*; same auth + RBAC model as
+// moderation: session required for every route, per-route permission
+// checks inside adminRoutes.js. Audit is written audit-first there.
+const contentEngineRoutes = require("../contentEngine/adminRoutes");
+contentEngineRoutes.registerAdminRoutes({ router, core, auth });
+
 // MODERATION - multilingual content moderation + Reason Library.
 // Mounted under /admin/api/moderation/*; every route requires a valid// admin session (requireAdmin) AND per-route core.can RBAC checks.
 const moderationRoutes = require("../moderation/routes");
