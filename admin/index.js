@@ -512,4 +512,6 @@ router.get("/audit", auth.requireAdmin, async (req, res) => {
 
 // MODERATION - multilingual content moderation + Reason Library.
 // Mounted under /admin/api/moderation/*; every route requires a valid// admin session (requireAdmin) AND per-route core.can RBAC checks.
+const moderationRoutes = require("../moderation/routes");
+router.use("/moderation", auth.requireAdmin, moderationRoutes);
 module.exports = router;

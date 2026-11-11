@@ -1,13 +1,13 @@
 /**
- * Control Center admin core tests — standalone script, no live Firebase.
+ * Control Center admin core tests Ã¢â‚¬â€ standalone script, no live Firebase.
  * Run: node tests/adminCore.test.js
  *
  * Covers (Phase 1 security contract):
- *  1. RBAC matrix — role/permission boundaries incl. super_admin-only perms.
- *  2. deepSanitize — secrets never pass through (psw, tokens...).
+ *  1. RBAC matrix Ã¢â‚¬â€ role/permission boundaries incl. super_admin-only perms.
+ *  2. deepSanitize Ã¢â‚¬â€ secrets never pass through (psw, tokens...).
  *  3. maskEmail.
- *  4. Audit write — record shape + append-only semantics with mocked RTDB.
- *  5. requireAdmin middleware — bad/missing token → 401; valid session+token → req.admin.
+ *  4. Audit write Ã¢â‚¬â€ record shape + append-only semantics with mocked RTDB.
+ *  5. requireAdmin middleware Ã¢â‚¬â€ bad/missing token Ã¢â€ â€™ 401; valid session+token Ã¢â€ â€™ req.admin.
  */
 process.env.ADMIN_JWT_SECRET = "test-admin-secret";
 process.env.ADMIN_AUDIT_SALT = "test-salt";
@@ -15,7 +15,7 @@ process.env.ADMIN_AUDIT_SALT = "test-salt";
 const assert = require("assert");
 const Module = require("module");
 
-// ── Mock the user-db firebase module BEFORE core/auth load ──
+// Ã¢â€â‚¬Ã¢â€â‚¬ Mock the user-db firebase module BEFORE core/auth load Ã¢â€â‚¬Ã¢â€â‚¬
 const store = {};
 const mockPushCounter = { n: 0 };
 const mockRef = (db, path) => ({ path, db });
@@ -33,7 +33,7 @@ const mockUpdate = async (r, patch) => { store[r.path] = { ...(store[r.path] || 
 const origResolve = Module._resolveFilename;
 Module._resolveFilename = function (request, ...args) {
     if (request === "./datastore/firebase" || request.endsWith("datastore/firebase") && request.includes("admin")) {
-        // not used — admin/core receives handles by injection
+        // not used Ã¢â‚¬â€ admin/core receives handles by injection
     }
     return origResolve.call(this, request, ...args);
 };
@@ -44,10 +44,11 @@ const jwt = require("jsonwebtoken");
 
 let passed = 0;
 function ok(name, fn) {
-    try { fn(); passed++; console.log(`  ✓ ${name}`); }
-    catch (e) { console.error(`  ✗ ${name}: ${e.message}`); process.exitCode = 1; }
+    try { fn(); passed++; console.log(`  Ã¢Å“â€œ ${name}`); }
+    catch (e) { console.error(`  Ã¢Å“â€” ${name}: ${e.message}`); process.exitCode = 1; }
 }
 
+const dbfns = require('../datastore/firebase.js');
 // init handles with mocked RTDB shim
 core.initAdmin({
     dbUsers: { label: "users-db" },
@@ -58,9 +59,8 @@ core.initAdmin({
     redisMode: "memory",
 });
 // swap the real firebase helpers out via handles injection surface:
-// core.writeAudit uses handles() destructuring of { ref, push, set } — provide them
+// core.writeAudit uses handles() destructuring of { ref, push, set } Ã¢â‚¬â€ provide them
 const realHandles = core.handles;
-const dbfns = require('../datastore/firebase.js');
     core.handles = () => ({
     ...realHandles(),
     dbUsers: { label: "users-db" },
@@ -120,18 +120,16 @@ console.log("Audit:");
     });
 
     ok("audit failure visible when store throws", async () => {
-        const dbfns = require('../datastore/firebase.js');
     core.handles = () => ({ ...realHandles(), dbUsers: {}, ref: mockRef, push: () => { throw new Error("db-down"); }, set: mockSet, get: mockGet });
         let threw = false;
         try { await core.writeAudit({ adminUid: "A1", action: "x" }); } catch { threw = true; }
         assert(threw);
         // restore the good shim
-        const dbfns = require('../datastore/firebase.js');
     core.handles = () => ({ ...realHandles(), dbUsers: { label: "users-db" }, dbContent: { label: "content-db" }, ref: mockRef, set: mockSet, get: mockGet, push: mockPush, update: mockUpdate });
     });
 
     console.log("Admin JWT middleware:");
-    ok("valid token + live session → req.admin with DB-loaded role", async () => {
+    ok("valid token + live session Ã¢â€ â€™ req.admin with DB-loaded role", async () => {
         store["control_admins/A1"] = { uid: "A1", name: "K", email: "k@x.com", role: "admin", active: true };
         store["control_sessions/A1/S1"] = { active: true, exp: Date.now() + 60000 };
         const token = auth.signAdminToken("A1", "S1");
@@ -142,7 +140,7 @@ console.log("Audit:");
         assert.strictEqual(req.admin.role, "admin"); // loaded from DB, not token
         assert(req.admin.perms.includes("users.suspend"));
     });
-    ok("expired/absent session → 401 even with valid token", async () => {
+    ok("expired/absent session Ã¢â€ â€™ 401 even with valid token", async () => {
         const req2 = { headers: { authorization: `Bearer ${auth.signAdminToken("A1", "GONE")}` } };
         let statusCode = 0;
         await new Promise((res) => auth.requireAdmin(req2, { status: (c) => { statusCode = c; return { json: () => { } }; } }, () => res()));
@@ -152,7 +150,7 @@ console.log("Audit:");
         const forged = jwt.sign({ uid: "A1", sid: "S1", role: "super_admin" }, "test-admin-secret", { issuer: "bayan-control-center" });
         const req = { headers: { authorization: `Bearer ${forged}` } };
         await new Promise((res) => auth.requireAdmin(req, { status: (c) => ({ json: () => { } }) }, () => res()));
-        // session valid → passes, but role comes from DB ("admin"), never the token
+        // session valid Ã¢â€ â€™ passes, but role comes from DB ("admin"), never the token
         assert.strictEqual(req.admin ? req.admin.role : null, "admin");
     });
 
