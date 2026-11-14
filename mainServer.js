@@ -1058,6 +1058,23 @@ app.post("/auth", (req, res) => {
         if (decoded.pass !== undefined) {
             return res.status(401).json({ success: false, message: "Token expired, please sign in again" });
         }
+        // Identity comes FIRST from the VERIFIED JWT (cryptographically trusted).
+        // The DB profile read is an ENRICHMENT + ban-check step, not the source
+        // of identity — so a Firebase outage can never throw "user is not
+        // defined" here again (INCIDENT FIX: the degraded branch referenced the
+        // try-scoped `user` and crashed with ReferenceError when findbyID was
+        // the call that failed, e.g. PERMISSION_DENIED).
+        const userData = {
+            imgProfile: null,
+            id: decoded.id,
+            name: decoded.name || "",
+            username: decoded.username || "",
+            Bio: null,
+            followers: null,
+            following: null,
+            IdPoster: null,
+            settings: null,
+        };
         try {
             const user = await DaoForDbUser.findbyID(decoded.id);
             if (!user) return res.status(401).json({ success: false, message: "Token expired, please sign in again" });
@@ -1068,7 +1085,7 @@ app.post("/auth", (req, res) => {
                 await sign.getUserSettings(
                     user.Id_user
                 );
-            const userData = {
+            Object.assign(userData, {
                 imgProfile: user.imgProfile,
                 id: user.Id_user,
                 name: user.F_user,
@@ -1078,27 +1095,17 @@ app.post("/auth", (req, res) => {
                 following: user.following,
                 IdPoster: user.Posters,
                 settings
-            };
+            });
             res.json({ success: true, valid: true, userData });
         } catch (err) {
-            // Datastore ACCESS failure while assembling the profile: the session
-            // itself is valid (JWT verified, user record loaded). Never report a
-            // 500 here — the frontend must treat this as a retryable server
-            // error WITH session preserved, not as an auth rejection.
+            // Datastore ACCESS failure while ENRICHING the profile: the session
+            // itself is valid (JWT verified). Never report a 500 or a 401 here —
+            // the frontend must treat this as a retryable server error WITH the
+            // session preserved, not as an auth rejection. JWT-identity fields
+            // are always populated (never an incomplete/anonymous user object).
             if (isDbAccessError(err)) {
                 console.warn("POST /auth degraded (datastore access error):", err.code || err.message);
-                const userData = {
-                    imgProfile: user.imgProfile,
-                    id: user.Id_user,
-                    name: user.F_user,
-                    username: user.S_user,
-                    Bio: user.Bio,
-                    followers: user.followers,
-                    following: user.following,
-                    IdPoster: user.Posters,
-                    settings: null,
-                };
-                return res.json({ valid: true, userData, degraded: true });
+                return res.json({ success: true, valid: true, userData, degraded: true });
             }
             console.error("POST /auth error:", err.message);
             res.status(500).json({ message: "Error fetching user data" });
@@ -2488,8 +2495,18 @@ app.get(
                 history: doc.history || [],
             });
         } catch (err) {
-            console.error("GET /audio-hub/library error:", err.message);
-            res.status(500).json({ error: err.message });
+            console.error("GET /audio-hub/library error:", err.code || err.message);
+            // PERMISSION_DENIED / outage → retryable 503, NOT fake data and NOT
+            // a 500 that the frontend could misread. Message is stable/structured;
+            // internal Firebase details are not exposed.
+            if (isDbAccessError(err)) {
+                return res.status(503).json({
+                    status: "error",
+                    code: "AUDIO_LIBRARY_UNAVAILABLE",
+                    favorites: [], playlists: [], history: [],
+                });
+            }
+            res.status(500).json({ status: "error", code: "AUDIO_LIBRARY_FAILED", error: err.message });
         }
     }
 );
@@ -2543,8 +2560,11 @@ app.put(
             await update(ref(db, `${AUDIOHUB_ROOT}/${req.user.id}`), merged);
             res.json({ status: "ok", data: merged });
         } catch (err) {
-            console.error("PUT /audio-hub/library error:", err.message);
-            res.status(500).json({ error: err.message });
+            console.error("PUT /audio-hub/library error:", err.code || err.message);
+            if (isDbAccessError(err)) {
+                return res.status(503).json({ status: "error", code: "AUDIO_LIBRARY_UNAVAILABLE" });
+            }
+            res.status(500).json({ status: "error", code: "AUDIO_LIBRARY_FAILED", error: err.message });
         }
     }
 );
@@ -3381,7 +3401,11 @@ try {
     });
     app.use("/admin/api", adminRouter);
     // Seed moderation categories/dictionary/reason templates once (idempotent).
-    Promise.resolve(seedModeration()).catch((e) => console.error("moderation seed:", e.message));
+    // OPTIONAL service: a Permission-denied here (RTDB rules on control_moderation)
+    // is logged with the failing PATH + code so the exact rule can be identified,
+    // but never blocks startup or auth.
+    Promise.resolve(seedModeration()).catch((e) =>
+        console.error("moderation seed failed (OPTIONAL, non-blocking):", e.code || "", e.message));
     console.log("ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂºÃ‚Â¡ÃƒÂ¯Ã‚Â¸Ã‚Â  Control Center admin API mounted at /admin/api");
 } catch (adminErr) {
     // Fail-safe: an admin module problem must never take the platform down.

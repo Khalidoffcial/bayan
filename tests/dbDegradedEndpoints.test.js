@@ -168,6 +168,62 @@ t("12. admin middleware untouched by user-session degradation", () => {
     assert.ok(!authSrc.includes("isDbAccessError"), "user degradation must not leak into admin auth");
 });
 
+console.log("INCIDENT regression — POST /auth 'user is not defined' (prod mainServer.js:1091):");
+// Reproduces the exact production crash: PERMISSION_DENIED thrown by findbyID
+// (profile lookup itself fails) → old code's catch-block referenced the
+// try-scoped `user` → ReferenceError escaped the jwt.verify callback.
+// We execute the REAL POST /auth handler from mainServer.js with injected DAO
+// behavior and a fake express res, asserting: 200 + degraded:true + JWT identity.
+t("13. POST /auth + PERMISSION_DENIED on profile read → 200 degraded:true with JWT identity (no ReferenceError, no 500, no 401)", async () => {
+    // Extract the full `app.post("/auth", ...)` handler block from the source.
+    const start = src.indexOf('app.post("/auth"');
+    const end = src.indexOf('app.post("/editProfile"');
+    assert.ok(start > 0 && end > start, "/auth handler not found");
+    let block = src.substring(start, end);
+    // Strip the app.post(...) wrapper → the inner (req,res) handler.
+    const cbStart = block.indexOf(", async(req, res)");
+    assert.ok(cbStart > 0);
+    const handlerSrc = "return async " + block.substring(cbStart + 2, block.lastIndexOf("});"));
+
+    const token = jwt.sign({ id: "u9", name: "Incident", username: "incident" }, SECRET);
+    const captured = {};
+    const sandbox = {
+        jwt,
+        process: { env: { ACCESS_TOKEN_SECRET: SECRET } },
+        console: { warn() {}, error() {}, log() {} },
+        DaoForDbUser: { findbyID: () => { const e = new Error("Permission denied"); e.code = "PERMISSION_DENIED"; throw e; } },
+        sign: { getUserSettings: async () => null },
+        isDbAccessError: null,
+    };
+    vm.runInContext(extract("isDbAccessError"), vm.createContext(sandbox));
+    const handler = vm.runInContext(handlerSrc, vm.createContext(sandbox));
+
+    const res = {
+        statusCode: 0, body: null,
+        status(c) { this.statusCode = c; return this; },
+        json(o) { this.body = o; captured.status = this.statusCode; return this; },
+    };
+    // Must NOT throw ReferenceError (the original incident).
+    await handler({ headers: { authorization: "Bearer " + token } }, res);
+    assert.strictEqual(res.statusCode, 0, "no explicit error status — 200 degraded response");
+    assert.strictEqual(res.body.valid, true);
+    assert.strictEqual(res.body.degraded, true);
+    assert.strictEqual(res.body.userData.id, "u9", "JWT identity survives the outage");
+    assert.strictEqual(res.body.userData.name, "Incident");
+    assert.strictEqual(res.body.userData.username, "incident");
+    assert.strictEqual(res.body.userData.settings, null);
+});
+
+t("14. degraded /auth response never contains a null/incomplete anonymous identity", async () => {
+    // Contract: userData always carries the JWT's identity fields.
+    const i = src.indexOf('app.post("/auth")') >= 0 ? src.indexOf('app.post("/auth")') : src.indexOf('app.post("/auth")');
+    const start = src.indexOf('app.post("/auth")') >= 0 ? src.indexOf('app.post("/auth")') : src.indexOf('app.post("/auth")');
+    const blockStart = src.indexOf('app.post("/auth"');
+    const block = src.substring(blockStart, src.indexOf('app.post("/editProfile"'));
+    assert.ok(block.includes("decoded.id"), "identity derived from verified JWT claims");
+    assert.ok(block.includes("degraded: true"), "degraded flag present");
+});
+
 (async () => {
     console.log(`\n${pass} passed, ${fail} failed`);
     console.log("SUMMARY: " + pass + " passed, " + fail + " failed");

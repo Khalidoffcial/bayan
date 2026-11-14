@@ -40,7 +40,7 @@ function startDoabHarvest({ intervalMs = 6 * 60 * 60 * 1000 } = {}) {
             const r = await harvestRun();
             console.log(`[doab-harvest] added=${r.added} batches=${r.batches || 0}${r.error ? ` error=${r.error}` : ""}${r.exhausted ? " (index complete)" : " (more pending)"}`);
         } catch (e) {
-            console.error("[doab-harvest] failed:", e.message);
+            console.error(`[doab-harvest] failed (OPTIONAL, non-blocking): ${e.code || ""} ${e.message} — books search falls back to direct provider APIs`);
         }
     };
     // first run shortly after boot, then on the interval
