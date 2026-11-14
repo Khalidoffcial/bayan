@@ -1,0 +1,378 @@
+﻿node : 
+At line:1 char:152
++ ... an-backend; node node_modules\jest\bin\jest.js --runInBand --forceExi ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ ensureSeeded populates categories/dictionary/reasons once".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:159:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ scanAndFlag creates a case with evidence".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:167:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ duplicate detection does not re-alert".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:177:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ review action without reason is rejected".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:182:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ moderator can hide, cannot ban (RBAC)".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:188:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ hide sets hidden on content record".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:202:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ delete removes content + audit recorded".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:211:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ user notification written to the user's own node, no internal notes".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:219:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ dismiss (false positive) sends NO user notification".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:225:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ duplicate submit blocked (10s window)".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:239:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ suspend + ban enforce accountState, then reversal restores".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:248:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ warn notification localized (ar + en)".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:262:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ appeal flow: create → approve → content/account restored".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:271:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ overview stats computed from real cases only".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:283:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ concurrent duplicate actions: only one wins (parallel race)".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:288:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ reason render honors language and placeholders".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:298:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ disabled reason template refuses to render".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:304:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ alerts: one per admin per case, unread tracked".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:308:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "  ✓ config policy default never auto-suspends".
+
+    [0m [90m 77 |[39m [36mlet[39m pass [33m=[39m [35m0[39m[33m,[39m fail [33m=[39m [35m0[39m[33m;[39m
+     [90m 78 |[39m [36mconst[39m t [33m=[39m [36masync[39m (name[33m,[39m fn) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 79 |[39m     [36mtry[39m { [36mawait[39m fn()[33m;[39m 
+pass[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✓ "[39m [33m+[39m name)[33m;[39m }
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 80 |[39m     [36mcatch[39m (e) { fail[33m++[39m[33m;[39m console[33m.[39mlog([32m"  ✗ "[39m 
+[33m+[39m name [33m+[39m [32m" — "[39m [33m+[39m e[33m.[39mmessage)[33m;[39m }
+     [90m 81 |[39m }[33m;[39m
+     [90m 82 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:79:39)
+      at tests/moderation.test.js:317:5
+
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "
+    32 passed, 0 failed".
+
+    [0m [90m 321 |[39m     })[33m;[39m
+     [90m 322 |[39m
+    [31m[1m>[22m[39m[90m 323 |[39m     console[33m.[39mlog([32m`\n${pass} passed, ${fail} 
+failed`[39m)[33m;[39m
+     [90m     |[39m             [31m[1m^[22m[39m
+     [90m 324 |[39m     process[33m.[39mexit(fail [33m?[39m [35m1[39m [33m:[39m [35m0[39m)[33m;[39m
+     [90m 325 |[39m })()[33m.[39m[36mcatch[39m((e) [33m=>[39m { console[33m.[39merror(e)[33m;[39m 
+process[33m.[39mexit([35m1[39m)[33m;[39m })[33m;[39m
+     [90m 326 |[39m[0m
+
+      at console.log (node_modules/@jest/console/build/BufferedConsole.js:156:10)
+      at log (tests/moderation.test.js:323:13)
+
+  ●  process.exit called with "0"
+
+    [0m [90m 322 |[39m
+     [90m 323 |[39m     console[33m.[39mlog([32m`\n${pass} passed, ${fail} failed`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 324 |[39m     process[33m.[39mexit(fail [33m?[39m [35m1[39m [33m:[39m 
+[35m0[39m)[33m;[39m
+     [90m     |[39m             [31m[1m^[22m[39m
+     [90m 325 |[39m })()[33m.[39m[36mcatch[39m((e) [33m=>[39m { console[33m.[39merror(e)[33m;[39m 
+process[33m.[39mexit([35m1[39m)[33m;[39m })[33m;[39m
+     [90m 326 |[39m[0m
+
+      at exit (tests/moderation.test.js:324:13)

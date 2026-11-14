@@ -2,6 +2,9 @@ const { createServer } = require("http");
 const express = require("express");
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
+
+// Username uniqueness service — ATOMIC server-side guarantee (see file header).
+const usernameService = require("./datastore/username.service.js");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const fs = require("fs");
@@ -145,6 +148,29 @@ app.use(cors({
 }));
 
 
+// ======================================================
+// HEALTH / ROOT — registered BEFORE every heavy route so
+// these responses never depend on Firebase, Redis, the
+// Content Engine or any optional service. Deliberately
+// static: no DB read, no env dump, no secrets.
+// ======================================================
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        service: "bayan-backend",
+        status: "ok",
+        time: new Date().toISOString(),
+    });
+});
+app.get("/health", (req, res) => {
+    res.json({
+        success: true,
+        status: "ok",
+        uptimeSec: Math.floor(process.uptime()),
+        time: new Date().toISOString(),
+    });
+});
+
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
@@ -233,6 +259,29 @@ function tokenPayloadFromUser(user) {
 // Verify a Bearer token and require that the user still exists in the DB.
 // Rejects suspended/banned accounts (accountState). attachUser=true ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ req.userProfile
 // holds the profile (incl. psw) for server-side checks; never serialized.
+
+// True when a datastore error is an ACCESS failure (rules/network/outage),
+// NOT a "record absent" result. Those must never kill a valid JWT session.
+function isDbAccessError(err) {
+    const code = String((err && err.code) || "").toLowerCase();
+    const msg = String((err && err.message) || "").toLowerCase();
+    return (
+        code.includes("permission") ||
+        code.includes("unavailable") ||
+        code.includes("network") ||
+        code.includes("deadline") ||
+        msg.includes("permission denied") ||
+        msg.includes("permission_denied") ||
+        msg.includes("insufficient permissions") ||
+        msg.includes("app_check") ||
+        msg.includes("app check") ||
+        msg.includes("app/check") ||
+        code.includes("app/") ||
+        msg.includes("network error") ||
+        msg.includes("unavailable")
+    );
+}
+
 function requireUser(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -263,6 +312,19 @@ function requireUser(req, res, next) {
             req.userAccountState = state;
             next();
         } catch (err) {
+            // Datastore ACCESS failure (rules/network outage): the JWT itself is
+            // cryptographically valid. Treat the session as authenticated in a
+            // DEGRADED mode instead of returning 500 for every request. The
+            // ban-check is temporarily unverifiable; a datastore outage must
+            // never break every authenticated session.
+            if (isDbAccessError(err)) {
+                console.warn("requireUser degraded (datastore access error):", err.code || err.message);
+                req.user = { id: decoded.id, name: decoded.name, username: decoded.username };
+                req.userProfile = null;
+                req.userAccountState = "unknown";
+                req.dbDegraded = true;
+                return next();
+            }
             console.error("requireUser error:", err.message);
             return res.status(500).json({ success: false, message: "Auth error" });
         }
@@ -766,154 +828,241 @@ function classifyNovel(text, threshold = 2) {
 
 // ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â®Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾
 app.post("/signin", loginRateLimit, async(req, res) => {
-    const { identifierUser, password } = req.body;
+    const t0 = Date.now();
+    const logStage = (stage) => console.log(`[timing] signin stage=${stage} ms=${Date.now() - t0}`);
+    const { identifierUser, password } = req.body || {};
     if (!identifierUser || !password)
-        return res.status(400).json({ message: "Please enter all fields" });
+        return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: "Please enter all fields" });
+    if (typeof password !== "string" || password.length > 128 || typeof identifierUser !== "string" || identifierUser.length > 120)
+        return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: "Invalid input" });
 
     try {
-        const user = await sign.login_user(identifierUser, password);
-        if (!user) return res.status(401).json({ message: "Invalid credentials" });
+        logStage("lookup+verify-start");
+        const user = await sign.login_user(identifierUser.trim(), password);
+        logStage("lookup+verify");
+        if (!user) return res.status(401).json({ success: false, code: "INVALID_CREDENTIALS", message: "Invalid credentials" });
 
-        // SECURITY (Phase 1): identity-only JWT ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the bcrypt hash (pass) is no
+        // SECURITY (Phase 1): identity-only JWT - the bcrypt hash (pass) is no
         // longer embedded. Existing clients only read accessToken/userData.
         const payload = tokenPayloadFromUser(user);
-        const settings =
-            await sign.getUserSettings(
-                user.Id_user
-            );
-        const userData = {
-            imgProfile: user.imgProfile,
-            id: user.Id_user,
-            name: user.F_user,
-            username: user.S_user,
-            Bio: user.Bio,
-            followers: user.followers,
-            following: user.following,
-            IdPoster: user.Posters,
-            settings
-        };
+        const settings = await sign.getUserSettings(user.Id_user);
+        logStage("settings");
+        const userData = buildUserData(user, settings);
 
-        res.json({ message: "Login successful", accessToken: generateToken(payload), userData });
+        res.json({ success: true, message: "Login successful", accessToken: generateToken(payload), userData });
     } catch (err) {
-        console.error("Signin error:", err);
-        res.status(500).json({ message: "Internal server error" });
+        if (isDbAccessError(err)) {
+            console.warn("Signin degraded (datastore access error):", err.code || err.message);
+            return res.status(503).json({ success: false, code: "SERVICE_UNAVAILABLE", message: "Temporary server issue, please try again" });
+        }
+        console.error("Signin error:", err.message);
+        res.status(500).json({ success: false, code: "INTERNAL", message: "Internal server error" });
     }
 });
 
-// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾ÃƒËœÃ‚Â¯ÃƒËœÃ‚Â®Ãƒâ„¢Ã‹â€ Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â¨ÃƒËœÃ‚Â¬Ãƒâ„¢Ã‹â€ ÃƒËœÃ‚Â¬Ãƒâ„¢Ã¢â‚¬Å¾
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â­ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¯
+// Signup rate limit — fixed window per IP, separate (tighter) budget than login.
+const signupBuckets = new Map();
+const SIGNUP_WINDOW_MS = 60 * 60 * 1000;
+const SIGNUP_MAX = 10;
+function signupRateLimit(req, res, next) {
+    const key = (req.headers["x-forwarded-for"]?.split(",")[0]?.trim()) || req.socket?.remoteAddress || "unknown";
+    const now = Date.now();
+    const b = signupBuckets.get(key);
+    if (!b || now - b.firstAt > SIGNUP_WINDOW_MS) {
+        signupBuckets.set(key, { count: 1, firstAt: now });
+        if (signupBuckets.size > 20000) signupBuckets.clear();
+        return next();
+    }
+    b.count += 1;
+    if (b.count > SIGNUP_MAX) {
+        return res.status(429).json({ success: false, code: "RATE_LIMITED", message: "Too many signup attempts, try later" });
+    }
+    next();
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+app.post("/signup", signupRateLimit, async(req, res) => {
+    const t0 = Date.now();
+    const logStage = (stage) => console.log(`[timing] signup stage=${stage} ms=${Date.now() - t0}`);
+    try {
+        const { fullName, username, email, uid, password } = req.body || {};
+
+        // ── 1. Validation (backend re-validates everything) ──
+        if (!fullName || typeof fullName !== "string" || !fullName.trim())
+            return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: "Please enter your full name" });
+        if (fullName.trim().length > 80)
+            return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: "Full name is too long" });
+        if (!password || typeof password !== "string")
+            return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: "Please enter a password" });
+        if (password.length < 8 || password.length > 128 || !/[A-Z]/.test(password))
+            return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: "Password must be 8-128 characters and contain an uppercase letter" });
+        if (!email || !EMAIL_RE.test(String(email)))
+            return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: "Please enter a valid email address" });
+
+        const norm = usernameService.normalizeUsername(username || "");
+        if (!norm.ok)
+            return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: norm.error });
+        const usernameKey = norm.key;
+        const emailNorm = String(email).trim().toLowerCase();
+        logStage("validated");
+
+        // ── 2. Duplicate email (single indexed query) ──
+        const existingByEmail = await sign.findbyEmail(emailNorm);
+        logStage("emailCheck");
+        if (existingByEmail && existingByEmail.Id_user) {
+            // Idempotent: a retried successful signup returns the SAME account,
+            // never a second one — but only when it belongs to this Google uid
+            // (when present). Otherwise it is a genuine conflict.
+            if (!uid || String(existingByEmail.uid || "") === String(uid)) {
+                const token = generateToken(tokenPayloadFromUser(existingByEmail));
+                const settings = await sign.getUserSettings(existingByEmail.Id_user);
+                logStage("existing-account");
+                return res.status(200).json({
+                    success: true,
+                    message: "Account created successfully",
+                    token,
+                    userData: buildUserData(existingByEmail, settings),
+                });
+            }
+            return res.status(409).json({ success: false, code: "EMAIL_TAKEN", message: "An account with this email already exists" });
+        }
+
+        // ── 3. ATOMIC username reservation (the uniqueness guarantee) ──
+        const uniqueId = generateUniqueId();
+        const claim = await usernameService.reserveUsername(usernameKey, uniqueId);
+        logStage("usernameReserve");
+        if (!claim.reserved) {
+            return res.status(409).json({ success: false, code: "USERNAME_TAKEN", message: "This username is already taken" });
+        }
+
+        // ── 4. Persist the account (rollback reservation on failure) ──
+        let user;
+        try {
+            user = await sign.logup_user_Insert(
+                fullName.trim(),
+                usernameService.displayUsername(usernameKey),
+                emailNorm,
+                uid || null,
+                uniqueId,
+                password
+            );
+            logStage("profileWrite");
+        } catch (writeErr) {
+            // Release OUR reservation only — no orphaned usernames, and never
+            // touching another user's reservation.
+            await usernameService.rollbackReservation(usernameKey, uniqueId);
+            throw writeErr;
+        }
+
+        // SECURITY: the plaintext password is never signed into a JWT.
+        const token = generateToken(tokenPayloadFromUser(user));
+        logStage("done");
+        res.status(201).json({
+            success: true,
+            message: "Account created successfully",
+            token,
+            userData: buildUserData(user, user.settings),
+        });
+    } catch (err) {
+        console.error("Signup error:", err.message);
+        if (isDbAccessError(err)) {
+            return res.status(503).json({ success: false, code: "SERVICE_UNAVAILABLE", message: "Temporary server issue, please try again" });
+        }
+        res.status(500).json({ success: false, code: "INTERNAL", message: "Internal server error" });
+    }
+});
+
+// Username availability — INFORMATIONAL ONLY (pre-flight UX hint for the
+// signup form). Uniqueness is enforced atomically inside POST /signup; this
+// endpoint can never be the guarantee (TOCTOU).
+app.post("/username/available", async(req, res) => {
+    try {
+        const norm = usernameService.normalizeUsername((req.body || {}).username || "");
+        if (!norm.ok) {
+            return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: norm.error, available: false });
+        }
+        const available = await usernameService.isUsernameAvailable(norm.key);
+        res.json({ success: true, username: norm.key, available });
+    } catch (err) {
+        console.error("username/available error:", err.message);
+        // Informational endpoint: failures must not block the signup form.
+        res.json({ success: false, available: null, message: "Availability check unavailable" });
+    }
+});
+
+// Google login — verified Firebase ID token only; uid/email from verified claims.
 app.post("/authGoogle", loginRateLimit, async(req, res) => {
     // SECURITY (P2): the client MUST present the Firebase ID token obtained
     // from the actual Google popup sign-in. Signature/issuer/audience/expiry
     // are verified server-side (admin/firebaseIdToken.js); uid and email are
-    // taken from the VERIFIED claims Ã¢â‚¬â€ never from the raw body Ã¢â‚¬â€ and must
+    // taken from the VERIFIED claims — never from the raw body — and must
     // match an existing Bayan account. No JWT is issued otherwise.
     const { idToken } = req.body || {};
-    if (!idToken) return res.status(400).json({ message: "Missing idToken" });
+    if (!idToken) return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: "Missing idToken" });
+    const t0 = Date.now();
+    const logStage = (stage) => console.log(`[timing] authGoogle stage=${stage} ms=${Date.now() - t0}`);
     try {
+        logStage("verify-start");
         let claims;
         try {
             claims = await verifyFirebaseIdToken(idToken);
         } catch (verr) {
             if (verr.code === "FIREBASE_ADMIN_INIT_FAILED" || verr.message?.startsWith("FIREBASE_ADMIN_INIT_FAILED")) {
                 console.error("authGoogle: admin SDK not configured:", verr.message);
-                return res.status(503).json({ message: "GOOGLE_AUTH_UNAVAILABLE" });
+                return res.status(503).json({ success: false, code: "GOOGLE_AUTH_UNAVAILABLE", message: "Google sign-in temporarily unavailable" });
             }
             console.error("authGoogle: idToken verification failed:", verr.code || verr.message);
-            return res.status(401).json({ message: "Invalid Google sign-in" });
+            return res.status(401).json({ success: false, code: "INVALID_GOOGLE_TOKEN", message: "Invalid Google sign-in" });
         }
+        logStage("verified");
         const email = claims.email;
         const uid = claims.uid;
         const existingUser = await sign.findUserByEmailAndUid(email, uid);
+        logStage("lookup");
         if (!existingUser)
-            return res.status(404).json({ message: "Invalid login credentials.", email, uid });
-        // SECURITY (Phase 1): identity-only JWT Ã¢â‚¬â€ no password hash inside.
+            return res.status(404).json({ success: false, code: "GOOGLE_NOT_REGISTERED", message: "Google account is not registered yet. Please sign up first." });
+        // SECURITY (Phase 1): identity-only JWT — no password hash inside.
         const payload = tokenPayloadFromUser(existingUser);
         const settings = await sign.getUserSettings(existingUser.Id_user);
-        res.json({ message: "Login successful", accessToken: generateToken(payload), userData: buildUserData(existingUser, settings) });
+        logStage("done");
+        res.json({ success: true, message: "Login successful", accessToken: generateToken(payload), userData: buildUserData(existingUser, settings) });
     } catch (err) {
-        console.error("Google login error:", err.message);
-        res.status(500).json({ message: "Internal server error" });
-    }
-});
-
-// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â³ÃƒËœÃ‚Â¬Ãƒâ„¢Ã…Â Ãƒâ„¢Ã¢â‚¬Å¾ ÃƒËœÃ‚Â­ÃƒËœÃ‚Â³ÃƒËœÃ‚Â§ÃƒËœÃ‚Â¨ ÃƒËœÃ‚Â¬ÃƒËœÃ‚Â¯Ãƒâ„¢Ã…Â ÃƒËœÃ‚Â¯
-app.post("/signup", async(req, res) => {
-    const { fullName, username, email, uid, password } = req.body;
-    if (!fullName || !username || !password)
-        return res.status(400).json({ message: "Please enter all fields" });
-
-    try {
-        const existsName = await sign.logup_user_check_fsp(fullName, username, password);
-        if (existsName) return res.status(409).json({ message: "Username already exists" });
-
-        const existingUser = await sign.findUserByEmailAndUid(email, uid);
-
-        if (existingUser) {
-            const payload = tokenPayloadFromUser(existingUser);
-            const settings =
-                await sign.getUserSettings(
-                    existingUser.Id_user
-                );
-            const userData = {
-                imgProfile: existingUser.imgProfile,
-                id: existingUser.Id_user,
-                name: existingUser.F_user,
-                username: existingUser.S_user,
-                Bio: existingUser.Bio,
-                followers: existingUser.followers,
-                following: existingUser.following,
-                IdPoster: existingUser.Posters,
-                settings
-            };
-            return res.json({ message: "Login successful", token: generateToken(payload), userData });
+        if (isDbAccessError(err)) {
+            console.warn("authGoogle degraded (datastore access error):", err.code || err.message);
+            return res.status(503).json({ success: false, code: "SERVICE_UNAVAILABLE", message: "Temporary server issue, please try again" });
         }
-
-        const uniqueId = generateUniqueId();
-        const user = await sign.logup_user_Insert(fullName, username, email, uid, uniqueId, password);
-        // SECURITY (Phase 1): the plaintext password is never signed into a JWT.
-        const token = generateToken(tokenPayloadFromUser(user));
-        const userData = {
-            imgProfile: user.imgProfile,
-            id: user.Id_user,
-            name: user.F_user,
-            username: user.S_user,
-            Bio: user.Bio,
-            followers: user.followers,
-            following: user.following,
-            IdPoster: user.Posters,
-            settings: user.settings
-        };
-
-        res.status(201).json({ message: "Signup successful", token, userData });
-    } catch (err) {
-        console.error("Signup error:", err);
-        res.status(500).json({ message: "Internal server error" });
+        console.error("username/available error:", err.message);
+        // Informational endpoint: failures must not block the signup form.
+        res.json({ success: false, available: null, message: "Availability check unavailable" });
     }
 });
 
 // ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ ÃƒËœÃ‚ÂªÃƒËœÃ‚Â­Ãƒâ„¢Ã¢â‚¬Å¡Ãƒâ„¢Ã¢â‚¬Å¡ Ãƒâ„¢Ã¢â‚¬Â¦Ãƒâ„¢Ã¢â‚¬Â  ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Å¾Ãƒâ„¢Ã¢â€šÂ¬ Token
 app.post("/auth", (req, res) => {
     if (!req.headers.authorization?.startsWith("Bearer "))
-        return res.status(401).json({ message: "No token provided" });
+        return res.status(401).json({ success: false, message: "No token provided" });
 
     const token = req.headers.authorization.split(" ")[1];
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err, decoded) => {
-        if (err) return res.status(403).json({ message: "Invalid token" });
+        if (err) return res.status(401).json({ success: false, message: "Token expired, please sign in again" });
         // SECURITY (Phase 1): /auth no longer re-derives identity from a hash.
         // New tokens carry { id, name, username }; the user record is loaded
         // fresh from the DB. Legacy tokens (with `pass`) are rejected with a
         // clear message so the client re-authenticates ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the ONLY behavior
         // change, required to retire hash-bearing tokens.
-        if (!decoded || decoded.id == null) return res.status(403).json({ message: "Invalid token" });
+        if (!decoded || decoded.id == null) return res.status(401).json({ success: false, message: "Token expired, please sign in again" });
         if (decoded.pass !== undefined) {
-            return res.status(401).json({ message: "Token expired, please sign in again" });
+            return res.status(401).json({ success: false, message: "Token expired, please sign in again" });
         }
         try {
             const user = await DaoForDbUser.findbyID(decoded.id);
-            if (!user) return res.status(403).json({ message: "Invalid token" });
+            if (!user) return res.status(401).json({ success: false, message: "Token expired, please sign in again" });
             if (String(user.accountState || "active") === "banned") {
-                return res.status(403).json({ message: "Account banned" });
+                return res.status(403).json({ success: false, message: "Account banned" });
             }
             const settings =
                 await sign.getUserSettings(
@@ -930,8 +1079,28 @@ app.post("/auth", (req, res) => {
                 IdPoster: user.Posters,
                 settings
             };
-            res.json({ valid: true, userData });
+            res.json({ success: true, valid: true, userData });
         } catch (err) {
+            // Datastore ACCESS failure while assembling the profile: the session
+            // itself is valid (JWT verified, user record loaded). Never report a
+            // 500 here — the frontend must treat this as a retryable server
+            // error WITH session preserved, not as an auth rejection.
+            if (isDbAccessError(err)) {
+                console.warn("POST /auth degraded (datastore access error):", err.code || err.message);
+                const userData = {
+                    imgProfile: user.imgProfile,
+                    id: user.Id_user,
+                    name: user.F_user,
+                    username: user.S_user,
+                    Bio: user.Bio,
+                    followers: user.followers,
+                    following: user.following,
+                    IdPoster: user.Posters,
+                    settings: null,
+                };
+                return res.json({ valid: true, userData, degraded: true });
+            }
+            console.error("POST /auth error:", err.message);
             res.status(500).json({ message: "Error fetching user data" });
         }
     });
@@ -1674,16 +1843,28 @@ app.get(
     requireUser,
     async(req, res) => {
         try {
+            // Degraded mode: datastore access failed in requireUser — return the
+            // existing settings defaults rather than a 500 (which the frontend
+            // must NEVER interpret as "session expired").
+            if (req.dbDegraded || !req.userProfile) {
+                return res.json({ appearance: {}, notifications: {}, reading: {}, creator: {}, profile: {}, degraded: true });
+            }
 
             const settings =
                 await sign.getUserSettings(
                     req.user.id
                 );
-console.log("Fetched settings for user", req.user.id, ":", settings);
-            res.json(settings);
+
+            // getUserSettings returns null for a missing profile — serve defaults
+            // instead of serializing null (frontend expects an object).
+            res.json(settings || { appearance: {}, notifications: {}, reading: {}, creator: {}, profile: {} });
 
         } catch (err) {
-
+            if (isDbAccessError(err)) {
+                // Never 500 on a datastore access problem — degrade gracefully.
+                console.warn("GET /settings degraded:", err.code || err.message);
+                return res.json({ appearance: {}, notifications: {}, reading: {}, creator: {}, profile: {}, degraded: true });
+            }
             console.error("GET /settings error:", err.message);
             res.status(500).json({
                 error: err.message
@@ -2378,7 +2559,21 @@ app.get(
             const cached = await cacheGet("audiohub:trending");
             if (cached) return res.json({ status: "ok", items: cached });
 
-            const snap = await get(ref(db, AUDIOHUB_ROOT));
+            // Datastore access failure (rules/network outage) — an external store
+            // being down must NEVER crash this endpoint. Frontend contract:
+            // { status: "ok", items: [...] } with an empty array as the empty state.
+            if (req.dbDegraded) return res.json({ status: "ok", items: [], degraded: true });
+
+            let snap;
+            try {
+                snap = await get(ref(db, AUDIOHUB_ROOT));
+            } catch (dbErr) {
+                if (isDbAccessError(dbErr)) {
+                    console.warn("GET /audio-hub/trending degraded (datastore access error):", dbErr.code || dbErr.message);
+                    return res.json({ status: "ok", items: [], degraded: true });
+                }
+                throw dbErr;
+            }
             if (!snap.exists()) return res.json({ status: "ok", items: [] });
             const all = snap.val() || {};
             const counts = new Map();
@@ -2397,8 +2592,11 @@ app.get(
             await cacheSet("audiohub:trending", items, 300);
             res.json({ status: "ok", items });
         } catch (err) {
+            // Genuine unexpected server error — still logged loudly, never hidden,
+            // but never fabricate data. Return a structured error the frontend
+            // treats as "Audio Hub unavailable" (NOT an auth failure).
             console.error("GET /audio-hub/trending error:", err.message);
-            res.status(500).json({ error: err.message });
+            res.status(503).json({ status: "error", error: "TRENDING_UNAVAILABLE", items: [] });
         }
     }
 );
@@ -3189,6 +3387,18 @@ try {
     // Fail-safe: an admin module problem must never take the platform down.
     console.error("Control Center admin module failed to mount:", adminErr.message);
 }
+
+// ======================================================
+// PROCESS RESILIENCE — a failure in an optional subsystem
+// (content engine, socket handler, moderation seed) must
+// never take the whole HTTP server down.
+// ======================================================
+process.on("uncaughtException", (err) => {
+    console.error("uncaughtException (server kept alive):", err && (err.stack || err.message));
+});
+process.on("unhandledRejection", (reason) => {
+    console.error("unhandledRejection (server kept alive):", reason && (reason.stack || reason.message || reason));
+});
 
 // ======================================================
 // START SERVER

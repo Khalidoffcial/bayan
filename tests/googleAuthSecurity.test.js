@@ -21,7 +21,7 @@ const feSvc = fs.readFileSync(
 
 console.log("Server-side verification:");
 t("/authGoogle requires idToken (no idToken → 400)", () => {
-    assert.ok(src.includes('if (!idToken) return res.status(400).json({ message: "Missing idToken" })'));
+    assert.ok(src.includes('if (!idToken) return res.status(400).json({ success: false, code: "VALIDATION_ERROR", message: "Missing idToken" })'));
 });
 t("/authGoogle verifies idToken BEFORE any user lookup/JWT", () => {
     const route = src.slice(src.indexOf('app.post("/authGoogle"'), src.indexOf('app.post("/authGoogle"') + 3000);
