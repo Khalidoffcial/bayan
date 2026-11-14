@@ -204,6 +204,29 @@ tAsync("findExistingDuplicates detects two profiles sharing one normalized name"
     assert.strictEqual(duplicates[0].users.length, 2);
 });
 
+console.log("\n── Signup concurrency semantics (static, route source) ──");
+t("EMAIL_TAKEN takes priority over username reservation (no orphan on duplicate email)", () => {
+    const route = src.slice(src.indexOf('app.post("/signup"'), src.indexOf('app.post("/username/available"'));
+    assert.ok(route.indexOf("findbyEmail(emailNorm)") < route.indexOf("reserveUsername(usernameKey"),
+        "email dedupe check must run BEFORE the username reservation");
+});
+t("USERNAME_TAKEN short-circuits BEFORE any profile write", () => {
+    const route = src.slice(src.indexOf('app.post("/signup"'), src.indexOf('app.post("/username/available"'));
+    assert.ok(route.indexOf('code: "USERNAME_TAKEN"') < route.indexOf("logup_user_Insert("),
+        "409 USERNAME_TAKEN must be returned before logup_user_Insert is reachable");
+});
+t("reservation rollback is owner-scoped (never another user's reservation)", () => {
+    const svcSrc = usernameSvcSrc;
+    assert.ok(svcSrc.includes("releaseUsernameIfOwner"));
+    assert.ok(svcSrc.includes("String(current.uid) === String(uid)"));
+});
+t("duplicate-email retry path does NOT reserve a new username", () => {
+    const route = src.slice(src.indexOf('app.post("/signup"'), src.indexOf('app.post("/username/available"'));
+    const emailBlockEnd = route.indexOf("return res.status(409).json({ success: false, code: \"EMAIL_TAKEN\"");
+    const reserveBlock = route.indexOf("reserveUsername(usernameKey, uniqueId)");
+    assert.ok(emailBlockEnd > 0 && reserveBlock > emailBlockEnd);
+});
+
 console.log("\n── Legacy-token rejection ──");
 t("a legacy hash-bearing token is refused by requireUser contract (static)", () => {
     assert.ok(src.includes("decoded.pass !== undefined"));
