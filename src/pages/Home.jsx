@@ -55,7 +55,7 @@ export const HomePage = () => {
 
     setAuthState("restoring");
     axios
-      .post(API_ENDPOINTS.AUTH, {}, { headers: { Authorization: "Bearer " + token } })
+      .post(API_ENDPOINTS.AUTH, {}, { headers: { Authorization: "Bearer " + token }, timeout: 10000 })
       .then((res) => {
         if (cancelled) return;
         if (res.status === 200 && res.data?.userData) {
@@ -70,15 +70,16 @@ export const HomePage = () => {
       .catch((err) => {
         if (cancelled) return;
         const status = err?.response?.status;
-        if (status === 401 || status === 403) {
+        const isAuthRejection =
+          status === 401 ||
+          (status === 403 && !err?.response?.data?.degraded);
+        if (isAuthRejection) {
           // CONFIRMED invalid/expired/banned → clear stale local profile, redirect
-          if (status === 403 || (err?.response?.data?.message || "").toLowerCase().includes("expired")) {
-            localStorage.removeItem("me");
-          }
+          localStorage.removeItem("me");
           setAuthState("unauthenticated");
           goWelcome();
         } else {
-          // Network/server error — session is NOT dead. Recoverable error UI.
+          // Network/server error/timeout — session is NOT dead. Recoverable error UI.
           setAuthState("error");
         }
       });

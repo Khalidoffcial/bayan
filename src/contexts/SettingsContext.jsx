@@ -181,8 +181,12 @@ export const SettingsProvider = ({ children }) => {
         }
       );
     } catch (error) {
-      // If 401 Unauthorized (expired/invalid token), clean up stale session token gracefully
-      if (error?.response?.status === 401) {
+      // Only a CONFIRMED auth rejection may touch the session.
+      // 5xx / network errors are server-side problems: keep the session and
+      // the saved settings — the context simply stays on local defaults and
+      // the user can retry. A 500 from /settings must NEVER log the user out.
+      const status = error?.response?.status;
+      if (status === 401 || status === 403) {
         cookie("remove");
       } else {
         console.error("Load settings error:", error);

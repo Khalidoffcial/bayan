@@ -10,7 +10,7 @@ const uploadImagesLazy = async (images) => {
 };
 
 export const saveArticleOrNovel = async (payload) => {
-  const token = cookie("get") || localStorage.getItem("token");
+  const token = cookie("get");
   const headers = token ? { Authorization: "Bearer " + token } : {};
 
   const response = await axios.post(
@@ -22,7 +22,7 @@ export const saveArticleOrNovel = async (payload) => {
 };
 
 export const saveIdeaPost = async (payload) => {
-  const token = cookie("get") || localStorage.getItem("token");
+  const token = cookie("get");
   const headers = token ? { Authorization: "Bearer " + token } : {};
 
   const response = await axios.post(

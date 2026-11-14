@@ -22,7 +22,7 @@ const LandingPage = () => {
 
   // زيّر مسجل؟ → الرئيسية مباشرة (فحص هادئ بلا toast)
   useEffect(() => {
-    const token = cookie("get") || localStorage.getItem("token") || localStorage.getItem("Token");
+    const token = cookie("get");
     if (!token) return;
     let alive = true;
     import("../../features/auth/services/auth.service").then(({ verifyAuthToken }) =>

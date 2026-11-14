@@ -7,10 +7,12 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  // Hard timeout for every API call — a hung request must never freeze the UI.
+  timeout: 15000,
 });
 
 apiClient.interceptors.request.use((config) => {
-  const token = cookie("get") || localStorage.getItem("token") || localStorage.getItem("Token");
+  const token = cookie("get"); // unified resolver (localStorage/cookie/sessionStorage + legacy)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
